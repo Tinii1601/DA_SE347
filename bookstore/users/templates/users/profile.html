@@ -1,0 +1,31 @@
+<!-- users/templates/users/profile.html -->
+{% extends 'base.html' %}
+{% block title %}Hồ sơ cá nhân{% endblock %}
+
+{% block content %}
+<h1>Hồ sơ của bạn</h1>
+<div class="row">
+  <div class="col-md-4 text-center">
+    {% if request.user.profile.avatar %}
+      <img src="{{ request.user.profile.avatar.url }}" class="rounded-circle" width="150" height="150" alt="Avatar">
+    {% else %}
+      <div class="bg-secondary rounded-circle d-inline-block" style="width:150px;height:150px;"></div>
+    {% endif %}
+    <h5 class="mt-3">{{ request.user.get_full_name|default:request.user.username }}</h5>
+    <p>{{ request.user.email }}</p>
+  </div>
+  <div class="col-md-8">
+    <h4>Địa chỉ giao hàng</h4>
+    <a href="{% url 'address_add' %}" class="btn btn-sm btn-primary mb-3">Thêm địa chỉ</a>
+    {% for addr in addresses %}
+    <div class="border p-3 mb-2 rounded">
+      <p><strong>{{ addr.full_name }}</strong> - {{ addr.phone }}</p>
+      <p>{{ addr.address_line }}, {{ addr.ward }}, {{ addr.district }}, {{ addr.city }}</p>
+      {% if addr.is_default %}<span class="badge bg-success">Mặc định</span>{% endif %}
+    </div>
+    {% empty %}
+    <p class="text-muted">Chưa có địa chỉ nào.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

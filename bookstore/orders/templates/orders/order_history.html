@@ -1,0 +1,22 @@
+<!-- orders/templates/orders/order_history.html -->
+{% extends 'base.html' %}
+{% block title %}Lịch sử đơn hàng{% endblock %}
+
+{% block content %}
+<h1>Lịch sử đơn hàng</h1>
+{% for order in orders %}
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between">
+    <span>Đơn hàng #{{ order.order_number }}</span>
+    <span class="badge bg-{{ order.status|yesno:'success,warning,secondary' }}">{{ order.get_status_display }}</span>
+  </div>
+  <div class="card-body">
+    <p>Ngày đặt: {{ order.created_at|date:"d/m/Y H:i" }}</p>
+    <p>Tổng tiền: <strong>{{ order.total_amount|floatformat:0 }}₫</strong></p>
+    <p>Phương thức: {{ order.payment.get_method_display }}</p>
+  </div>
+</div>
+{% empty %}
+<p class="text-center text-muted">Chưa có đơn hàng nào.</p>
+{% endfor %}
+{% endblock %}

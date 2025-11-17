@@ -1,0 +1,25 @@
+<!-- users/templates/users/address_form.html -->
+{% extends 'base.html' %}
+{% block title %}Thêm địa chỉ{% endblock %}
+
+{% block content %}
+<h1>Thêm địa chỉ giao hàng</h1>
+<form method="post">
+  {% csrf_token %}
+  <div class="row g-3">
+    <div class="col-md-6">{{ form.full_name }}</div>
+    <div class="col-md-6">{{ form.phone }}</div>
+    <div class="col-12">{{ form.address_line }}</div>
+    <div class="col-md-4">{{ form.ward }}</div>
+    <div class="col-md-4">{{ form.district }}</div>
+    <div class="col-md-4">{{ form.city }}</div>
+    <div class="col-12">
+      <div class="form-check">
+        {{ form.is_default }}
+        <label class="form-check-label">Đặt làm địa chỉ mặc định</label>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary mt-3">Lưu địa chỉ</button>
+</form>
+{% endblock %}

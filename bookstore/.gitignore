@@ -1,0 +1,7 @@
+# Bảo mật – QUAN TRỌNG NHẤT
+.env
+.env.*
+
+# Database – không bao giờ commit
+db.sqlite3
+db.sqlite3-journal

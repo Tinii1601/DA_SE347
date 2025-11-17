@@ -1,0 +1,32 @@
+<!-- orders/templates/orders/checkout.html -->
+{% extends 'base.html' %}
+{% block title %}Thanh toán{% endblock %}
+
+{% block content %}
+<h1>Thanh toán đơn hàng</h1>
+<form method="post">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-8">
+      <h5>Phương thức thanh toán</h5>
+      <div class="border p-3 mb-3">
+        {{ form.payment_method }}
+      </div>
+      <h5>Ghi chú</h5>
+      {{ form.note }}
+      {{ form.coupon_code }}
+    </div>
+    <div class="col-md-4">
+      <div class="border p-3">
+        <h5>Tóm tắt đơn hàng</h5>
+        <p>Tạm tính: 500,000₫</p>
+        <p>Phí ship: 30,000₫</p>
+        <p>Giảm giá: 0₫</p>
+        <hr>
+        <p class="h5">Tổng: <strong class="text-danger">530,000₫</strong></p>
+      </div>
+      <button type="submit" class="btn btn-success w-100 mt-3">Xác nhận thanh toán</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

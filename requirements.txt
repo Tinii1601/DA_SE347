@@ -1,0 +1,4 @@
+cloudinary
+django-cloudinary-storage
+django
+python-decouple

@@ -1,0 +1,9 @@
+title,author,publisher,isbn,description,price,discount_price,stock,category,published_year,pages,image_file
+"Nhà Giả Kim","Paulo Coelho","NXB Trẻ","9786041123456","Hành trình theo đuổi giấc mơ của cậu bé chăn cừu.",89000,75000,50,"Văn học nước ngoài",1988,208,"nha-gia-kim.jpg"
+"Đắc Nhân Tâm","Dale Carnegie","NXB Tổng hợp","9786045893456","Nghệ thuật giao tiếp và ứng xử.",99000,85000,30,"Kỹ năng sống",1936,320,"dac-nhan-tam.jpg"
+"Tôi Thấy Hoa Vàng Trên Cỏ Xanh","Nguyễn Nhật Ánh","NXB Trẻ","9786041121234","Tuổi thơ trong trẻo và buồn vui.",95000,79000,100,"Văn học Việt Nam",2010,356,"toi-thay-hoa-vang.jpg"
+"Atomic Habits","James Clear","NXB Lao Động","9786045899012","Thay đổi nhỏ, kết quả lớn.",139000,119000,60,"Kỹ năng sống",2018,320,"atomic-habits.jpg"
+"Sapiens: Lược Sử Loài Người","Yuval Noah Harari","NXB Thế Giới","9786047789456","Hành trình từ thời tiền sử đến hiện đại.",169000,149000,25,"Lịch sử",2011,512,"sapiens.jpg"
+"Dế Mèn Phiêu Lưu Ký","Tô Hoài","NXB Kim Đồng","9786042015678","Hành trình của chú dế mèn.",45000,,80,"Sách thiếu nhi",1941,160,"de-men.jpg"
+"Cà Phê Cùng Tony","Tony Buổi Sáng","NXB Trẻ","9786041126787","Tản văn hài hước về khởi nghiệp.",89000,69000,45,"Kinh doanh",2014,280,"ca-phe-cung-tony.jpg"
+"Harry Potter và Hòn Đá Phù Thủy","J.K. Rowling","NXB Trẻ","9786041129012","Tập 1 series phù thủy nổi tiếng.",129000,109000,90,"Khoa học viễn tưởng",1997,336,"harry-potter.jpg"

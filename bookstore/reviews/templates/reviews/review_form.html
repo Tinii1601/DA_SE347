@@ -1,0 +1,21 @@
+<!-- reviews/templates/reviews/review_form.html -->
+{% extends 'base.html' %}
+{% block title %}Viết đánh giá{% endblock %}
+
+{% block content %}
+<h1>Viết đánh giá cho: {{ form.instance.book.title }}</h1>
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label>Đánh giá của bạn</label>
+    <div class="d-flex gap-2">
+      {{ form.rating }}
+    </div>
+  </div>
+  <div class="mb-3">
+    <label>Nội dung đánh giá</label>
+    {{ form.comment }}
+  </div>
+  <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+</form>
+{% endblock %}

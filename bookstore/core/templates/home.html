@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Trang chủ{% endblock %}
+{% block content %}
+  <h1>Sách mới</h1>
+  <div class="row">
+    {% for book in new_books %}
+      <div class="col-md-3 mb-4">
+        <a href="{% url 'book_detail' book.slug %}">
+          {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" class="img-fluid" alt="{{ book.title }}" loading="lazy">
+          {% else %}
+            <div class="bg-light p-5">No image</div>
+          {% endif %}
+        </a>
+        <h5>{{ book.title }}</h5>
+        <p>{{ book.get_final_price }}₫</p>
+      </div>
+    {% endfor %}
+  </div>
+  <!-- Tương tự cho best_sellers -->
+{% endblock %}

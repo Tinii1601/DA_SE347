@@ -1,0 +1,35 @@
+<!-- books/templates/books/search.html -->
+{% extends 'base.html' %}
+{% block title %}Tìm kiếm sách{% endblock %}
+
+{% block content %}
+<h1>Tìm kiếm sách</h1>
+
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-6">
+    {{ form.q }}
+  </div>
+  <div class="col-md-4">
+    {{ form.category }}
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Tìm</button>
+  </div>
+</form>
+
+<div class="row">
+  {% for book in books %}
+  <div class="col-6 col-md-3 mb-4">
+    <a href="{% url 'book_detail' book.slug %}">
+      {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" class="img-fluid rounded" loading="lazy" style="height: 200px; object-fit: cover;">
+      {% endif %}
+    </a>
+    <h6 class="mt-2 text-truncate">{{ book.title }}</h6>
+    <p class="small text-muted">{{ book.author }}</p>
+  </div>
+  {% empty %}
+  <p class="text-center text-muted">Không tìm thấy kết quả nào.</p>
+  {% endfor %}
+</div>
+{% endblock %}

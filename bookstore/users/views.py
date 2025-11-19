@@ -1,6 +1,6 @@
 # users/views.py
 from django.views.generic import FormView, TemplateView, CreateView
-from django.contrib.auth.views import LoginView as AuthLoginView
+from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import RegistrationForm, LoginForm, AddressForm
 from django.contrib.auth import login
@@ -35,6 +35,9 @@ class RegisterView(FormView):
 class LoginView(AuthLoginView):
     template_name = 'users/login.html'
     form_class = LoginForm
+
+class LogoutView(AuthLogoutView):
+    next_page = reverse_lazy('core:home')
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/profile.html'

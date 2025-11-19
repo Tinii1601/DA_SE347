@@ -20,7 +20,7 @@
 <div class="row">
   {% for book in books %}
   <div class="col-6 col-md-3 mb-4">
-    <a href="{% url 'book_detail' book.slug %}">
+    <a href="{% url 'books:book_detail' book.slug %}">
       {% if book.cover_image %}
         <img src="{{ book.cover_image.url }}" class="img-fluid rounded" loading="lazy" style="height: 200px; object-fit: cover;">
       {% endif %}

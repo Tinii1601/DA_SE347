@@ -7,6 +7,6 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['new_books'] = Book.objects.filter(is_active=True).order_by('-created_at')[:10]
-        context['best_sellers'] = Book.objects.filter(is_active=True).order_by('-price')[:5]
+        context['new_books'] = Book.objects.filter(is_active=True).prefetch_related('reviews').order_by('-created_at')[:10]
+        context['best_sellers'] = Book.objects.filter(is_active=True).prefetch_related('reviews').order_by('-price')[:5]
         return context

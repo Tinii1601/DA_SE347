@@ -4,16 +4,48 @@
   <h1>Sách mới</h1>
   <div class="row">
     {% for book in new_books %}
-      <div class="col-md-3 mb-4">
-        <a href="{% url 'book_detail' book.slug %}">
-          {% if book.cover_image %}
-            <img src="{{ book.cover_image.url }}" class="img-fluid" alt="{{ book.title }}" loading="lazy">
-          {% else %}
-            <div class="bg-light p-5">No image</div>
-          {% endif %}
-        </a>
-        <h5>{{ book.title }}</h5>
-        <p>{{ book.get_final_price }}₫</p>
+      <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <div class="card book-card">
+          <a href="{% url 'books:book_detail' book.slug %}">
+            {% if book.cover_image %}
+              <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center bg-light" style="height: 350px;">
+                <span class="text-muted">No Image</span>
+              </div>
+            {% endif %}
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text">{{ book.author }}</p>
+            {% with rating_info=book.get_average_rating %}
+              {% if rating_info.count > 0 %}
+                <div class="d-flex align-items-center mb-2">
+                  <div class="text-warning">
+                    {% with avg_int=rating_info.average|floatformat:0 %}
+                      {% for i in "12345" %}
+                        {% if i <= avg_int %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    {% endwith %}
+                  </div>
+                  <span class="ms-2 text-muted" style="font-size: 0.8rem;">({{ rating_info.count }} đánh giá)</span>
+                </div>
+              {% else %}
+                <div class="d-flex align-items-center mb-2" style="height: 24px;">
+                  <span class="text-muted" style="font-size: 0.8rem;">Chưa có đánh giá</span>
+                </div>
+              {% endif %}
+            {% endwith %}
+            <p class="price">{{ book.get_final_price|floatformat:0 }}₫</p>
+          </div>
+          <div class="card-footer bg-transparent border-top-0">
+              <a href="#" class="btn btn-primary w-100">Thêm vào giỏ</a>
+          </div>
+        </div>
       </div>
     {% endfor %}
   </div>

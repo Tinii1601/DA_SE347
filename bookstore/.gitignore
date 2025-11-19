@@ -6,9 +6,6 @@
 db.sqlite3
 db.sqlite3-journal
 
-# Thư mục media chứa file upload – không bao giờ commit
-media/
-
 real_covers/
 
 import_data.py

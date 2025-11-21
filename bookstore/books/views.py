@@ -1,19 +1,41 @@
 # books/views.py
 from django.views.generic import ListView, DetailView
-from .models import Book
+from django.shortcuts import get_object_or_404
+from .models import Book, Category
 from .forms import BookSearchForm
 
 class BookListView(ListView):
     model = Book
     template_name = 'books/book_list.html'
     context_object_name = 'books'
-    queryset = Book.objects.filter(is_active=True)
+    paginate_by = 12
+
+    def get_queryset(self):
+        queryset = Book.objects.filter(is_active=True).select_related('category')
+        category_slug = self.kwargs.get('category_slug')
+        if category_slug:
+            category = get_object_or_404(Category, slug=category_slug)
+            # Lấy ID của category hiện tại và tất cả các con của nó
+            category_ids = category.get_descendants_and_self_ids()
+            # Lọc sách thuộc bất kỳ danh mục nào trong danh sách ID
+            queryset = queryset.filter(category_id__in=category_ids)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = None
+        category_slug = self.kwargs.get('category_slug')
+        if category_slug:
+            context['category'] = get_object_or_404(Category, slug=category_slug)
+        return context
+
 
 class BookDetailView(DetailView):
     model = Book
     template_name = 'books/book_detail.html'
     context_object_name = 'book'
     slug_field = 'slug'
+
 
 class BookSearchView(ListView):
     model = Book

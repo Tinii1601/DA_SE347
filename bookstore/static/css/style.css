@@ -93,3 +93,16 @@ main>.container {
     background-color: #0b5ed7;
     border-color: #0a58ca;
 }
+
+/* Custom search form width */
+.navbar-search-form {
+    width: 300px;
+    /* Default width */
+}
+
+@media (min-width: 992px) {
+    .navbar-search-form {
+        width: 400px;
+        /* Wider on larger screens */
+    }
+}

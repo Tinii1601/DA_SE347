@@ -1,9 +1,32 @@
-title,author,publisher,isbn,description,price,discount_price,stock,category,published_year,pages,image_file
-"Nhà Giả Kim","Paulo Coelho","NXB Trẻ","9786041123456","Hành trình theo đuổi giấc mơ của cậu bé chăn cừu.",89000,75000,50,"Văn học nước ngoài",1988,208,"nha-gia-kim.jpg"
-"Đắc Nhân Tâm","Dale Carnegie","NXB Tổng hợp","9786045893456","Nghệ thuật giao tiếp và ứng xử.",99000,85000,30,"Kỹ năng sống",1936,320,"dac-nhan-tam.jpg"
-"Tôi Thấy Hoa Vàng Trên Cỏ Xanh","Nguyễn Nhật Ánh","NXB Trẻ","9786041121234","Tuổi thơ trong trẻo và buồn vui.",95000,79000,100,"Văn học Việt Nam",2010,356,"toi-thay-hoa-vang.jpg"
-"Atomic Habits","James Clear","NXB Lao Động","9786045899012","Thay đổi nhỏ, kết quả lớn.",139000,119000,60,"Kỹ năng sống",2018,320,"atomic-habits.jpg"
-"Sapiens: Lược Sử Loài Người","Yuval Noah Harari","NXB Thế Giới","9786047789456","Hành trình từ thời tiền sử đến hiện đại.",169000,149000,25,"Lịch sử",2011,512,"sapiens.jpg"
-"Dế Mèn Phiêu Lưu Ký","Tô Hoài","NXB Kim Đồng","9786042015678","Hành trình của chú dế mèn.",45000,,80,"Sách thiếu nhi",1941,160,"de-men.jpg"
-"Cà Phê Cùng Tony","Tony Buổi Sáng","NXB Trẻ","9786041126787","Tản văn hài hước về khởi nghiệp.",89000,69000,45,"Kinh doanh",2014,280,"ca-phe-cung-tony.jpg"
-"Harry Potter và Hòn Đá Phù Thủy","J.K. Rowling","NXB Trẻ","9786041129012","Tập 1 series phù thủy nổi tiếng.",129000,109000,90,"Khoa học viễn tưởng",1997,336,"harry-potter.jpg"
+title,author,price,discount_price,stock,category,description,isbn,published_year,pages,image_file
+"Đắc Nhân Tâm","Dale Carnegie",99000,85000,45,"Kỹ năng sống - Sống đẹp","Nghệ thuật ứng xử và giao tiếp",9786041183456,1936,320,dac-nhan-tam.jpg
+"Nhà Giả Kim","Paulo Coelho",89000,75000,60,"Văn Học","Hành trình theo đuổi giấc mơ",9786041123456,1988,208,nha-gia-kim.jpg
+"Tôi Thấy Hoa Vàng Trên Cỏ Xanh","Nguyễn Nhật Ánh",120000,105000,80,"Văn Học","Tuổi thơ trong trẻo",9786041121234,2010,376,toi-thay-hoa-vang.jpg
+"Cho Tôi Xin Một Vé Đi Tuổi Thơ","Nguyễn Nhật Ánh",115000,98000,70,"Văn Học","Những ngày tháng không thể quên",9786041127890,2008,312,cho-toi-xin-mot-ve.jpg
+"Cà Phê Cùng Tony","Tony Buổi Sáng",89000,69000,55,"Kỹ năng sống - Sống đẹp","Khởi nghiệp và tư duy trẻ",9786041126787,2014,280,ca-phe-cung-tony.jpg
+"Tuổi Trẻ Đáng Giá Bao Nhiêu","Rosie Nguyễn",95000,79000,65,"Kỹ năng sống - Sống đẹp","Hành trình trưởng thành",9786041129012,2018,248,tuoi-tre-dang-gia.jpg
+"Sài Gòn Đẹp Xưa","Phạm Công Luận",135000,115000,40,"Lịch Sử - Địa Lý","Ký ức Sài Gòn xưa",9786041134567,2020,380,ngay-xua-o-sai-gon.jpg
+"Người Việt Cao Quý","A. Pazzi Vũ Hạnh",75000,65000,50,"Văn Học","Tác phẩm kinh điển",9786041145678,1936,280,nguoi-viet-cao-quy.jpg
+
+"Atomic Habits","James Clear",189000,159000,90,"Non-fiction","Tiny changes, remarkable results",9780735211290,2018,320,atomic-habits.jpg
+"Sapiens","Yuval Noah Harari",219000,189000,55,"Non-fiction","A brief history of humankind",9780062316097,2015,512,sapiens-en.jpg
+"The Subtle Art of Not Giving a F*ck","Mark Manson",169000,139000,70,"Non-fiction","A counterintuitive approach",9780062457714,2016,224,subtle-art.jpg
+"Becoming","Michelle Obama",299000,259000,45,"Non-fiction","Memoir of the former First Lady",9781524763138,2018,448,becoming.jpg
+"Harry Potter and the Philosopher's Stone","J.K. Rowling",199000,169000,80,"Fiction","The beginning of magic",9780439708180,1997,336,harry-potter.jpg
+"The Book Thief","Markus Zusak",159000,129000,50,"Fiction","Narrated by Death",9780375842207,2005,552,book-thief.jpg
+"Where the Crawdads Sing","Delia Owens",179000,149000,65,"Fiction","A story of survival and love",9780735219093,2018,384,crawdads-sing.jpg
+"Thinking, Fast and Slow","Daniel Kahneman",219000,189000,40,"Non-fiction","How we think",9780374533557,2011,512,thinking-fast.jpg
+"The Intelligent Investor","Benjamin Graham",259000,219000,35,"Non-fiction","Warren Buffett's bible",9780060555665,1949,640,intelligent-investor.jpg
+
+"Chú Bé Mang Pyjama Sọc","John Boyne",89000,75000,60,"Children's Books","Câu chuyện cảm động",9786041134567,2006,216,pyjama-soc.jpg
+"Charlotte's Web","E.B. White",99000,85000,55,"Children's Books","Some pig",9780064400551,1952,192,charlottes-web.jpg
+"Matilda","Roald Dahl",119000,99000,65,"Children's Books","The girl with special powers",9780142414166,1988,240,matilda.jpg
+"The Gruffalo","Julia Donaldson",99000,85000,70,"Children's Books","A mouse took a stroll",9780333711170,1999,32,gruffalo.jpg
+
+"Hộp 20 cây bút bi Thiên Long","Thiên Long",105000,85000,500,"Bút - Viết","Bút bi viết mượt",8935001800012,2023,1,but-bi-tl.jpg
+"Bút Gel Bấm Bút Bi Nước Deli","Deli",8000,7000,400,"Bút - Viết","Mực gel cao cấp",8935001812345,2023,1,but-gel-sare.jpg
+"Bút Chì 2B Deli 58103","Deli",6000,5000,450,"Bút - Viết","Bút chì vẽ và viết",8935001823456,2023,1,but-chi-2b.jpg
+"Lốc 5 Cuốn Tập Kẻ Ngang Campus B5 Repete (200 Trang)","Campus",170000,136000,300,"Tập - Vở","Tập đại học",8935001845678,2023,200,tap-200trang.jpg
+"Sổ tay ghi chép A5 gáy xoắn 60 trang Deli","Deli",45000,39000,200,"Sổ & Giấy","Sổ ghi chép tiện dụng",8935001856789,2023,120,so-tay-gay-xoan.jpg
+"Thước Kẻ 30cm","Thiên Long",8000,7000,500,"Dụng Cụ Học Tập","Thước nhựa trong",8935001889012,2023,1,thuoc-ke.jpg
+"Hộp Đựng Bút Đa Năng Grepaco Bằng Vải Bố Canvas","Grepaco",69000,55000,250,"Hộp bút - Bóp viết","Hộp bút đa năng",8935001890123,2023,1,hop-but-vai.jpg

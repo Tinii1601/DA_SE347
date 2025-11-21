@@ -1,4 +1,4 @@
-cloudinary
-django-cloudinary-storage
 django
+Pillow
 python-decouple
+unidecode

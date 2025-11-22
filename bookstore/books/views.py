@@ -12,21 +12,43 @@ class BookListView(ListView):
 
     def get_queryset(self):
         queryset = Book.objects.filter(is_active=True).select_related('category')
+        
+        # Lọc theo danh mục
         category_slug = self.kwargs.get('category_slug')
         if category_slug:
             category = get_object_or_404(Category, slug=category_slug)
-            # Lấy ID của category hiện tại và tất cả các con của nó
             category_ids = category.get_descendants_and_self_ids()
-            # Lọc sách thuộc bất kỳ danh mục nào trong danh sách ID
             queryset = queryset.filter(category_id__in=category_ids)
+
+        # Sắp xếp
+        sort_by = self.request.GET.get('sort', '-created_at') # Mặc định là hàng mới
+        valid_sorts = [
+            'title', '-title', 
+            'price', '-price', 
+            '-created_at'
+        ]
+        if sort_by in valid_sorts:
+            queryset = queryset.order_by(sort_by)
+            
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = None
         category_slug = self.kwargs.get('category_slug')
+
         if category_slug:
-            context['category'] = get_object_or_404(Category, slug=category_slug)
+            category = get_object_or_404(Category, slug=category_slug)
+            context['category'] = category
+            context['subcategories'] = category.children.all()
+            context['breadcrumb'] = category.get_ancestors()
+        else:
+            # Nếu không có danh mục nào được chọn, hiển thị các danh mục cấp cao nhất
+            context['top_level_categories'] = Category.objects.filter(parent__isnull=True)
+        
+        # Giữ lại tham số sort khi chuyển trang
+        context['current_sort'] = self.request.GET.get('sort', '-created_at')
+        
         return context
 
 

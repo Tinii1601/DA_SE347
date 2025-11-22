@@ -1,46 +1,135 @@
 <!-- books/templates/books/book_list.html -->
-{% extends 'base.html' %}
-{% block title %}Danh sách sách{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if category %}
+        {{ category.name }}
+    {% else %}
+        Tất cả sách
+    {% endif %}
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-  <div class="col-md-6">
-    <h1>Tất cả sách</h1>
-  </div>
-  <div class="col-md-6 text-end">
-    <a href="{% url 'books:book_search' %}" class="btn btn-outline-primary">Tìm kiếm nâng cao</a>
-  </div>
-</div>
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'books:book_list' %}">Danh mục</a></li>
+            {% if category %}
+                {% for ancestor in breadcrumb %}
+                    <li class="breadcrumb-item"><a href="{% url 'books:category_detail' ancestor.slug %}">{{ ancestor.name }}</a></li>
+                {% endfor %}
+                <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+            {% endif %}
+        </ol>
+    </nav>
 
-<div class="row">
-  {% for book in books %}
-  <div class="col-6 col-md-4 col-lg-3 mb-4">
-    <div class="card h-100 shadow-sm">
-      <a href="{% url 'books:book_detail' book.slug %}">
-        {% if book.cover_image %}
-          <img src="{{ book.cover_image.url }}" 
-               class="card-img-top" 
-               alt="{{ book.title }}" 
-               loading="lazy" 
-               style="height: 300px; object-fit: cover;">
-        {% else %}
-          <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
-            <span class="text-muted">Không có ảnh</span>
-          </div>
-        {% endif %}
-      </a>
-      <div class="card-body d-flex flex-column">
-        <h6 class="card-title text-truncate">{{ book.title }}</h6>
-        <p class="text-muted small">Tác giả: {{ book.author }}</p>
-        <p class="text-danger fw-bold mt-auto">{{ book.get_final_price|floatformat:0 }}₫</p>
-        <a href="{% url 'books:book_detail' book.slug %}" class="btn btn-sm btn-primary">Xem chi tiết</a>
-      </div>
+    <div class="row">
+        <!-- Cột trái: Danh mục -->
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Danh mục</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% if category %}
+                        {# Đang ở trong một danh mục cụ thể, hiển thị các danh mục con #}
+                        {% for sub in subcategories %}
+                            <a href="{% url 'books:category_detail' sub.slug %}" class="list-group-item list-group-item-action">{{ sub.name }}</a>
+                        {% endfor %}
+                        {% if not subcategories and category.parent %}
+                             <a href="{% url 'books:category_detail' category.parent.slug %}" class="list-group-item list-group-item-action">&larr; Quay lại {{ category.parent.name }}</a>
+                        {% endif %}
+                    {% else %}
+                        {# Không ở trong danh mục nào, hiển thị các danh mục cấp cao nhất #}
+                        {% for cat in top_level_categories %}
+                            <a href="{% url 'books:category_detail' cat.slug %}" class="list-group-item list-group-item-action">{{ cat.name }}</a>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Danh sách sản phẩm và Sắp xếp -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    {% if category %}
+                        {{ category.name }}
+                    {% else %}
+                        Tất cả sản phẩm
+                    {% endif %}
+                </h2>
+                
+                <!-- Dropdown Sắp xếp -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sắp xếp theo
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item {% if current_sort == '-created_at' %}active{% endif %}" href="?sort=-created_at">Hàng mới</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'title' %}active{% endif %}" href="?sort=title">Tên: A-Z</a></li>
+                        <li><a class="dropdown-item {% if current_sort == '-title' %}active{% endif %}" href="?sort=-title">Tên: Z-A</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'price' %}active{% endif %}" href="?sort=price">Giá: Tăng dần</a></li>
+                        <li><a class="dropdown-item {% if current_sort == '-price' %}active{% endif %}" href="?sort=-price">Giá: Giảm dần</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Danh sách sản phẩm -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                {% for book in books %}
+                    <div class="col">
+                        {% include 'books/partials/book_card.html' with book=book %}
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <p class="text-center">Không tìm thấy sản phẩm nào.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Phân trang -->
+            {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                        {% endif %}
+
+                        {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                                <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}&sort={{ current_sort }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
     </div>
-  </div>
-  {% empty %}
-  <div class="col-12">
-    <p class="text-center text-muted">Không tìm thấy sách nào.</p>
-  </div>
-  {% endfor %}
 </div>
 {% endblock %}

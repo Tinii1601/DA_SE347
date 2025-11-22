@@ -55,6 +55,17 @@ class Category(models.Model):
             result.extend(child.get_descendants_and_self_ids())
         return result
 
+    def get_ancestors(self):
+        """
+        Trả về danh sách các danh mục cha, dùng cho breadcrumb.
+        """
+        ancestors = []
+        k = self.parent
+        while k is not None:
+            ancestors.append(k)
+            k = k.parent
+        return ancestors[::-1]  # Đảo ngược để có thứ tự từ gốc -> cha
+
 
 class Book(models.Model):
     title = models.CharField(max_length=255)

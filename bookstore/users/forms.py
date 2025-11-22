@@ -28,14 +28,24 @@ class RegistrationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
+        # Lấy email từ cleaned_data
+        email = self.cleaned_data['email']
+        user.email = email
+        
         if commit:
             user.save()
             # Tạo hoặc cập nhật UserProfile
             profile, created = UserProfile.objects.get_or_create(user=user)
             profile.phone = self.cleaned_data['phone']
+            profile.email = email  # Đồng bộ email vào profile
             profile.save()
         return user
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("Địa chỉ email này đã được sử dụng. Vui lòng chọn email khác.")
+        return email
 
 
 # ĐĂNG NHẬP

@@ -100,9 +100,43 @@ main>.container {
     /* Default width */
 }
 
-@media (min-width: 992px) {
-    .navbar-search-form {
-        width: 400px;
-        /* Wider on larger screens */
-    }
+/* Product Carousel for Home Page */
+.product-carousel-container {
+    position: relative;
 }
+
+.product-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 1rem;
+    /* Add some space for the scrollbar */
+    gap: 1rem;
+    /* Space between items */
+}
+
+/* Hide scrollbar */
+.product-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.product-carousel {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.product-carousel-item {
+    flex: 0 0 auto;
+    width: 24%;
+    /* Show 4 items, adjust as needed */
+    margin-right: 1%;
+}
+
+/* Add navigation buttons if you want */
+/* 
+.carousel-control-prev, .carousel-control-next {
+    ...
+}
+*/

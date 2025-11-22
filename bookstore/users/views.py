@@ -12,7 +12,7 @@ from .models import UserProfile, Address
 class RegisterView(FormView):
     template_name = 'users/register.html'
     form_class = RegistrationForm
-    success_url = reverse_lazy('login')  
+    success_url = reverse_lazy('users:login')  
 
     def form_valid(self, form):
         # Lưu user + profile

@@ -32,11 +32,11 @@
                     {% for parent_cat in parent_categories %}
                       <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
                         <h6 class="text-uppercase fw-bold">
-                          <a href="{% url 'books:book_list_by_category' parent_cat.slug %}" class="text-dark text-decoration-none">{{ parent_cat.name }}</a>
+                          <a href="{% url 'books:category_detail' parent_cat.slug %}" class="text-dark text-decoration-none">{{ parent_cat.name }}</a>
                         </h6>
                         <ul class="list-unstyled">
                           {% for child_cat in parent_cat.children.all %}
-                            <li><a href="{% url 'books:book_list_by_category' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
+                            <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
                           {% endfor %}
                         </ul>
                       </div>
@@ -99,7 +99,7 @@
   </header>
 
   <main class="flex-shrink-0">
-    <div class="container mt-4">
+    <div class="container">
       {% if messages %}
         <div class="messages">
           {% for message in messages %}

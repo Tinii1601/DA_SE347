@@ -3,6 +3,19 @@ from django import forms
 from .models import Order, Payment
 
 
+class CartAddProductForm(forms.Form):
+    quantity = forms.IntegerField(
+        min_value=1,
+        initial=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control text-center', 'style': 'width: 70px;'})
+    )
+    override = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.HiddenInput
+    )
+
+
 class CheckoutForm(forms.ModelForm):
     payment_method = forms.ChoiceField(
         choices=Payment.METHOD_CHOICES,

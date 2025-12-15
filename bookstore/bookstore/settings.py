@@ -17,6 +17,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1
 
 # ================== APPLICATIONS ==================
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,6 +58,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.categories_processor',
+                'orders.context_processors.cart',
             ],
         },
     },
@@ -105,6 +107,15 @@ LOGIN_URL = '/users/login/'
 
 # ================== SESSION & MESSAGES ==================
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+CART_SESSION_ID = 'cart'
 
 # ================== DEFAULT AUTO FIELD ==================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ================== MOMO PAYMENT CONFIG ==================
+MOMO_API_ENDPOINT = config('MOMO_API_ENDPOINT', default='https://test-payment.momo.vn/v2/gateway/api/create')
+MOMO_PARTNER_CODE = config('MOMO_PARTNER_CODE', default='')
+MOMO_ACCESS_KEY = config('MOMO_ACCESS_KEY', default='')
+MOMO_SECRET_KEY = config('MOMO_SECRET_KEY', default='')
+MOMO_RETURN_URL = config('MOMO_RETURN_URL', default='http://127.0.0.1:8000/orders/momo/return/')
+MOMO_NOTIFY_URL = config('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')

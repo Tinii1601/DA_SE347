@@ -130,3 +130,7 @@ class Book(models.Model):
         total_rating = sum(review.rating for review in reviews)
         average = total_rating / count
         return {'average': round(average, 1), 'count': count}
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('books:book_detail', args=[self.slug])

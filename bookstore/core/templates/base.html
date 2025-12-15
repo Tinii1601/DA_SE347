@@ -8,91 +8,216 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="{% static 'css/base.css' %}?v=1.1" rel="stylesheet">
+  <link href="{% static 'css/components.css' %}?v=1.1" rel="stylesheet">
+  <link href="{% static 'css/auth.css' %}?v=1.1" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="{% url 'core:home' %}">
-          <i class="bi bi-book-half"></i> Bookstore
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item dropdown position-static">
-              <a class="nav-link dropdown-toggle" href="#" id="megaMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-list"></i> Danh mục sản phẩm
-              </a>
-              <div class="dropdown-menu w-100 mt-0" aria-labelledby="megaMenuDropdown" style="border-top-left-radius: 0; border-top-right-radius: 0;">
-                <div class="container">
-                  <div class="row my-4">
-                    {% for parent_cat in parent_categories %}
-                      <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
-                        <h6 class="text-uppercase fw-bold">
-                          <a href="{% url 'books:category_detail' parent_cat.slug %}" class="text-dark text-decoration-none">{{ parent_cat.name }}</a>
-                        </h6>
-                        <ul class="list-unstyled">
-                          {% for child_cat in parent_cat.children.all %}
-                            <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
-                          {% endfor %}
-                        </ul>
-                      </div>
-                    {% endfor %}
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Về chúng tôi</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Liên hệ</a>
-            </li>
-          </ul>
-          <form class="d-flex navbar-search-form" action="{% url 'books:book_search' %}" method="get">
-            <input class="form-control me-2" type="search" name="q" placeholder="Tìm kiếm sách..." aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Tìm</button>
+  <!-- Desktop Header (md and up) -->
+  <header class="bg-lumiere text-white d-none d-md-block">
+    <!-- Top Header -->
+    <div class="container header-top">
+      <div class="row align-items-center">
+        <!-- Logo -->
+        <div class="col-md-3 text-start">
+          <a href="{% url 'core:home' %}" class="brand-logo">
+            The Lumière
+          </a>
+          <span class="brand-subtitle">BOOKSTORE</span>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="col-md-5">
+          <form action="{% url 'books:book_search' %}" method="get" class="position-relative d-flex align-items-center">
+            <input class="form-control search-bar" type="search" name="q" placeholder="Tìm kiếm..." aria-label="Search">
+            <button class="btn search-btn position-absolute end-0 me-1" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
           </form>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a href="{% url 'orders:cart_detail' %}" class="nav-link">
-                <i class="bi bi-cart-fill"></i> Giỏ hàng
-                <span class="badge bg-danger rounded-pill">{{ request.session.cart|length }}</span>
-              </a>
-            </li>
+        </div>
+
+        <!-- Utilities -->
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+          <div class="d-flex align-items-center me-3">
+            <i class="bi bi-brightness-high me-3" style="cursor: pointer;"></i>
+            <a href="#" class="utility-link">TRỢ GIÚP</a>
+            
             {% if user.is_authenticated %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-person-circle"></i> Chào, {{ user.username }}
+              <div class="dropdown d-inline">
+                <a class="utility-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{ user.username|upper }}
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="#">Tài khoản của tôi</a></li>
-                  <li><a class="dropdown-item" href="#">Lịch sử đơn hàng</a></li>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="#">Tài khoản</a></li>
+                  <li><a class="dropdown-item" href="{% url 'orders:order_history' %}">Lịch sử đơn hàng</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <form id="logout-form" action="{% url 'users:logout' %}" method="post" class="d-none">
                         {% csrf_token %}
                     </form>
-                    <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit();">
-                      <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                    </a>
+                    <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit();">Đăng xuất</a>
                   </li>
                 </ul>
-              </li>
+              </div>
             {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:login' %}">
-                  <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link btn btn-primary text-white" href="{% url 'users:register' %}">Đăng ký</a>
-              </li>
+              <a href="{% url 'users:login' %}" class="utility-link">ĐĂNG NHẬP</a>
             {% endif %}
-          </ul>
+          </div>
+          
+          <a href="{% url 'orders:cart_detail' %}" class="cart-icon ms-2">
+            <i class="bi bi-cart3"></i>
+            {% if cart|length > 0 %}
+              <span class="cart-badge">{{ cart|length }}</span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="container header-bottom">
+      <ul class="nav justify-content-start">
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom ps-0" href="{% url 'core:home' %}">Trang chủ</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="#">Về Lumière</a>
+        </li>
+        <li class="nav-item dropdown position-static">
+          <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="megaMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Sản phẩm
+          </a>
+          <div class="dropdown-menu w-100 mt-0" aria-labelledby="megaMenuDropdown" style="border-top-left-radius: 0; border-top-right-radius: 0;">
+            <div class="container">
+              <div class="row my-4">
+                {% for parent_cat in parent_categories %}
+                  <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                    <h6 class="text-uppercase fw-bold">
+                      <a href="{% url 'books:category_detail' parent_cat.slug %}" class="text-dark text-decoration-none">{{ parent_cat.name }}</a>
+                    </h6>
+                    <ul class="list-unstyled">
+                      {% for child_cat in parent_cat.children.all %}
+                        <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="#">Tin tức & Sự kiện</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="#">Liên hệ</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+  
+  <!-- Mobile Header (down to md) -->
+  <header class="bg-lumiere text-white d-md-none pb-3">
+    <div class="container pt-2 pb-2 d-flex justify-content-between align-items-center">
+        <!-- Hamburger -->
+        <button class="btn text-white border-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <i class="bi bi-list fs-1"></i>
+        </button>
+        
+        <!-- Logo -->
+        <div class="text-center">
+             <a href="{% url 'core:home' %}" class="brand-logo fs-3">The Lumière</a>
+        </div>
+
+        <!-- Cart -->
+        <a href="{% url 'orders:cart_detail' %}" class="cart-icon position-relative text-white">
+            <i class="bi bi-cart3 fs-3"></i>
+            {% if cart|length > 0 %}
+              <span class="cart-badge">{{ cart|length }}</span>
+            {% endif %}
+        </a>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="container">
+        <form action="{% url 'books:book_search' %}" method="get" class="position-relative d-flex align-items-center">
+            <input class="form-control search-bar" type="search" name="q" placeholder="Tìm kiếm..." aria-label="Search">
+            <button class="btn search-btn position-absolute end-0 me-1" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+  </header>
+
+  <!-- Mobile Menu Offcanvas -->
+  <div class="offcanvas offcanvas-start bg-lumiere text-white" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title brand-logo" id="mobileMenuLabel">The Lumière</h5>
+      <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <!-- User Info -->
+      <div class="mb-4 pb-3 border-bottom border-secondary">
+        {% if user.is_authenticated %}
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-person-circle fs-4 me-2"></i>
+                <span class="fw-bold">{{ user.username|upper }}</span>
+            </div>
+            <ul class="list-unstyled ms-4">
+                <li><a href="#" class="text-white text-decoration-none py-1 d-block">Tài khoản của tôi</a></li>
+                <li><a href="{% url 'orders:order_history' %}" class="text-white text-decoration-none py-1 d-block">Lịch sử đơn hàng</a></li>
+                <li>
+                    <form id="logout-form-mobile" action="{% url 'users:logout' %}" method="post" class="d-none">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" onclick="document.getElementById('logout-form-mobile').submit();" class="text-white text-decoration-none py-1 d-block">Đăng xuất</a>
+                </li>
+            </ul>
+        {% else %}
+            <a href="{% url 'users:login' %}" class="btn btn-outline-light w-100 mb-2">Đăng nhập</a>
+            <a href="{% url 'users:register' %}" class="btn btn-light w-100 text-dark">Đăng ký</a>
+        {% endif %}
+      </div>
+
+      <!-- Navigation -->
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-white fs-5 ps-0" href="{% url 'core:home' %}">TRANG CHỦ</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-white fs-5 ps-0" href="#">VỀ LUMIÈRE</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-white fs-5 ps-0 dropdown-toggle" data-bs-toggle="collapse" href="#mobileProducts" role="button" aria-expanded="false" aria-controls="mobileProducts">
+            SẢN PHẨM
+          </a>
+          <div class="collapse mt-2 ms-3" id="mobileProducts">
+            {% for parent_cat in parent_categories %}
+                <div class="mb-3">
+                    <a href="{% url 'books:category_detail' parent_cat.slug %}" class="text-white text-decoration-none fw-bold d-block mb-1">{{ parent_cat.name }}</a>
+                    <ul class="list-unstyled ms-3 border-start border-secondary ps-2">
+                        {% for child_cat in parent_cat.children.all %}
+                            <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="text-white-50 text-decoration-none d-block py-1">{{ child_cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+          </div>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-white fs-5 ps-0" href="#">TIN TỨC & SỰ KIỆN</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-white fs-5 ps-0" href="#">LIÊN HỆ</a>
+        </li>
+      </ul>
+      
+      <div class="mt-5 pt-3 border-top border-secondary">
+        <a href="#" class="text-white text-decoration-none me-3"><i class="bi bi-question-circle"></i> Trợ giúp</a>
+      </div>
+    </div>
+  </div>
         </div>
       </div>
     </nav>
@@ -114,10 +239,109 @@
     </div>
   </main>
 
-  <footer class="footer mt-auto py-3 bg-dark text-white">
-    <div class="container text-center">
-      <span>&copy; {% now "Y" %} Bookstore. All rights reserved.</span>
+  <footer class="bg-lumiere text-white pt-5 pb-3 mt-auto">
+    <div class="container">
+      <div class="row">
+        <!-- Column 1: Logo & Contact -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <div class="text-center text-lg-start mb-3">
+            <a href="{% url 'core:home' %}" class="brand-logo d-block mb-1" style="font-size: 2rem;">The Lumière</a>
+            <span class="brand-subtitle d-block mb-3">Bookstore</span>
+            <span class="d-block small mb-3">| EST. 2024 |</span>
+          </div>
+          
+          <div class="d-flex justify-content-center justify-content-lg-start gap-3 mb-3 social-icons">
+            <a href="#" class="text-white fs-4"><i class="bi bi-envelope"></i></a>
+            <a href="#" class="text-white fs-4"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="text-white fs-4"><i class="bi bi-twitter-x"></i></a>
+          </div>
+
+          <div class="contact-info text-center text-lg-start">
+            <p class="mb-2"><i class="bi bi-telephone-fill me-2"></i>Đặt hàng: 1800 8386</p>
+            <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i>lumiere_bookstore@gmail.com</p>
+          </div>
+        </div>
+
+        <!-- Column 2: Policies -->
+        <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+          <h5 class="fw-bold mb-3">Chính sách</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Chính sách bảo mật</a></li>
+            <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Điều khoản sử dụng</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Learn More -->
+        <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+          <h5 class="fw-bold mb-3">Tìm hiểu thêm</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Hướng dẫn xuất hóa đơn GTGT</a></li>
+            <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Tuyển dụng</a></li>
+            <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Hệ thống cửa hàng</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Map -->
+        <div class="col-lg-4">
+          <div class="card bg-secondary border-0 text-white overflow-hidden" style="height: 150px;">
+            <!-- Placeholder for Map Image -->
+            <div class="card-img h-100 w-100" style="background-color: #7f9c8c; position: relative;">
+                <div class="position-absolute top-50 start-50 translate-middle text-center w-100">
+                    <i class="bi bi-geo-alt-fill fs-3 mb-1"></i>
+                    <p class="mb-0 fw-bold">Tìm vị trí quán gần nhất</p>
+                </div>
+                <!-- Decorative lines to mimic the map style in image -->
+                <div style="position: absolute; top: -20px; left: 20px; width: 20px; height: 200px; background: rgba(255,255,255,0.3); transform: rotate(45deg);"></div>
+                <div style="position: absolute; top: -50px; right: 50px; width: 30px; height: 300px; background: rgba(255,255,255,0.3); transform: rotate(-45deg);"></div>
+            </div>
+          </div>
+          <p class="mt-2 small text-center text-lg-start">Đường Hàn Thuyên, phường Linh Trung, TP. Thủ Đức</p>
+        </div>
+      </div>
+
+      <hr class="my-4 border-white opacity-25">
+      
+      <div class="text-center small opacity-75">
+        &copy; 2024 Lumière Bookstore.
+      </div>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const forms = document.querySelectorAll('.add-to-cart-form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const url = this.action;
+          const formData = new FormData(this);
+          
+          fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.cart_length !== undefined) {
+              const cartIcon = document.querySelector('.cart-icon');
+              let badge = cartIcon.querySelector('.cart-badge');
+              if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'cart-badge';
+                cartIcon.appendChild(badge);
+              }
+              badge.textContent = data.cart_length;
+            }
+          })
+          .catch(error => console.error('Error:', error));
+        });
+      });
+    });
+  </script>
 </body>
 </html>

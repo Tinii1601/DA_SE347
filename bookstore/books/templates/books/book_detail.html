@@ -3,6 +3,21 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+    {% if breadcrumb %}
+      {% for cat in breadcrumb %}
+        <li class="breadcrumb-item"><a href="{% url 'books:category_detail' cat.slug %}">{{ cat.name }}</a></li>
+      {% endfor %}
+    {% endif %}
+    {% if category %}
+      <li class="breadcrumb-item"><a href="{% url 'books:category_detail' category.slug %}">{{ category.name }}</a></li>
+    {% endif %}
+    <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+  </ol>
+</nav>
+
 <div class="row">
   <div class="col-md-4">
     {% if book.cover_image %}
@@ -32,13 +47,13 @@
     </p>
 
     <div class="mt-4">
-      <form action="#" method="post">
+      <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form">
           {% csrf_token %}
-          <input type="hidden" name="book_id" value="{{ book.id }}">
           <div class="row align-items-center">
               <div class="col-md-4 col-lg-3">
                   <label for="quantity" class="form-label"><strong>Số lượng:</strong></label>
-                  <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1" max="{{ book.stock }}">
+                  {{ cart_product_form.quantity }}
+                  {{ cart_product_form.override }}
               </div>
               <div class="col-md-8 col-lg-9 mt-3 mt-md-0">
                   <button type="submit" class="btn btn-success btn-lg w-100">
@@ -54,6 +69,48 @@
     <p>{{ book.description|linebreaks }}</p>
   </div>
 </div>
+
+<script>
+    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const url = form.action;
+        const formData = new FormData(form);
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.cart_length !== undefined) {
+                // Update cart badge
+                const badge = document.querySelector('.bi-cart-fill').nextElementSibling;
+                if (badge) {
+                    badge.textContent = data.cart_length;
+                    badge.classList.remove('d-none');
+                } else {
+                    // If badge doesn't exist (cart was empty), create it or reload
+                    location.reload(); 
+                }
+                
+                // Show success message (optional)
+                alert('Đã thêm vào giỏ hàng!');
+            } else {
+                // Fallback
+                window.location.href = "{% url 'orders:cart_detail' %}";
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = "{% url 'orders:cart_detail' %}";
+        });
+    });
+</script>
 
 <hr class="my-5">
 

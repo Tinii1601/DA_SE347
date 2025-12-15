@@ -65,8 +65,10 @@ class OrderItem(models.Model):
     
 class Payment(models.Model):
     METHOD_CHOICES = [
-        ('cod', 'Thanh toán khi nhận hàng'), ('momo', 'MoMo'),
-        ('vnpay', 'VNPAY'), ('credit_card', 'Thẻ tín dụng'),
+        ('cod', 'Thanh toán khi nhận hàng'), 
+        ('momo', 'MoMo'),
+        ('vietqr', 'VietQR'),
+        ('vnpay', 'VNPAY'), 
     ]
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')

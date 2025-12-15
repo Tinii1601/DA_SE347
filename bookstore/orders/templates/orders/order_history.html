@@ -1,22 +1,64 @@
-<!-- orders/templates/orders/order_history.html -->
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Lịch sử đơn hàng{% endblock %}
 
 {% block content %}
-<h1>Lịch sử đơn hàng</h1>
-{% for order in orders %}
-<div class="card mb-3">
-  <div class="card-header d-flex justify-content-between">
-    <span>Đơn hàng #{{ order.order_number }}</span>
-    <span class="badge bg-{{ order.status|yesno:'success,warning,secondary' }}">{{ order.get_status_display }}</span>
-  </div>
-  <div class="card-body">
-    <p>Ngày đặt: {{ order.created_at|date:"d/m/Y H:i" }}</p>
-    <p>Tổng tiền: <strong>{{ order.total_amount|floatformat:0 }}₫</strong></p>
-    <p>Phương thức: {{ order.payment.get_method_display }}</p>
-  </div>
+<div class="container py-4">
+    <h1 class="mb-4">Lịch sử đơn hàng</h1>
+    
+    {% if orders %}
+        {% for order in orders %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-bold">Đơn hàng #{{ order.order_number }}</span>
+                    <span class="text-muted ms-2">({{ order.created_at|date:"d/m/Y H:i" }})</span>
+                </div>
+                <div>
+                    <span class="badge bg-{{ order.status|yesno:'success,warning,secondary' }} fs-6">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="card-subtitle mb-2 text-muted">Sản phẩm:</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            {% for item in order.items.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <span class="fw-bold">{{ item.book.title }}</span>
+                                    <span class="text-muted">x {{ item.quantity }}</span>
+                                </div>
+                                <span>{{ item.price|floatformat:0 }}₫</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4 border-start">
+                        <p class="mb-1">Phương thức: <strong>{{ order.payment.get_method_display }}</strong></p>
+                        <p class="mb-1">Tổng tiền: <strong class="text-danger fs-5">{{ order.total_amount|floatformat:0 }}₫</strong></p>
+                        
+                        {% if order.status == 'pending' %}
+                            {% if order.payment.method == 'vietqr' %}
+                                <a href="{% url 'orders:payment_vietqr' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
+                            {% elif order.payment.method == 'momo' %}
+                                <a href="{% url 'orders:payment_momo' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x display-1 text-muted"></i>
+            <p class="lead mt-3">Bạn chưa có đơn hàng nào.</p>
+            <a href="{% url 'core:home' %}" class="btn btn-primary">Mua sắm ngay</a>
+        </div>
+    {% endif %}
 </div>
-{% empty %}
-<p class="text-center text-muted">Chưa có đơn hàng nào.</p>
-{% endfor %}
 {% endblock %}

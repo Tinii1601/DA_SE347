@@ -1,0 +1,35 @@
+/* Auth Pages Styles (Login/Register) */
+.btn-lumiere {
+    background-color: var(--lumiere-green);
+    color: white;
+    border: 1px solid var(--lumiere-green);
+    transition: all 0.3s ease;
+}
+
+.btn-lumiere:hover {
+    background-color: #143d24;
+    border-color: #143d24;
+    color: white;
+}
+
+.btn-outline-lumiere {
+    background-color: white;
+    color: var(--lumiere-green);
+    border: 1px solid var(--lumiere-green);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-lumiere:hover {
+    background-color: var(--lumiere-green);
+    color: white;
+}
+
+.form-control:focus {
+    border-color: var(--lumiere-green);
+    box-shadow: 0 0 0 0.25rem rgba(26, 77, 46, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--lumiere-green);
+    border-color: var(--lumiere-green);
+}

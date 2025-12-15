@@ -3,71 +3,108 @@
 {% block title %}Đăng ký{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card shadow">
-      <div class="card-body p-5">
-        <h3 class="text-center mb-4">Đăng ký tài khoản</h3>
+<div class="container py-3">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted">Trang chủ</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Đăng ký</li>
+    </ol>
+  </nav>
+</div>
 
-        <!-- Hiển thị thông báo -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-5">
+          <h3 class="text-center fw-bold mb-5">ĐĂNG KÝ</h3>
+
+          <!-- Hiển thị thông báo -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            
+            <!-- Row 1: Full Name & Date of Birth -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.full_name.label }}</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                  <div class="text-danger small">{{ form.full_name.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.date_of_birth.label }}</label>
+                {{ form.date_of_birth }}
+                {% if form.date_of_birth.errors %}
+                  <div class="text-danger small">{{ form.date_of_birth.errors|join:", " }}</div>
+                {% endif %}
+              </div>
             </div>
-          {% endfor %}
-        {% endif %}
 
-        <form method="post">
-          {% csrf_token %}
+            <!-- Row 2: Phone & Email -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                  <div class="text-danger small">{{ form.phone.errors|join:", " }}</div>
+                {% endif %}
+                <div class="form-text small text-muted">Vui lòng nhập đủ 10 số</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                  <div class="text-danger small">{{ form.email.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Tên đăng nhập</label>
-            {{ form.username }}
-            {% if form.username.errors %}
-              <div class="text-danger small">{{ form.username.errors|join:", " }}</div>
-            {% endif %}
-          </div>
+            <!-- Row 3: Password & Confirm Password -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                  <div class="text-danger small">{{ form.password1.errors|join:", " }}</div>
+                {% endif %}
+                <div class="form-text small text-muted">Mật khẩu từ 8 - 12 chữ số bao gồm chữ, số, và ký tự</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold fst-italic">{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                  <div class="text-danger small">{{ form.password2.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-              <div class="text-danger small">{{ form.email.errors|join:", " }}</div>
-            {% endif %}
-          </div>
+            <!-- Checkbox -->
+            <div class="mb-4 form-check">
+              <input type="checkbox" class="form-check-input" id="termsCheck" required>
+              <label class="form-check-label text-muted" for="termsCheck">
+                Tôi đã đọc và đồng ý với Điều khoản dịch vụ và Chính sách bảo mật
+              </label>
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Số điện thoại</label>
-            {{ form.phone }}
-            {% if form.phone.errors %}
-              <div class="text-danger small">{{ form.phone.errors|join:", " }}</div>
-            {% endif %}
-          </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-lumiere px-5 py-2 fw-bold text-uppercase">Tạo tài khoản</button>
+            </div>
+          </form>
 
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            {{ form.password1 }}
-            {% if form.password1.errors %}
-              <div class="text-danger small">{{ form.password1.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Nhập lại mật khẩu</label>
-            {{ form.password2 }}
-            {% if form.password2.errors %}
-              <div class="text-danger small">{{ form.password2.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <button type="submit" class="btn btn-success w-100">Đăng ký</button>
-        </form>
-
-        <p class="text-center mt-3 text-muted">
-          Đã có tài khoản? <a href="{% url 'users:login' %}">Đăng nhập ngay</a>
-        </p>
+          <p class="text-center mt-4 text-muted">
+            Nếu bạn đã có tài khoản <a href="{% url 'users:login' %}" class="text-danger text-decoration-none">hãy đăng nhập !</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>

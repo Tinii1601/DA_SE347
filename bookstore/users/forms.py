@@ -7,39 +7,67 @@ from .models import UserProfile, Address
 
 # ĐĂNG KÝ 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+    full_name = forms.CharField(
+        label="Họ và tên (*)",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
     )
-
+    date_of_birth = forms.DateField(
+        label="Ngày sinh (*)",
+        widget=forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây', 'type': 'date'})
+    )
     phone = forms.CharField(
+        label="Số điện thoại (*)",
         max_length=15,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Số điện thoại'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
+    )
+    email = forms.EmailField(
+        label="Email (*)",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
     )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'password1', 'password2']
+        fields = ['full_name', 'date_of_birth', 'phone', 'email', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Tên đăng nhập'})
-        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Mật khẩu'})
-        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Nhập lại mật khẩu'})
+        # Remove username field from the form as we will set it to phone number
+        if 'username' in self.fields:
+            del self.fields['username']
+            
+        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
+        self.fields['password1'].label = "Mật khẩu (*)"
+        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
+        self.fields['password2'].label = "Xác nhận mật khẩu (*)"
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        # Lấy email từ cleaned_data
-        email = self.cleaned_data['email']
-        user.email = email
+        # Set username to phone number
+        user.username = self.cleaned_data['phone']
+        user.email = self.cleaned_data['email']
+        
+        # Split full name
+        full_name = self.cleaned_data['full_name']
+        if ' ' in full_name:
+            user.first_name, user.last_name = full_name.rsplit(' ', 1)
+        else:
+            user.first_name = full_name
         
         if commit:
             user.save()
             # Tạo hoặc cập nhật UserProfile
             profile, created = UserProfile.objects.get_or_create(user=user)
             profile.phone = self.cleaned_data['phone']
-            profile.email = email  # Đồng bộ email vào profile
+            profile.email = self.cleaned_data['email']
+            profile.date_of_birth = self.cleaned_data['date_of_birth']
             profile.save()
         return user
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if User.objects.filter(username=phone).exists():
+            raise forms.ValidationError("Số điện thoại này đã được đăng ký.")
+        return phone
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -51,10 +79,12 @@ class RegistrationForm(UserCreationForm):
 # ĐĂNG NHẬP
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tên đăng nhập hoặc email'})
+        label="Số điện thoại (*)",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mật khẩu'})
+        label="Mật khẩu (*)",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
     )
 
     class Meta:

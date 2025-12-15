@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 from .models import Book, Category
 from .forms import BookSearchForm
+from orders.forms import CartAddProductForm
 
 class BookListView(ListView):
     model = Book
@@ -57,6 +58,17 @@ class BookDetailView(DetailView):
     template_name = 'books/book_detail.html'
     context_object_name = 'book'
     slug_field = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart_product_form'] = CartAddProductForm()
+        
+        # Breadcrumb logic
+        if self.object.category:
+            context['breadcrumb'] = self.object.category.get_ancestors()
+            context['category'] = self.object.category
+            
+        return context
 
 
 class BookSearchView(ListView):

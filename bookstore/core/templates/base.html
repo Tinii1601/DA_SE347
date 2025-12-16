@@ -9,96 +9,117 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
   <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="{% url 'core:home' %}">
-          <i class="bi bi-book-half"></i> Bookstore
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item dropdown position-static">
-              <a class="nav-link dropdown-toggle" href="#" id="megaMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-list"></i> Danh mục sản phẩm
-              </a>
-              <div class="dropdown-menu w-100 mt-0" aria-labelledby="megaMenuDropdown" style="border-top-left-radius: 0; border-top-right-radius: 0;">
-                <div class="container">
-                  <div class="row my-4">
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#175229;">
+        <div class="container">
+          <!-- Logo -->
+          <a class="navbar-brand" href="{% url 'core:home' %}">
+            <i class="bi bi-book-half"></i> Bookstore
+          </a>
+          <!-- Mobile button -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                  aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <!-- Nav content -->
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Left menu items -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item"> <a class="nav-link" href="{% url 'core:home' %}">Trang chủ</a></li>
+              <li class="nav-item"> <a class="nav-link" href="#">Về Bookstore</a> </li>
+              <!-- Mega Menu -->
+              <li class="nav-item dropdown position-static">
+                <li class="nav-item dropdown position-static d-flex align-items-center">
+                  <a class="nav-link" href="{% url 'books:book_list' %}">Sản phẩm</a>
+                  <a class="nav-link dropdown-toggle dropdown-toggle-split"
+                    href="#" data-bs-toggle="dropdown" aria-expanded="false"> </a>
+                <li class="nav-item dropdown position-static d-flex align-items-center">
+                <div class="dropdown-menu w-100 p-3">
+                  <div class="row">
                     {% for parent_cat in parent_categories %}
-                      <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
-                        <h6 class="text-uppercase fw-bold">
-                          <a href="{% url 'books:category_detail' parent_cat.slug %}" class="text-dark text-decoration-none">{{ parent_cat.name }}</a>
-                        </h6>
-                        <ul class="list-unstyled">
-                          {% for child_cat in parent_cat.children.all %}
-                            <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
-                          {% endfor %}
-                        </ul>
-                      </div>
+                    <div class="col-md-3">
+                      <h6 class="fw-bold">{{ parent_cat.name }}</h6>
+                      <ul class="list-unstyled">
+                        {% for child_cat in parent_cat.children.all %}
+                        <li>
+                          <a class="dropdown-item" href="{% url 'books:category_detail' child_cat.slug %}">
+                            {{ child_cat.name }}
+                          </a>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
                     {% endfor %}
                   </div>
                 </div>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Về chúng tôi</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Liên hệ</a>
-            </li>
-          </ul>
-          <form class="d-flex navbar-search-form" action="{% url 'books:book_search' %}" method="get">
-            <input class="form-control me-2" type="search" name="q" placeholder="Tìm kiếm sách..." aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Tìm</button>
-          </form>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a href="{% url 'orders:cart_detail' %}" class="nav-link">
-                <i class="bi bi-cart-fill"></i> Giỏ hàng
-                <span class="badge bg-danger rounded-pill">{{ request.session.cart|length }}</span>
-              </a>
-            </li>
-            {% if user.is_authenticated %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-person-circle"></i> Chào, {{ user.username }}
+              </li>
+              <li class="nav-item"> <a class="nav-link" href="#">Tin tức & Sự kiện</a> </li>
+              <li class="nav-item"> <a class="nav-link" href="#">Liên hệ</a> </li>
+            </ul>
+            <!-- Search + Right items -->
+            <form class="d-flex me-3 search-bar-custom" action="{% url 'books:book_search' %}" method="get">
+              <input type="text" name="q" placeholder="Tìm kiếm">
+              <button class="search-btn" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+            <!-- User and Cart -->
+            <ul class="navbar-nav">
+              <li class="nav-item me-2">
+                <a href="{% url 'orders:cart_detail' %}" class="cart-icon">
+                  <i class="bi bi-cart"></i>
+                  <span class="badge">{{ request.session.cart|length }}</span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="#">Tài khoản của tôi</a></li>
+              </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% comment %} Hiển thị avatar nếu có, còn không dùng icon mặc định {% endcomment %}
+                    {% if request.user.is_authenticated %}
+                      {% if request.user.profile.avatar %}
+                        <img src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}"
+                            class="rounded-circle me-2" width="35" height="35" style="object-fit:cover;">
+                      {% elif request.user.socialaccount_set.first %}
+                        <img src="{{ request.user.socialaccount_set.first.get_avatar_url }}" alt="{{ request.user.username }}"
+                            class="rounded-circle me-2" width="35" height="35" style="object-fit:cover;">
+                      {% else %}
+                        <img src="{% static 'img/default-avatar.jpg' %}" alt="{{ request.user.username }}"
+                            class="rounded-circle me-2" width="35" height="35" style="object-fit:cover;">
+                      {% endif %}
+                    {% else %}
+                      <i class="bi bi-person-circle fs-4 me-2"></i>
+                    {% endif %}
+                    <span class="visually-hidden">Tài khoản</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="{% url 'users:profile' %}">Tài khoản</a></li>
                   <li><a class="dropdown-item" href="#">Lịch sử đơn hàng</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <form id="logout-form" action="{% url 'users:logout' %}" method="post" class="d-none">
-                        {% csrf_token %}
+                      {% csrf_token %}
                     </form>
                     <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit();">
-                      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                      Đăng xuất
                     </a>
                   </li>
                 </ul>
               </li>
-            {% else %}
+              {% else %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:login' %}">
-                  <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
-                </a>
+                <a class="nav-link" href="{% url 'users:login' %}">Đăng nhập</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link btn btn-primary text-white" href="{% url 'users:register' %}">Đăng ký</a>
-              </li>
-            {% endif %}
-          </ul>
+              {% endif %}
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
-  </header>
-
-  <main class="flex-shrink-0">
+      </nav>
+    </header>
+  <main class="flex-fill">
     <div class="container">
       {% if messages %}
         <div class="messages">
@@ -113,7 +134,6 @@
       {% block content %}{% endblock %}
     </div>
   </main>
-
   <footer class="footer mt-auto py-3 bg-dark text-white">
     <div class="container text-center">
       <span>&copy; {% now "Y" %} Bookstore. All rights reserved.</span>

@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 from .models import Book, Category
 from .forms import BookSearchForm
+        
 
 class BookListView(ListView):
     model = Book
@@ -50,7 +51,6 @@ class BookListView(ListView):
         context['current_sort'] = self.request.GET.get('sort', '-created_at')
         
         return context
-
 
 class BookDetailView(DetailView):
     model = Book

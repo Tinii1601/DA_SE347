@@ -1,142 +1,374 @@
-/* bookstore/static/css/style.css */
 
-/* Sticky footer styles */
-main>.container {
-    padding: 60px 15px 0;
+main > .container {
+    /* Top padding + bottom padding so content never collides with footer
+       when additional error lines appear inside forms. */
+    padding: 60px 15px 60px;
 }
 
 .footer {
     background-color: #f5f5f5;
 }
-
-/* Custom navbar */
-.navbar-brand {
+/* Background + text color */
+.l-header {
+    background-color: #175229;
+    color: #F8DAD0;
+}
+/* Logo */
+.logo-text {
+    font-size: 24px;
     font-weight: bold;
+    color: #F8DAD0 !important;
+    text-decoration: none;
+}
+/* --- Bắt đầu phần Search Bar mới theo thiết kế --- */
+.search-bar-custom {
+    position: relative;
+    width: 100%;
+    max-width: 300px; /* Độ rộng tối đa */
 }
 
-.navbar .nav-item .nav-link.active {
-    font-weight: bold;
-    color: #fff !important;
+/* Ô nhập liệu (Input) */
+.search-bar-custom input {
+    width: 100%;
+    background-color: #123f25; 
+    border-radius: 50px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    color: #e0e0e0;
+    padding: 10px 55px 10px 20px; 
+    outline: none; 
+    font-size: 16px;
 }
 
-/* Book card styles */
+.search-bar-custom input::placeholder {
+    color: #aebfb5; 
+}
+
+/* Nút tìm kiếm (Button) */
+.search-bar-custom .search-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 6px; 
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #94a396; 
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+/* Màu icon kính lúp */
+.search-bar-custom .search-btn i {
+    color: #ffffff; 
+    font-size: 16px;
+}
+.search-bar-custom .search-btn:hover {
+    background-color: #aebfb5;
+}
+/* --- Kết thúc phần Search Bar mới --- */
+.top-menu a {
+    color: #F8DAD0 !important;
+    font-weight: 500;
+    margin: 0 4px;
+    text-decoration: none;
+}
+.top-menu .divider {
+    margin: 0 6px;
+    color: #e7cbbb;
+}
+/* Cart icon */
+.cart-icon {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #F8DAD0 !important;
+  text-decoration: none;
+}
+.navbar .cart-icon {
+    /* make cart icon container match avatar size and center its glyph */
+    display: inline-flex !important;
+    width: 38px !important;
+    height: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+}
+.navbar .cart-icon .bi {
+    /* glyph size inside the larger container; keep it centered */
+    font-size: 24px !important;
+    line-height: 1 !important;
+}
+/* Ensure the actual <i class="bi bi-cart"> element is exactly 21.54x21.54 */
+.navbar i.bi.bi-cart {
+    /* make the <i> fill the cart container and center the pseudo-element */
+    width: 38px !important;
+    height: 38px !important;
+    display: inline-block !important;
+    line-height: 38px !important;
+    text-align: center !important;
+    font-size: 24px !important;
+}
+/* Bootstrap Icons render via ::before — ensure that pseudo-element matches the container */
+.navbar i.bi.bi-cart::before {
+    display: inline-block !important;
+    width: 38px !important;
+    height: 38px !important;
+    line-height: 38px !important;
+    font-size: 24px !important;
+    text-align: center !important;
+}
+/* Small badge overlayed on top-right of cart icon */
+.cart-icon i.bi {
+  font-size: 24px;
+  line-height: 1;
+}
+.cart-icon .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(35%, -35%);
+  background-color: #dc3545 !important;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  line-height: 18px;
+  border-radius: 50%;
+  text-align: center;
+  border: 2px solid #175229;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.cart-icon .badge {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 0.7rem;
+    line-height: 18px;
+    background-color: #dc3545 !important;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.cart-icon:hover .badge {
+  transform: translate(40%, -40%) scale(1.05);
+  transition: transform 0.2s ease;
+}
+/* User avatar in navbar */
+.navbar .user-avatar {
+    /* set avatar size to match cart container for consistent alignment */
+    width: 48.34px !important;
+    height: 48.34px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    object-fit: cover !important;
+    box-sizing: border-box !important;
+}
+/* Ensure avatar and cart icon align and look identical as boxes */
+.navbar .user-avatar,
+.navbar .cart-icon .bi {
+    border-radius: 50%;
+    overflow: hidden;
+}
+/* Make navbar items align vertically center so icons and text line up */
+.navbar .navbar-nav,
+.navbar .d-flex {
+    align-items: center !important;
+}
+/* Ensure nav links center their contents */
+.navbar .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+/* Optional: put login text inside a circular box to match avatar/cart */
+.navbar .user-login-box {
+    width: 40px !important;
+    height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    color: #F8DAD0 !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+}
+.navbar .user-login-box:hover {
+    background: rgba(255,255,255,0.04) !important;
+}
+.navbar .user-login-box .login-text {
+    font-size: 0.85rem;
+    line-height: 1;
+}
+/* Ensure navbar search input lines up with icons */
+.navbar .navbar-search-form .form-control {
+    height: 40px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+/* Rounded search (match attachment): apply when you wrap the form with .search-rounded */
+.navbar .navbar-search-form.search-rounded {
+    position: relative;
+    max-width: 600px;
+}
+.navbar .navbar-search-form.search-rounded .form-control {
+    border-radius: 28px !important;
+    padding: 10px 48px 10px 20px !important; /* space for circular icon */
+    background: linear-gradient(90deg, #104b2e 0%, #0d3f26 100%) !important;
+    color: #F8DAD0 !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+    box-shadow: none !important;
+}
+.navbar .navbar-search-form.search-rounded .form-control::placeholder {
+    color: #e3dcd3 !important;
+}
+/* circular search button placed inside the search form */
+.navbar .navbar-search-form.search-rounded .search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #d7c5af;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: #175229;
+}
+.navbar .navbar-search-form.search-rounded .search-btn i {
+    font-size: 16px;
+}
+.bottom-menu a {
+    color: #F8DAD0 !important;
+    margin: 0 18px;
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: none;
+}
+.bottom-menu a:hover {
+    opacity: 0.7;
+}
+/* Dropdown menu under Sản phẩm */
+.bottom-menu .dropdown-menu {
+    border-radius: 6px;
+    margin-top: 10px;
+}
 .book-card {
     border: 1px solid #e9ecef;
-    /* Faint default border */
     transition: transform .2s, box-shadow .2s, border-color .2s;
-    /* Add border-color to transition */
     height: 100%;
 }
-
 .book-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+    box-shadow: 0 4px 15px rgba(0,0,0,.08);
     border-color: #0d6efd;
-    /* Primary blue border on hover */
 }
-
 .book-card .card-img-top {
     width: 100%;
     aspect-ratio: 2 / 3;
     object-fit: cover;
     padding: 5px;
-    /* Add some padding around the image */
 }
-
 .card-body {
     padding: 0.75rem;
 }
-
 .card-title {
     font-size: 1rem;
-    /* Slightly smaller title */
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 0.25rem;
 }
-
 .card-text {
     font-size: 0.85rem;
     color: #6c757d;
     margin-bottom: 0.5rem;
 }
-
 .price {
     font-size: 1.1rem;
     font-weight: bold;
     color: #dc3545;
 }
-
 .original-price {
     text-decoration: line-through;
     color: #6c757d;
     font-size: 0.9rem;
     margin-left: 8px;
 }
-
-/* Cart badge */
 .navbar .badge {
     font-size: 0.7em;
     vertical-align: top;
     margin-left: 2px;
 }
-
-/* Button styles */
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-/* Custom search form width */
-.navbar-search-form {
-    width: 300px;
-    /* Default width */
-}
-
-/* Product Carousel for Home Page */
+/* ============================================
+   PRODUCT CAROUSEL
+============================================ */
 .product-carousel-container {
     position: relative;
 }
-
 .product-carousel {
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     padding-bottom: 1rem;
-    /* Add some space for the scrollbar */
     gap: 1rem;
-    /* Space between items */
 }
-
 /* Hide scrollbar */
 .product-carousel::-webkit-scrollbar {
     display: none;
 }
-
 .product-carousel {
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 }
-
 .product-carousel-item {
     flex: 0 0 auto;
     width: 24%;
-    /* Show 4 items, adjust as needed */
     margin-right: 1%;
 }
-
-/* Add navigation buttons if you want */
-/* 
-.carousel-control-prev, .carousel-control-next {
-    ...
+.btn-login {
+    background-color: #175229 !important;
+    border-color: #175229 !important;
+    color: #F8DAD0 !important;
+    font-weight: 600;
+    border-radius: 8px;
 }
-*/
+.btn-login:hover {
+    background-color: #0f3a1d !important;
+    border-color: #0f3a1d !important;
+}
+.navbar .bi,
+.navbar .nav-link,
+.navbar .cart-icon,
+.navbar .user-login-box,
+.navbar .dropdown-toggle,
+.navbar-brand,
+.navbar-brand i{
+    color: #F8DAD0 !important; 
+}
+
+.navbar .bi:hover,
+.navbar .nav-link:hover,
+.navbar .cart-icon:hover,
+.navbar .user-login-box:hover,
+.navbar-brand:hover,
+.navbar-brand:hover i{
+    color: #fbeee6 !important;
+    opacity: 0.9;
+}

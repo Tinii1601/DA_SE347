@@ -32,10 +32,10 @@ class CheckoutView(LoginRequiredMixin, FormView):
         payment.save()
         return super().form_valid(form)
 
-class OrderHistoryView(LoginRequiredMixin, ListView):
-    model = Order
+class OrderHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'orders/order_history.html'
-    context_object_name = 'orders'
-
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders'] = []  # sau này thay bằng Order.objects.filter(user=self.request.user)
+        context['active'] = 'orders'
+        return context

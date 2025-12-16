@@ -30,7 +30,34 @@ INSTALLED_APPS = [
     'users',
     'orders',
     'reviews',
+    # login social
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 ]
+SITE_ID = 1
+
+# Optional: Jazzmin configuration. Tweak these to taste.
+JAZZMIN_SETTINGS = {
+    "site_title": "Bookstore Admin",
+    "site_header": "Bookstore",
+    "welcome_sign": "Welcome to Bookstore admin",
+    "show_ui_builder": False,
+    "topmenu_links": [
+        {"name": "Return to site", "url": "/", "new_window": False},
+    ],
+}
+
+# Optional UI tweaks for Jazzmin
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",
+    "navbar_small_text": False,
+    "body_small_text": False,
+    "brand_colour": "#175229",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -40,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'bookstore.urls'
@@ -98,6 +126,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 AUTHENTICATION_BACKENDS = [
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -108,3 +137,21 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # ================== DEFAULT AUTO FIELD ==================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# ================== EMAIL CONFIGURATION ==================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'nguyenthikimngoc1402@gmail.com'
+EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'apryl-unstent(or)iously-olive.ngrok-free.dev',
+]
+SOCIALACCOUNT_LOGIN_ON_GET = True
+

@@ -1,18 +1,16 @@
-<!-- users/templates/users/register.html -->
 {% extends 'base.html' %}
 {% block title %}Đăng ký{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-6">
+  <div class="col-md-8">
     <div class="card shadow">
       <div class="card-body p-5">
-        <h3 class="text-center mb-4">Đăng ký tài khoản</h3>
+        <h3 class="text-center mb-4">ĐĂNG KÝ</h3>
 
-        <!-- Hiển thị thông báo -->
         {% if messages %}
           {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
               {{ message }}
               <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -21,53 +19,89 @@
 
         <form method="post">
           {% csrf_token %}
-
-          <div class="mb-3">
-            <label class="form-label">Tên đăng nhập</label>
-            {{ form.username }}
-            {% if form.username.errors %}
-              <div class="text-danger small">{{ form.username.errors|join:", " }}</div>
-            {% endif %}
+          <div class="row">
+            <!-- Tên đăng nhập -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Tên đăng nhập<span class="text-danger">*</span></label>
+              {{ form.username }}
+              {% if form.username.errors %}
+                <div class="text-danger small mt-1"> {{ form.username.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Họ -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Họ <span class="text-danger">*</span></label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <div class="text-danger small mt-1"> {{ form.first_name.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Tên -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Tên <span class="text-danger">*</span></label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <div class="text-danger small mt-1"> {{ form.last_name.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Ngày sinh -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Ngày sinh <span class="text-danger">*</span></label>
+              {{ form.date_of_birth }}
+              {% if form.date_of_birth.errors %}
+                <div class="text-danger small mt-1"> {{ form.date_of_birth.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Số điện thoại -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger small mt-1"> {{ form.phone.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Email <span class="text-danger">*</span> </label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger small mt-1"> {{ form.email.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            <!-- Mật khẩu -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Mật khẩu <span class="text-danger">*</span> </label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}
+                <div class="text-danger small mt-1">
+                  {{ form.password1.errors|join:", " }}
+                </div>
+              {% endif %}
+            </div>
+            <!-- Xác nhận mật khẩu -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Xác nhận mật khẩu <span class="text-danger">*</span> </label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}
+                <div class="text-danger small mt-1">
+                  {{ form.password2.errors|join:", " }}
+                </div>
+              {% endif %}
+            </div>
           </div>
-
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-              <div class="text-danger small">{{ form.email.errors|join:", " }}</div>
-            {% endif %}
+          <!-- Điều khoản -->
+          <div class="form-check mb-4">
+            {{ form.agree_terms }}
+            <label class="form-check-label ms-2">
+              Tôi đã đọc và đồng ý với
+              <a href="#" class="text-decoration-underline">Điều khoản dịch vụ</a> và
+              <a href="#" class="text-decoration-underline">Chính sách bảo mật</a>
+            </label>
+            {{ form.agree_terms.errors }}
           </div>
-
-          <div class="mb-3">
-            <label class="form-label">Số điện thoại</label>
-            {{ form.phone }}
-            {% if form.phone.errors %}
-              <div class="text-danger small">{{ form.phone.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            {{ form.password1 }}
-            {% if form.password1.errors %}
-              <div class="text-danger small">{{ form.password1.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Nhập lại mật khẩu</label>
-            {{ form.password2 }}
-            {% if form.password2.errors %}
-              <div class="text-danger small">{{ form.password2.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-
-          <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+          <button type="submit" class="btn btn-success px-5 d-block mx-auto">TẠO TÀI KHOẢN</button>
         </form>
-
-        <p class="text-center mt-3 text-muted">
-          Đã có tài khoản? <a href="{% url 'users:login' %}">Đăng nhập ngay</a>
-        </p>
+        <p class="text-center mt-3 text-muted"> Đã có tài khoản? <a href="{% url 'users:login' %}">Đăng nhập ngay</a></p>
       </div>
     </div>
   </div>

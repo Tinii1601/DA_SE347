@@ -9,9 +9,9 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
 
-class UserAdmin(BaseUserAdmin):
-    inlines = (UserProfileInline, )
-
+class UserAdmin(admin.ModelAdmin):
+    inlines = (UserProfileInline,)
+    list_display = ('username', 'first_name', 'last_name', 'email')
 # Ghi đè UserAdmin mặc định
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

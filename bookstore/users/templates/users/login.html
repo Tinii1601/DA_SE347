@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load socialaccount %}
 {% block title %}Đăng nhập{% endblock %}
 
 {% block content %}
@@ -27,7 +28,7 @@
           {# Kết thúc phần thông báo lỗi chung #}
           
           <div class="mb-3">
-            <label class="form-label">Tên đăng nhập hoặc email</label>
+            <label class="form-label">Tên đăng nhập hoặc email <span class="text-danger">*</span> </label>
             {{ form.username }}
             {# Hiển thị lỗi cụ thể cho trường username (nếu có) #}
             {% for error in form.username.errors %}
@@ -35,18 +36,31 @@
             {% endfor %}
           </div>
           <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
+            <label class="form-label">Mật khẩu <span class="text-danger">*</span> </label>
             {{ form.password }}
             {# Hiển thị lỗi cụ thể cho trường password (nếu có) #}
             {% for error in form.password.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
           </div>
-          <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+          <p class="text-end mt-3"><a href="{% url 'users:forget_password' %}" class="text-danger">Quên mật khẩu</a></p>
+          <button type="submit" class="btn btn-success w-100">ĐĂNG NHẬP</button>
         </form>
-        <p class="text-center mt-3">
-          Chưa có tài khoản? <a href="{% url 'users:register' %}">Đăng ký ngay</a>
-        </p>
+        <p></p>
+        <a href="{% url 'users:register' %}" class="btn btn-outline-success w-100 mb-4">TẠO TÀI KHOẢN </a>
+        <div class="text-center mb-3 text-muted">Hoặc</div>
+        <!-- Social login -->
+        <a href="{% provider_login_url 'google' %}"
+          class="btn btn-outline-secondary w-100 mb-2 d-flex align-items-center justify-content-center gap-2">
+          <img src="https://developers.google.com/identity/images/g-logo.png" width="18">
+          Đăng nhập với Google
+        </a>
+        <p></p>
+        <a href="{% provider_login_url 'facebook' %}"
+          class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+          <i class="bi bi-facebook text-primary"></i>
+          Đăng nhập với Facebook
+        </a>
       </div>
     </div>
   </div>

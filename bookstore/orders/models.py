@@ -6,9 +6,18 @@ from users.models import Address
 # Create your models here.
 # orders/models.py
 class Coupon(models.Model):
+    TYPE_CHOICES = [
+        ('percent', 'Giảm phần trăm đơn hàng'),
+        ('fixed', 'Giảm số tiền cố định'),
+        ('ship_percent', 'Giảm phần trăm phí ship'),
+        ('ship_fixed', 'Giảm tiền ship cố định'),
+    ]
+    
     code = models.CharField(max_length=50, unique=True)
-    discount_percent = models.PositiveIntegerField(help_text="Ví dụ: 10 = 10%")
+    discount_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='percent')
+    value = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Giá trị giảm (VNĐ hoặc %)")
     min_order_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    max_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Giảm tối đa (0 là không giới hạn)")
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     is_active = models.BooleanField(default=True)
@@ -16,12 +25,32 @@ class Coupon(models.Model):
     used_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.code
+        return f"{self.code} - {self.get_discount_type_display()}"
 
     def is_valid(self):
         from django.utils import timezone
         now = timezone.now()
         return (self.is_active and self.valid_from <= now <= self.valid_to and self.used_count < self.max_uses)
+    
+    def calculate_discount(self, order_total, shipping_fee=0):
+        discount = 0
+        if order_total < self.min_order_value:
+            return 0
+            
+        if self.discount_type == 'percent':
+            discount = (order_total * self.value) / 100
+            if self.max_discount > 0:
+                discount = min(discount, self.max_discount)
+        elif self.discount_type == 'fixed':
+            discount = self.value
+        elif self.discount_type == 'ship_percent':
+            discount = (shipping_fee * self.value) / 100
+            if self.max_discount > 0:
+                discount = min(discount, self.max_discount)
+        elif self.discount_type == 'ship_fixed':
+            discount = min(self.value, shipping_fee)
+            
+        return discount
     
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -62,22 +91,3 @@ class OrderItem(models.Model):
 
     def get_subtotal(self):
         return self.price * self.quantity
-    
-class Payment(models.Model):
-    METHOD_CHOICES = [
-        ('cod', 'Thanh toán khi nhận hàng'), 
-        ('momo', 'MoMo'),
-        ('vietqr', 'VietQR'),
-        ('vnpay', 'VNPAY'), 
-    ]
-
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
-    method = models.CharField(max_length=20, choices=METHOD_CHOICES)
-    transaction_id = models.CharField(max_length=100, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    status = models.CharField(max_length=20, default='pending')
-    paid_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Thanh toán {self.order.order_number}"

@@ -12,6 +12,7 @@
   <link href="{% static 'css/base.css' %}?v=1.1" rel="stylesheet">
   <link href="{% static 'css/components.css' %}?v=1.1" rel="stylesheet">
   <link href="{% static 'css/auth.css' %}?v=1.1" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
   <!-- Desktop Header (md and up) -->
@@ -79,13 +80,13 @@
     <div class="container header-bottom">
       <ul class="nav justify-content-start">
         <li class="nav-item">
-          <a class="nav-link nav-link-custom ps-0" href="{% url 'core:home' %}">Trang chủ</a>
+          <a class="nav-link nav-link-custom ps-0 {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Trang chủ</a>
         </li>
         <li class="nav-item">
           <a class="nav-link nav-link-custom" href="#">Về Lumière</a>
         </li>
         <li class="nav-item dropdown position-static">
-          <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="megaMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link nav-link-custom dropdown-toggle {% if 'books' in request.path %}active{% endif %}" href="#" id="megaMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Sản phẩm
           </a>
           <div class="dropdown-menu w-100 mt-0" aria-labelledby="megaMenuDropdown" style="border-top-left-radius: 0; border-top-right-radius: 0;">
@@ -308,40 +309,7 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const forms = document.querySelectorAll('.add-to-cart-form');
-      forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          const url = this.action;
-          const formData = new FormData(this);
-          
-          fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.cart_length !== undefined) {
-              const cartIcon = document.querySelector('.cart-icon');
-              let badge = cartIcon.querySelector('.cart-badge');
-              if (!badge) {
-                badge = document.createElement('span');
-                badge.className = 'cart-badge';
-                cartIcon.appendChild(badge);
-              }
-              badge.textContent = data.cart_length;
-            }
-          })
-          .catch(error => console.error('Error:', error));
-        });
-      });
-    });
-  </script>
+  <script src="{% static 'js/base.js' %}"></script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

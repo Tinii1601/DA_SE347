@@ -43,9 +43,9 @@
                         
                         {% if order.status == 'pending' %}
                             {% if order.payment.method == 'vietqr' %}
-                                <a href="{% url 'orders:payment_vietqr' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
-                            {% elif order.payment.method == 'momo' %}
-                                <a href="{% url 'orders:payment_momo' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
+                                <a href="{% url 'payment:payment_vietqr' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
+                                {% elif order.payment.method == 'momo' %}
+                                <a href="{% url 'payment:payment_momo' order.id %}" class="btn btn-primary w-100 mt-2">Thanh toán ngay</a>
                             {% endif %}
                         {% endif %}
                     </div>

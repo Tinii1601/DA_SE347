@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Xác thực OTP{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border shadow-sm">
+                <div class="card-body p-5 text-center">
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'users:login' %}" class="text-muted"><i class="bi bi-x-lg"></i></a>
+                    </div>
+                    
+                    <h4 class="fw-bold mb-2">Xác thực OTP</h4>
+                    <p class="text-muted small mb-4">Mã OTP đã được gửi đến email của bạn!</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if error %}
+                        <div class="alert alert-danger small">{{ error }}</div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <input type="text" name="otp" class="form-control text-center fs-4 tracking-widest" placeholder="------" maxlength="6" required style="letter-spacing: 10px;">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <span class="small text-muted">Không nhận được OTP? <a href="{% url 'users:forgot_password' %}" class="text-danger text-decoration-none fw-bold">Gửi lại OTP</a></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'users:login' %}" class="btn btn-outline-secondary w-50">Hủy</a>
+                            <button type="submit" class="btn btn-success w-50" style="background-color: #1a4d2e; border-color: #1a4d2e;">Tiếp tục</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

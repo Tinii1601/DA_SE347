@@ -4,8 +4,20 @@
 
 {% block title %}Giỏ hàng của bạn{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mb-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+        </ol>
+    </nav>
+
     <!-- Header -->
     <div class="text-center mb-5">
         <h2 class="fw-bold text-uppercase">Giỏ hàng</h2>
@@ -46,8 +58,8 @@
                                     <p class="text-muted small mb-2">{{ product.author }}</p>
                                     <form action="{% url 'orders:cart_remove' product.id %}" method="post">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-link text-muted p-0 text-decoration-none small">
-                                            Xóa
+                                        <button type="submit" class="btn btn-sm btn-outline-danger mt-2 px-3">
+                                            <i class="bi bi-trash me-1"></i> Xóa
                                         </button>
                                     </form>
                                 </div>
@@ -90,14 +102,12 @@
             </div>
             <p class="text-end text-muted small mb-4">Phí vận chuyển và thuế được tính khi thanh toán.</p>
             
-            <a href="{% url 'orders:checkout' %}" class="btn btn-success w-100 py-3 text-uppercase fw-bold rounded-0" style="background-color: #1a4d2e; border-color: #1a4d2e;">
+            <a href="{% url 'orders:checkout' %}" class="btn btn-success w-100 py-3 text-uppercase fw-bold rounded-0 mb-3" style="background-color: #1a4d2e; border-color: #1a4d2e;">
                 Thanh toán
             </a>
-            <div class="text-center mt-3">
-                <a href="{{ continue_shopping_url }}" class="text-decoration-none text-muted small">
-                    <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
-                </a>
-            </div>
+            <a href="{{ continue_shopping_url }}" class="btn btn-outline-dark w-100 py-3 text-uppercase fw-bold rounded-0">
+               <i class="bi bi-arrow-left me-2"></i> Tiếp tục mua sắm
+            </a>
         </div>
     </div>
 
@@ -124,11 +134,4 @@
     </div>
     {% endif %}
 </div>
-
-<style>
-    .form-check-input:checked {
-        background-color: #1a4d2e;
-        border-color: #1a4d2e;
-    }
-</style>
 {% endblock %}

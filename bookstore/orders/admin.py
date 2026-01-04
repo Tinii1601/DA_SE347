@@ -1,13 +1,13 @@
 # orders/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Order, OrderItem, Coupon, Payment
+from .models import Order, OrderItem, Coupon
 
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ['code', 'discount_percent', 'min_order_value', 'valid_to', 'is_active', 'used_count']
-    list_filter = ['is_active', 'valid_from', 'valid_to']
+    list_display = ['code', 'discount_type', 'value', 'min_order_value', 'valid_to', 'is_active', 'used_count']
+    list_filter = ['is_active', 'valid_from', 'valid_to', 'discount_type']
     search_fields = ['code']
 
 

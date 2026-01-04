@@ -1,6 +1,7 @@
 # orders/forms.py
 from django import forms
-from .models import Order, Payment
+from .models import Order
+from payment.models import Payment
 
 
 class CartAddProductForm(forms.Form):
@@ -24,7 +25,7 @@ class CheckoutForm(forms.ModelForm):
     coupon_code = forms.CharField(
         max_length=50,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mã giảm giá (nếu có)'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mã giảm giá (nếu có)', 'id': 'coupon-input'})
     )
 
     class Meta:

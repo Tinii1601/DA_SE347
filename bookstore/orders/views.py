@@ -8,7 +8,8 @@ from books.models import Book
 from users.models import Address
 from .cart import Cart
 from .forms import CartAddProductForm, CheckoutForm
-from .models import Order, OrderItem, Payment
+from .models import Order, OrderItem
+from payment.models import Payment
 
 from django.http import JsonResponse
 
@@ -70,11 +71,13 @@ class CheckoutView(LoginRequiredMixin, View):
         
         form = CheckoutForm()
         addresses = Address.objects.filter(user=request.user)
+        default_address = addresses.filter(is_default=True).first() or addresses.first()
         
         return render(request, 'orders/checkout.html', {
             'cart': cart,
             'form': form,
-            'addresses': addresses
+            'addresses': addresses,
+            'default_address': default_address
         })
 
     def post(self, request):
@@ -84,25 +87,80 @@ class CheckoutView(LoginRequiredMixin, View):
             
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            # Get address
-            address_id = request.POST.get('address_id')
-            if not address_id:
-                # Handle case where no address is selected
-                addresses = Address.objects.filter(user=request.user)
-                return render(request, 'orders/checkout.html', {
-                    'cart': cart,
-                    'form': form,
-                    'addresses': addresses,
-                    'error': 'Vui lòng chọn địa chỉ giao hàng'
-                })
-            
-            address = get_object_or_404(Address, id=address_id, user=request.user)
+            # Handle Address: Check if new address data is provided
+            full_name = request.POST.get('full_name')
+            phone = request.POST.get('phone')
+            city = request.POST.get('city')
+            district = request.POST.get('district')
+            ward = request.POST.get('ward')
+            address_line = request.POST.get('address_line')
+
+            if full_name and phone and city and district and ward and address_line:
+                # Create or update address
+                # For simplicity in this flow, we'll create a new one or get an existing identical one
+                address, created = Address.objects.get_or_create(
+                    user=request.user,
+                    full_name=full_name,
+                    phone=phone,
+                    city=city,
+                    district=district,
+                    ward=ward,
+                    address_line=address_line,
+                    defaults={'is_default': True} # Set as default if created
+                )
+            else:
+                # Fallback to existing logic (address_id)
+                address_id = request.POST.get('address_id')
+                if not address_id:
+                    # Try to get the default address
+                    address = Address.objects.filter(user=request.user, is_default=True).first()
+                    if not address:
+                        # If no default, get the first one
+                        address = Address.objects.filter(user=request.user).first()
+                    
+                    if not address:
+                         addresses = Address.objects.filter(user=request.user)
+                         return render(request, 'orders/checkout.html', {
+                            'cart': cart,
+                            'form': form,
+                            'addresses': addresses,
+                            'error': 'Vui lòng nhập thông tin giao hàng'
+                        })
+                else:
+                    address = get_object_or_404(Address, id=address_id, user=request.user)
             
             # Create Order
             order = form.save(commit=False)
             order.user = request.user
             order.shipping_address = address
             order.total_amount = cart.get_total_price()
+            
+            # Apply Coupon
+            coupon_id = request.session.get('coupon_id')
+            if coupon_id:
+                try:
+                    from .models import Coupon
+                    coupon = Coupon.objects.get(id=coupon_id)
+                    if coupon.is_valid():
+                        discount = coupon.calculate_discount(order.total_amount, order.shipping_fee)
+                        order.coupon = coupon
+                        order.discount_amount = discount
+                        order.total_amount = float(order.total_amount) + float(order.shipping_fee) - float(discount)
+                        
+                        # Update usage
+                        coupon.used_count += 1
+                        coupon.save()
+                        
+                        # Clear session
+                        del request.session['coupon_id']
+                    else:
+                        # Coupon invalid, just calculate total with shipping
+                        order.total_amount = float(order.total_amount) + float(order.shipping_fee)
+                except Coupon.DoesNotExist:
+                     order.total_amount = float(order.total_amount) + float(order.shipping_fee)
+            else:
+                order.total_amount = float(order.total_amount) + float(order.shipping_fee)
+
             order.save()
             
             # Create OrderItems
@@ -122,15 +180,20 @@ class CheckoutView(LoginRequiredMixin, View):
                 amount=order.total_amount
             )
             
-            # Clear Cart
-            cart.clear()
-            
             # Redirect based on payment method
+            print(f"DEBUG: Payment method selected: {payment_method}")
+            
             if payment_method == 'momo':
-                return redirect('orders:payment_momo', order_id=order.id)
+                return redirect('payment:payment_momo', order_id=order.id)
             elif payment_method == 'vietqr':
-                return redirect('orders:payment_vietqr', order_id=order.id)
+                return redirect('payment:payment_vietqr', order_id=order.id)
+            elif payment_method == 'cod':
+                # Clear Cart only for COD
+                cart.clear()
+                return redirect('orders:order_success', order_id=order.id)
             else:
+                # For other methods (e.g. vnpay), do not clear cart immediately
+                # TODO: Implement handlers for other methods
                 return redirect('orders:order_success', order_id=order.id)
                 
         addresses = Address.objects.filter(user=request.user)
@@ -139,14 +202,6 @@ class CheckoutView(LoginRequiredMixin, View):
             'form': form,
             'addresses': addresses
         })
-
-def payment_momo(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'orders/payment_momo.html', {'order': order})
-
-def payment_vietqr(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'orders/payment_vietqr.html', {'order': order})
 
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
@@ -160,3 +215,41 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+@require_POST
+def apply_coupon(request):
+    import json
+    from django.utils import timezone
+    from .models import Coupon
+    
+    try:
+        data = json.loads(request.body)
+        code = data.get('code')
+        cart = Cart(request)
+        total_price = cart.get_total_price()
+        shipping_fee = 30000 # Default shipping fee
+        
+        try:
+            coupon = Coupon.objects.get(code=code)
+            if coupon.is_valid():
+                discount = coupon.calculate_discount(total_price, shipping_fee)
+                if discount > 0:
+                    # Store in session
+                    request.session['coupon_id'] = coupon.id
+                    
+                    final_total = float(total_price) + shipping_fee - float(discount)
+                    return JsonResponse({
+                        'success': True,
+                        'discount': float(discount),
+                        'total': final_total,
+                        'message': f'Áp dụng mã {code} thành công!'
+                    })
+                else:
+                    return JsonResponse({'success': False, 'message': 'Đơn hàng chưa đủ điều kiện áp dụng mã này.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'})
+        except Coupon.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Mã giảm giá không tồn tại.'})
+            
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})

@@ -15,7 +15,7 @@ def user_avatar_upload_to(instance, filename):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    phone = models.CharField("Số điện thoại", max_length=15, blank=True, null=True, unique=True)
+    phone = models.CharField("Số điện thoại", max_length=10, blank=True, null=True, unique=True)
     email = models.EmailField(
         "Email", 
         max_length=255, 

@@ -4,3 +4,4 @@ python-decouple
 unidecode
 requests
 django-jazzmin
+payos 

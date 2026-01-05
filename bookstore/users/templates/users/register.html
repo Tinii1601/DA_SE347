@@ -3,8 +3,18 @@
 
 {% block content %}
 
-<div class="row justify-content-center">
-  <div class="col-md-8">
+<div class="container py-3">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted">Trang chủ</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Đăng ký</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
     <div class="card shadow">
       <div class="card-body p-5">
         <h3 class="text-center mb-4">ĐĂNG KÝ</h3>
@@ -15,6 +25,8 @@
               {{ message }}
               <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+          {% endfor %}
+        {% endif %}
 
         <form method="post">
           {% csrf_token %}
@@ -104,5 +116,6 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 {% endblock %}

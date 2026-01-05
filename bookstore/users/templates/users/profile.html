@@ -1,4 +1,3 @@
-<!-- users/templates/users/profile.html -->
 {% extends 'base.html' %}
 {% block title %}Hồ sơ cá nhân{% endblock %}
 
@@ -16,7 +15,7 @@
   </div>
   <div class="col-md-8">
     <h4>Địa chỉ giao hàng</h4>
-    <a href="{% url 'address_add' %}" class="btn btn-sm btn-primary mb-3">Thêm địa chỉ</a>
+    <a href="{% url 'users:address_add' %}" class="btn btn-sm btn-primary mb-3">Thêm địa chỉ</a>
     {% for addr in addresses %}
     <div class="border p-3 mb-2 rounded">
       <p><strong>{{ addr.full_name }}</strong> - {{ addr.phone }}</p>

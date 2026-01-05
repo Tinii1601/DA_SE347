@@ -32,7 +32,35 @@ INSTALLED_APPS = [
     'orders',
     'reviews',
     'payment',
+
+    # login social
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 ]
+SITE_ID = 1
+
+# Optional: Jazzmin configuration. Tweak these to taste.
+JAZZMIN_SETTINGS = {
+    "site_title": "Bookstore Admin",
+    "site_header": "Bookstore",
+    "welcome_sign": "Welcome to Bookstore admin",
+    "show_ui_builder": False,
+    "topmenu_links": [
+        {"name": "Return to site", "url": "/", "new_window": False},
+    ],
+}
+
+# Optional UI tweaks for Jazzmin
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",
+    "navbar_small_text": False,
+    "body_small_text": False,
+    "brand_colour": "#175229",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -42,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'bookstore.urls'
@@ -101,6 +130,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 AUTHENTICATION_BACKENDS = [
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -113,13 +143,6 @@ CART_SESSION_ID = 'cart'
 # ================== DEFAULT AUTO FIELD ==================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# # ================== MOMO PAYMENT CONFIG ==================
-# MOMO_API_ENDPOINT = config('MOMO_API_ENDPOINT', default='https://test-payment.momo.vn/v2/gateway/api/create')
-# MOMO_PARTNER_CODE = config('MOMO_PARTNER_CODE', default='')
-# MOMO_ACCESS_KEY = config('MOMO_ACCESS_KEY', default='')
-# MOMO_SECRET_KEY = config('MOMO_SECRET_KEY', default='')
-# MOMO_RETURN_URL = config('MOMO_RETURN_URL', default='http://127.0.0.1:8000/orders/momo/return/')
-
 # ================== PAYOS PAYMENT CONFIG ==================
 PAYOS_CLIENT_ID = config('PAYOS_CLIENT_ID', default='')
 PAYOS_API_KEY = config('PAYOS_API_KEY', default='')
@@ -128,15 +151,20 @@ PAYOS_CHECKSUM_KEY = config('PAYOS_CHECKSUM_KEY', default='')
 MOMO_NOTIFY_URL = config('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')
 
 # ================== EMAIL CONFIGURATION ==================
-# Cấu hình gửi email (Mặc định in ra console để test)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Cấu hình SMTP cho Gmail
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-# DEFAULT_FROM_EMAIL = f"Bookstore <{EMAIL_HOST_USER}>"
-DEFAULT_FROM_EMAIL = 'Bookstore <noreply@bookstore.com>'
+
+EMAIL_HOST_USER = 'nguyenthikimngoc1402@gmail.com'
+EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'apryl-unstent(or)iously-olive.ngrok-free.dev',
+]
+SOCIALACCOUNT_LOGIN_ON_GET = True
+

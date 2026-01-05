@@ -1,0 +1,72 @@
+{% load static %}
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="fw-bold mb-4">ĐỊA CHỈ THANH TOÁN</h5>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Họ và tên</label>
+        {{ address_form.full_name }}
+        {% for error in address_form.full_name.errors %}
+          <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Tỉnh / Thành phố</label>
+          <select class="form-select {% if address_form.city.errors %}is-invalid{% endif %}" id="city" name="city">
+            <option value="">Chọn tỉnh / thành phố</option>
+          </select>
+          {% for error in address_form.city.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Quận / Huyện</label>
+          <select class="form-select {% if address_form.district.errors %}is-invalid{% endif %}" id="district" name="district">
+            <option value="">Chọn quận / huyện</option>
+          </select>
+          {% for error in address_form.district.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Phường / Xã</label>
+          <select class="form-select {% if address_form.ward.errors %}is-invalid{% endif %}" id="ward" name="ward">
+            <option value="">Chọn phường / xã</option>
+          </select>
+          {% for error in address_form.ward.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Địa chỉ</label>
+          {{ address_form.address_line }}
+          {% for error in address_form.address_line.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" value="{{ request.user.email }}" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Số điện thoại</label>
+          <input type="text" class="form-control" name="phone"
+                 value="{{ default_address.phone|default:request.user.profile.phone }}">
+        </div>
+      </div>
+      <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-success px-4" name="save_address">Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/address.js' %}"></script>
+
+

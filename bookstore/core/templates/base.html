@@ -55,7 +55,7 @@
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <form id="logout-form" action="{% url 'users:logout' %}" method="post" class="d-none">
-                        {% csrf_token %}
+                      {% csrf_token %}
                     </form>
                     <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit();">Đăng xuất</a>
                   </li>
@@ -219,12 +219,7 @@
       </div>
     </div>
   </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <main class="flex-shrink-0">
+  <main class="flex-fill">
     <div class="container">
       {% if messages %}
         <div class="messages">
@@ -239,7 +234,7 @@
       {% block content %}{% endblock %}
     </div>
   </main>
-
+  
   <footer class="bg-lumiere text-white pt-5 pb-3 mt-auto">
     <div class="container">
       <div class="row">
@@ -304,7 +299,7 @@
       <hr class="my-4 border-white opacity-25">
       
       <div class="text-center small opacity-75">
-        &copy; 2024 Lumière Bookstore.
+        &copy; 2024 Bookstore.
       </div>
     </div>
   </footer>

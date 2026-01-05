@@ -4,48 +4,44 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 import os
-
+from PIL import Image
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import date
 
 # Tự động tạo thư mục nếu chưa có
 def user_avatar_upload_to(instance, filename):
     ext = filename.split('.')[-1].lower()
     filename = f"{instance.user.username}.{ext}"
     return f"users/avatars/{filename}"
-
+# Kiểm tra tuổi ≥ 14
+def validate_min_age_14(value):
+    today = date.today()
+    age = today.year - value.year - (
+        (today.month, today.day) < (value.month, value.day)
+    )
+    if age < 14:
+        raise ValidationError("Người dùng phải đủ 14 tuổi trở lên.")
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    phone = models.CharField("Số điện thoại", max_length=10, blank=True, null=True, unique=True)
-    email = models.EmailField(
-        "Email", 
-        max_length=255, 
-        blank=True, 
-        null=True,  
-        unique=True 
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='profile'
     )
-    avatar = models.ImageField(
-        "Ảnh đại diện",
-        upload_to=user_avatar_upload_to,
-        blank=True,
-        null=True,
-        help_text="Ảnh sẽ lưu tại: media/users/avatars/"
-    )
-    date_of_birth = models.DateField("Ngày sinh", blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    avatar = models.ImageField(upload_to=user_avatar_upload_to, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True,null=True, validators=[validate_min_age_14])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "Hồ sơ người dùng"
-        verbose_name_plural = "Hồ sơ người dùng"
-
+    def save(self, *args, **kwargs):
+        self.full_clean() 
+        super().save(*args, **kwargs)
+        if self.avatar and os.path.exists(self.avatar.path):
+            img = Image.open(self.avatar.path)
+            img = img.convert("RGB")
+            img.thumbnail((300, 300))
+            img.save(self.avatar.path, quality=85)
     def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username}"
-
-    def avatar_url(self):
-        if self.avatar and hasattr(self.avatar, 'url'):
-            return self.avatar.url
-        return "/static/img/default-avatar.jpg"  
-
+        return self.user.get_full_name() or self.user.username
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
@@ -72,3 +68,8 @@ class Address(models.Model):
             Address.objects.filter(user=self.user).update(is_default=False)
             self.is_default = True
         super().save(*args, **kwargs)
+        
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)

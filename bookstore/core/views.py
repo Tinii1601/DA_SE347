@@ -1,5 +1,6 @@
 # core/views.py
 from django.views.generic import TemplateView
+from django.shortcuts import render
 from books.models import Book, Category
 
 class HomeView(TemplateView):
@@ -25,3 +26,5 @@ class HomeView(TemplateView):
         context['best_sellers'] = Book.objects.filter(is_active=True).order_by('-price')[:5]
         
         return context
+
+

@@ -39,10 +39,28 @@ def cart_remove(request, book_id):
 
 def cart_detail(request):
     cart = Cart(request)
-    for item in cart:
-        item['update_quantity_form'] = CartAddProductForm(initial={
-                            'quantity': item['quantity'],
-                            'override': True})
+    
+    # Wrapper class to persist form data across iterations
+    class CartWrapper:
+        def __init__(self, cart):
+            self.cart = cart
+            self.items = []
+            for item in cart:
+                item['update_quantity_form'] = CartAddProductForm(initial={
+                                    'quantity': item['quantity'],
+                                    'override': True})
+                self.items.append(item)
+        
+        def __iter__(self):
+            return iter(self.items)
+            
+        def __len__(self):
+            return len(self.items)
+            
+        def get_total_price(self):
+            return self.cart.get_total_price()
+
+    cart_wrapper = CartWrapper(cart)
     
     # Logic for "Continue Shopping" URL
     referer = request.META.get('HTTP_REFERER')
@@ -58,7 +76,7 @@ def cart_detail(request):
     recommended_books = random.sample(all_books, min(len(all_books), 4))
 
     return render(request, 'orders/cart_detail.html', {
-        'cart': cart, 
+        'cart': cart_wrapper, 
         'continue_shopping_url': continue_shopping_url,
         'recommended_books': recommended_books
     })
@@ -208,8 +226,7 @@ def order_success(request, order_id):
     return render(request, 'orders/order_success.html', {'order': order})
 
 
-class OrderHistoryView(LoginRequiredMixin, ListView):
-    model = Order
+class OrderHistoryView(LoginRequiredMixin, TemplateView):
     template_name = 'orders/order_history.html'
     context_object_name = 'orders'
 

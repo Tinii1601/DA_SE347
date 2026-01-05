@@ -2,3 +2,10 @@ django
 Pillow
 python-decouple
 unidecode
+requests
+django-jazzmin
+payos 
+
+cryptography
+django-allauth
+PyJWT

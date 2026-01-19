@@ -1,0 +1,80 @@
+{% extends 'users/profile/profile_base.html' %}
+{% load static %}
+
+{% block title %}Sản phẩm yêu thích{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
+{% endblock %}
+
+{% block profile_content %}
+<div class="wishlist-page">
+  <div class="section-heading">
+    <h4>Sản phẩm yêu thích</h4>
+    <p class="text-muted">Chỉ bạn thấy danh sách này trên tài khoản của mình.</p>
+  </div>
+
+  <div id="wishlist-empty" class="wishlist-empty d-none">
+    <p>Bạn chưa có sản phẩm yêu thích nào.</p>
+    <a href="{% url 'books:book_list' %}" class="btn btn-success btn-sm">Mua sắm ngay</a>
+  </div>
+
+  <div id="wishlist-grid" class="wishlist-grid"></div>
+</div>
+
+<script>
+  (function () {
+    const userKey = "{{ request.user.id|default:'guest' }}";
+    const storageKey = `wishlist:${userKey}`;
+    const grid = document.getElementById("wishlist-grid");
+    const emptyState = document.getElementById("wishlist-empty");
+
+    function loadWishlist() {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveWishlist(items) {
+      localStorage.setItem(storageKey, JSON.stringify(items));
+    }
+
+    function removeItem(id) {
+      const items = loadWishlist().filter((item) => item.id !== id);
+      saveWishlist(items);
+      render();
+    }
+
+    function render() {
+      const items = loadWishlist();
+      grid.innerHTML = "";
+      if (!items.length) {
+        emptyState.classList.remove("d-none");
+        return;
+      }
+      emptyState.classList.add("d-none");
+
+      items.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "wishlist-card";
+        card.innerHTML = `
+          <a href="${item.url}" class="wishlist-thumb">
+            <img src="${item.cover || '{% static "img/logo.png" %}'}" alt="${item.title}">
+          </a>
+          <div class="wishlist-info">
+            <a href="${item.url}" class="wishlist-title">${item.title}</a>
+            <div class="wishlist-author">${item.author || ""}</div>
+            <div class="wishlist-price">${item.price || ""}</div>
+          </div>
+          <button class="wishlist-heart" type="button" aria-label="Bỏ yêu thích">
+            <i class="bi bi-heart-fill"></i>
+          </button>
+        `;
+        card.querySelector(".wishlist-heart").addEventListener("click", () => removeItem(item.id));
+        grid.appendChild(card);
+      });
+    }
+
+    render();
+  })();
+</script>
+{% endblock %}

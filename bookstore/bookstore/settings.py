@@ -24,6 +24,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ckeditor',
+    'ckeditor_uploader',
+    'import_export',
 
     # Local apps
     'core',
@@ -126,6 +129,13 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  
 
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+    }
+}
+
 # ================== AUTHENTICATION ==================
 AUTHENTICATION_BACKENDS = [
     'users.backends.EmailBackend',
@@ -161,6 +171,7 @@ EMAIL_HOST_USER = 'nguyenthikimngoc1402@gmail.com'
 EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='nguyenthikimngoc1402@gmail.com')
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',

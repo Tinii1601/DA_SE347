@@ -1,4 +1,4 @@
-/* Global Variables & Theme */
+﻿/* Global Variables & Theme */
 :root {
     --lumiere-green: #1a4d2e;
     --lumiere-light-green: #4f775d;
@@ -52,6 +52,12 @@ footer {
 /* Utility Classes */
 .text-justify {
     text-align: justify;
+}
+
+.content-html img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* Header Styles */
@@ -170,4 +176,105 @@ footer {
 .social-icons a:hover {
     transform: translateY(-3px);
     opacity: 1;
+}
+.header-top,
+.header-bottom {
+    border: none !important;
+}
+
+header {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+/* Logo size (original) */
+.brand-logo-img {
+    height: 150px;
+}
+
+/* Header spacing tweak: reduce top gap only */
+.header-top {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.header-bottom {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -30px;
+}
+
+
+.footer-logo-wrap {
+    display: inline-block;
+    height: 100px;
+    overflow: hidden;
+}
+
+.footer-logo-img {
+    height: 140px;
+    width: auto;
+    max-width: 100%;
+    display: block;
+    object-fit: contain;
+    transform: translateY(-6px);
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: -25px;
+}
+
+.footer-main {
+    align-items: flex-start;
+    row-gap: 24px;
+}
+
+.social-icons {
+    margin-bottom: 12px;
+}
+
+.contact-info p {
+    margin-bottom: 0.35rem;
+}
+
+footer.bg-lumiere {
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+footer.bg-lumiere hr {
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 991.98px) {
+    .footer-brand {
+        align-items: center;
+    }
+}
+
+.footer-left {
+    text-align: center;
+}
+
+.footer-left .social-icons {
+    justify-content: center !important;
+}
+
+.footer-left .contact-info {
+    text-align: center;
+}
+/* Logo size (original) */
+.brand-logo-img {
+    height: 180px;
+    width: auto;
+    max-width: 100%;
+    display: block;
+}
+
+/* Header spacing tweak: reduce top gap only */
+.header-top {
+    padding-top: 6px;
 }

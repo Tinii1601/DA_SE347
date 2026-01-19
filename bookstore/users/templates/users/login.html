@@ -53,15 +53,13 @@
         <a href="{% url 'users:register' %}" class="btn btn-outline-success w-100 mb-4">TẠO TÀI KHOẢN </a>
         <div class="text-center mb-3 text-muted">Hoặc</div>
         <!-- Social login -->
-        <a href="#"
-        {% comment %} <a href="{% provider_login_url 'google' %}" {% endcomment %}
+        <a href="{% provider_login_url 'google' %}"
           class="btn btn-outline-secondary w-100 mb-2 d-flex align-items-center justify-content-center gap-2">
           <img src="https://developers.google.com/identity/images/g-logo.png" width="18">
           Đăng nhập với Google
         </a>
         <p></p>
-        <a href="#"
-        {% comment %} <a href="{% provider_login_url 'facebook' %}" {% endcomment %}
+        <a href="{% provider_login_url 'facebook' %}"
           class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
           <i class="bi bi-facebook text-primary"></i>
           Đăng nhập với Facebook

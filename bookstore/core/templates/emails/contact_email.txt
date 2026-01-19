@@ -1,0 +1,10 @@
+Lien he moi tu website Bookstore
+
+Ten: {{ name }}
+Email: {{ email }}
+So dien thoai: {{ phone }}
+Tieu de: {{ subject }}
+Thoi gian: {{ submitted_at|date:"d/m/Y H:i" }}
+
+Noi dung:
+{{ message }}

@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils.text import slugify
 from unidecode import unidecode
+from ckeditor_uploader.fields import RichTextUploadingField
 import os
 
 
@@ -74,6 +75,7 @@ class Book(models.Model):
     publisher = models.CharField(max_length=150, blank=True)
     isbn = models.CharField(max_length=13, blank=True, null=True)
     description = models.TextField()
+    detailed_description = RichTextUploadingField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} | Tin tức{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/new_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<nav class="page-breadcrumb-top" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'core:news_list' %}">Tin tức &amp; Sự kiện</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+  </ol>
+</nav>
+
+<div class="news-detail-hero">
+  <h1>{{ post.title }}</h1>
+  {% if post.published_at %}
+    <div class="date">{{ post.published_at|date:"d/m/Y" }}</div>
+  {% endif %}
+</div>
+
+<div class="news-detail-body content-html">
+  {{ post.body_html|safe }}
+</div>
+
+{% if recommended_posts %}
+  <div class="news-recommend">
+    <h3 class="news-section-title">Bài viết khác</h3>
+    <div class="row g-4">
+      {% for item in recommended_posts %}
+        <div class="col-md-4">
+          <div class="card news-card">
+            <a href="{% url 'core:news_detail' item.slug %}" class="text-decoration-none">
+              <div class="news-thumb">
+                {% if item.cover_image %}
+                  <img src="{{ item.cover_image.url }}" alt="{{ item.title }}">
+                {% else %}
+                  <img src="{% static 'img/logo.png' %}" alt="{{ item.title }}">
+                {% endif %}
+              </div>
+              <div class="news-title">{{ item.title }}</div>
+            </a>
+            <div class="news-meta">
+              {% if item.published_at %}Ngày: {{ item.published_at|date:"d/m/Y" }}{% endif %}
+            </div>
+            <div class="news-summary">“{{ item.summary|default:""|truncatewords:100 }}”</div>
+            <a href="{% url 'core:news_detail' item.slug %}" class="news-more d-inline-block mt-2">Xem thêm →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

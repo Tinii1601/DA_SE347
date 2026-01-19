@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tin tức &amp; Sự kiện | Bookstore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/new_list.css' %}">
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="news-list-page">
+<nav class="page-breadcrumb-top" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tin tức &amp; Sự kiện</li>
+  </ol>
+</nav>
+
+<div class="news-hero">
+  <h1>Tin tức &amp; Sự kiện</h1>
+</div>
+
+<div class="row">
+  <div class="col-lg-9">
+    <div class="news-section-title">Ưu đãi</div>
+    <div class="row g-4 mb-4">
+      {% for post in promo_posts %}
+        <div class="col-md-4">
+          <div class="card news-card">
+            <a href="{% url 'core:news_detail' post.slug %}" class="text-decoration-none">
+              <div class="news-thumb">
+                {% if post.cover_image %}
+                  <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
+                {% else %}
+                  <img src="{% static 'img/logo.png' %}" alt="{{ post.title }}">
+                {% endif %}
+              </div>
+              <div class="news-title">{{ post.title }}</div>
+            </a>
+            <div class="news-meta">
+              {% if post.published_at %}Ngày: {{ post.published_at|date:"d/m/Y" }}{% endif %}
+            </div>
+            <div class="news-summary">“{{ post.summary|default:""|truncatewords:100 }}”</div>
+            <a href="{% url 'core:news_detail' post.slug %}" class="news-more d-inline-block mt-2">Xem thêm →</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">Chưa có bài viết ưu đãi.</p>
+      {% endfor %}
+    </div>
+
+    <div class="news-section-title">Sự kiện</div>
+    <div class="row g-4">
+      {% for post in event_posts %}
+        <div class="col-md-4">
+          <div class="card news-card">
+            <a href="{% url 'core:news_detail' post.slug %}" class="text-decoration-none">
+              <div class="news-thumb">
+                {% if post.cover_image %}
+                  <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
+                {% else %}
+                  <img src="{% static 'img/logo.png' %}" alt="{{ post.title }}">
+                {% endif %}
+              </div>
+              <div class="news-title">{{ post.title }}</div>
+            </a>
+            <div class="news-meta">
+              {% if post.published_at %}Ngày: {{ post.published_at|date:"d/m/Y" }}{% endif %}
+            </div>
+            <div class="news-summary">“{{ post.summary|default:""|truncatewords:100 }}”</div>
+            <a href="{% url 'core:news_detail' post.slug %}" class="news-more d-inline-block mt-2">Xem thêm →</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">Chưa có bài viết sự kiện.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-3 news-aside">
+    <h5>Bài viết mới</h5>
+    <ul class="list-unstyled">
+      {% for post in recent_posts %}
+        <li>
+          <a href="{% url 'core:news_detail' post.slug %}">{{ post.title }}</a>
+          {% if post.published_at %}
+            <small>{{ post.published_at|date:"d/m/Y" }}</small>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li class="text-muted">Chưa có bài viết.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -15,7 +15,7 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Tỉnh / Thành phố</label>
-          <select class="form-select {% if address_form.city.errors %}is-invalid{% endif %}" id="city" name="city">
+          <select class="form-select {% if address_form.city.errors %}is-invalid{% endif %}" id="city" name="city" data-current="{{ default_address.city|default:'' }}">
             <option value="">Chọn tỉnh / thành phố</option>
           </select>
           {% for error in address_form.city.errors %}
@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-6 mb-3">
           <label class="form-label">Quận / Huyện</label>
-          <select class="form-select {% if address_form.district.errors %}is-invalid{% endif %}" id="district" name="district">
+          <select class="form-select {% if address_form.district.errors %}is-invalid{% endif %}" id="district" name="district" data-current="{{ default_address.district|default:'' }}">
             <option value="">Chọn quận / huyện</option>
           </select>
           {% for error in address_form.district.errors %}
@@ -35,7 +35,7 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Phường / Xã</label>
-          <select class="form-select {% if address_form.ward.errors %}is-invalid{% endif %}" id="ward" name="ward">
+          <select class="form-select {% if address_form.ward.errors %}is-invalid{% endif %}" id="ward" name="ward" data-current="{{ default_address.ward|default:'' }}">
             <option value="">Chọn phường / xã</option>
           </select>
           {% for error in address_form.ward.errors %}
@@ -53,7 +53,7 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Email</label>
-          <input type="email" class="form-control" value="{{ request.user.email }}" disabled>
+          <input type="email" class="form-control" value="{{ display_email }}" disabled>
         </div>
         <div class="col-md-6 mb-3">
           <label class="form-label">Số điện thoại</label>

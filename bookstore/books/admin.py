@@ -1,11 +1,12 @@
 # books/admin.py
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html
 from .models import Category, Book
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ImportExportModelAdmin):
     list_display = ['name', 'slug', 'book_count']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
@@ -15,13 +16,22 @@ class CategoryAdmin(admin.ModelAdmin):
     book_count.short_description = "Số sách"
 
 @admin.register(Book)
-class BookAdmin(admin.ModelAdmin):
+class BookAdmin(ImportExportModelAdmin):
     list_display = ['title', 'author', 'final_price', 'stock', 'is_active', 'cover_image_thumb']
     list_filter = ['is_active', 'category', 'created_at']
     search_fields = ['title', 'author', 'isbn']
-    prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['created_at', 'updated_at']
     list_editable = ['is_active']
+    fieldsets = (
+        (None, {
+            "fields": (
+                "title", "author", "publisher", "isbn",
+                "category", "price", "discount_price", "stock", "is_active",
+                "cover_image", "description", "detailed_description",
+            )
+        }),
+        ("Thời gian", {"fields": ("created_at", "updated_at")}),
+    )
 
     def cover_image_thumb(self, obj):
         if obj.cover_image:

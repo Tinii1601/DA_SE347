@@ -1,0 +1,279 @@
+.order-detail {
+  padding: 8px 0 32px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-header h4 {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #1a4d2e;
+}
+
+.detail-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.info-card {
+  background: #fff;
+  border: 1px solid #e6e0d6;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.info-card h6 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6f6a5f;
+  margin-bottom: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.info-row.total {
+  font-weight: 700;
+  color: #1a4d2e;
+  border-top: 1px dashed #ddd2bf;
+  padding-top: 8px;
+}
+
+.order-progress {
+  --dot-size: 28px;
+  position: relative;
+  margin: 24px auto 30px;
+  max-width: 680px;
+}
+
+.progress-track {
+  position: absolute;
+  top: calc(var(--dot-size) / 2);
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #fff;
+  border: 1px solid #e5e1d7;
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  background: #1a4d2e;
+  border-radius: 999px;
+}
+
+.progress-steps {
+  position: relative;
+  min-height: 70px;
+  margin-top: 0;
+  z-index: 2;
+  padding: 0;
+}
+
+.progress-step {
+  position: absolute;
+  top: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #6f6a5f;
+  transform: translateX(-50%);
+}
+
+.progress-step:nth-child(1) {
+  left: 0%;
+}
+
+.progress-step:nth-child(2) {
+  left: 33.333%;
+}
+
+.progress-step:nth-child(3) {
+  left: 66.666%;
+}
+
+.progress-step:nth-child(4) {
+  left: 100%;
+}
+
+.progress-step .dot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  border: 2px solid #cfc9bd;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-size: 12px;
+  font-weight: 700;
+  position: relative;
+}
+
+.progress-step .label {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.progress-step.is-complete .dot,
+.progress-step.is-active .dot {
+  border-color: #1a4d2e;
+  background: #1a4d2e;
+  color: #fff;
+}
+
+.progress-step.is-complete .dot span,
+.progress-step.is-active .dot span {
+  display: none;
+}
+
+.progress-step.is-complete .dot::before,
+.progress-step.is-active .dot::before {
+  content: "✓";
+  font-size: 12px;
+}
+
+.progress-step:not(.is-complete):not(.is-active) .dot {
+  border-style: dashed;
+  color: #6f6a5f;
+}
+
+.progress-step.is-active .label,
+.progress-step.is-complete .label {
+  color: #1a4d2e;
+}
+
+.progress-step.is-canceled .dot {
+  border-color: #b91c1c;
+  background: #fff;
+  color: #b91c1c;
+}
+
+.order-status {
+  font-weight: 700;
+  color: #1a4d2e;
+}
+
+.order-status.status-pending {
+  color: #1a4d2e;
+}
+
+.order-status.status-shipping {
+  color: #0f766e;
+}
+
+.order-status.status-delivered {
+  color: #2f855a;
+}
+
+.order-status.status-canceled {
+  color: #b91c1c;
+}
+
+.canceled-note {
+  margin-top: 12px;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.order-items {
+  border: 1px solid #e6e0d6;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.order-items-header,
+.order-item-row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 0.8fr 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.order-items-header {
+  background: #f6f3ee;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #1a4d2e;
+  font-weight: 600;
+}
+
+.order-item-row {
+  border-top: 1px solid #eee3d2;
+  font-size: 14px;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5efe4;
+}
+
+.item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-name {
+  font-weight: 600;
+}
+
+@media (max-width: 992px) {
+  .detail-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .order-items-header {
+    display: none;
+  }
+
+  .order-item-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .order-item-row > div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .order-item-row > div::before {
+    content: attr(data-label);
+    color: #6f6a5f;
+    font-weight: 600;
+  }
+}

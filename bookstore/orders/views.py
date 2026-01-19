@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView, FormView, ListView
+from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from books.models import Book
 from users.models import Address
@@ -226,12 +226,60 @@ def order_success(request, order_id):
     return render(request, 'orders/order_success.html', {'order': order})
 
 
-class OrderHistoryView(LoginRequiredMixin, TemplateView):
+class OrderHistoryView(LoginRequiredMixin, ListView):
     template_name = 'orders/order_history.html'
     context_object_name = 'orders'
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related("payment")
+            .order_by("-created_at")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["active"] = "orders"
+        return context
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "orders/order_detail.html"
+    context_object_name = "order"
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related("payment", "shipping_address")
+            .prefetch_related("items__book")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        steps = [
+            {"key": "pending", "label": "Đã nhận đơn"},
+            {"key": "confirmed", "label": "Đang xử lý"},
+            {"key": "shipping", "label": "Đang giao hàng"},
+            {"key": "delivered", "label": "Đã giao hàng"},
+        ]
+        status = self.object.status
+        canceled = status == "canceled"
+        step_index = next((i for i, s in enumerate(steps) if s["key"] == status), 0)
+        total_steps = max(len(steps) - 1, 1)
+        progress_percent = 0 if canceled else int((step_index / total_steps) * 100)
+        subtotal = self.object.total_amount - self.object.shipping_fee + self.object.discount_amount
+        context.update(
+            {
+                "steps": steps,
+                "step_index": step_index,
+                "progress_percent": progress_percent,
+                "is_canceled": canceled,
+                "subtotal": subtotal,
+                "active": "orders",
+            }
+        )
+        return context
 
 @require_POST
 def apply_coupon(request):

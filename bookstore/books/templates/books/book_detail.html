@@ -1,6 +1,11 @@
-<!-- books/templates/books/book_detail.html -->
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}{{ book.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/book_detail.css' %}">
+{% endblock %}
 
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-4">
@@ -18,158 +23,231 @@
   </ol>
 </nav>
 
-<div class="row">
-  <div class="col-md-4">
-    {% if book.cover_image %}
-      <img src="{{ book.cover_image.url }}" class="img-fluid rounded shadow-lg w-100" style="aspect-ratio: 2/3; object-fit: cover;" alt="{{ book.title }}">
-    {% else %}
-      <div class="bg-light rounded d-flex align-items-center justify-content-center w-100" style="aspect-ratio: 2/3;">
-        <span class="text-muted">Không có ảnh bìa</span>
-      </div>
-    {% endif %}
-  </div>
-  <div class="col-md-8">
-    <h1>{{ book.title }}</h1>
-    <h4 class="text-muted">Tác giả: <strong>{{ book.author }}</strong></h4>
-    <hr>
-    <div class="d-flex align-items-baseline mb-3 fs-5">
-        <span class="price me-3 fs-5">{{ book.get_final_price|floatformat:0 }}₫</span>
-        {% if book.discount_price %}
-          <span class="original-price fs-5">Giá gốc: {{ book.price|floatformat:0 }}₫</span>
-        {% endif %}
+<div class="book-detail">
+  <div class="book-hero">
+    <div class="book-cover">
+      {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+      {% else %}
+        <div class="cover-placeholder">Không có ảnh bìa</div>
+      {% endif %}
     </div>
-    <p class="fs-5"><strong>Tồn kho:</strong> 
-        {% if book.in_stock %}
-            <span class="badge bg-success">Còn hàng</span>
-        {% else %}
-            <span class="badge bg-danger">Hết hàng</span>
-        {% endif %}
-    </p>
 
-    <div class="mt-4">
-      <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form">
-          {% csrf_token %}
-          <div class="row align-items-center">
-              <div class="col-md-4 col-lg-3">
-                  <label for="quantity" class="form-label"><strong>Số lượng:</strong></label>
-                  {{ cart_product_form.quantity }}
-                  {{ cart_product_form.override }}
-              </div>
-              <div class="col-md-8 col-lg-9 mt-3 mt-md-0">
-                  <button type="submit" class="btn btn-success btn-lg w-100">
-                      <i class="bi bi-cart-plus-fill"></i> Thêm vào giỏ hàng
-                  </button>
-              </div>
+    <div class="book-info">
+      <div class="title-row">
+        <div>
+          <h1>{{ book.title }}</h1>
+          <div class="book-author">Tác giả: <strong>{{ book.author }}</strong></div>
+          <div class="book-rating">
+            <div class="stars">
+              {% for i in "12345" %}
+                <i class="bi {% if avg_rating >= i|add:0 %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+              {% endfor %}
+            </div>
+            <span class="rating-number">{{ avg_rating|floatformat:1 }}/5</span>
+            <span class="rating-count">({{ total_reviews }} đánh giá)</span>
           </div>
+        </div>
+        <button
+          type="button"
+          class="wishlist-btn"
+          id="wishlist-btn"
+          data-book-id="{{ book.id }}"
+          data-title="{{ book.title|escape }}"
+          data-author="{{ book.author|escape }}"
+          data-price="{{ book.get_final_price|floatformat:0 }}₫"
+          data-cover="{{ book.cover_image.url|default_if_none:'' }}"
+          data-url="{{ request.build_absolute_uri }}"
+        >
+          <i class="bi bi-heart-fill"></i>
+        </button>
+      </div>
+
+      <div class="book-price">
+        <span class="current">{{ book.get_final_price|floatformat:0 }}₫</span>
+        {% if book.discount_price %}
+          <span class="original">{{ book.price|floatformat:0 }}₫</span>
+        {% endif %}
+      </div>
+
+      <div class="book-stock">
+        {% if book.in_stock %}
+          <span class="badge bg-success">Còn hàng</span>
+        {% else %}
+          <span class="badge bg-danger">Hết hàng</span>
+        {% endif %}
+      </div>
+
+      <div class="book-short">
+        {% if book.description %}
+          {{ book.description|truncatewords:100 }}
+        {% else %}
+          Sản phẩm chưa có mô tả ngắn.
+        {% endif %}
+      </div>
+
+      <div class="book-policy">
+        <div class="policy-item"><i class="bi bi-truck"></i> Miễn phí ship nội thành</div>
+        <div class="policy-item"><i class="bi bi-arrow-repeat"></i> Được phép đổi trả</div>
+        <div class="policy-item"><i class="bi bi-lightning-charge"></i> Giao hàng nhanh nhất</div>
+      </div>
+
+      <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form" class="book-cart">
+        {% csrf_token %}
+        <label for="quantity" class="form-label">Số lượng</label>
+        <div class="cart-row">
+          {{ cart_product_form.quantity }}
+          {{ cart_product_form.override }}
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
+          </button>
+        </div>
       </form>
     </div>
+  </div>
 
-    <hr>
-    <h4>Mô tả chi tiết</h4>
-    <p>{{ book.description|linebreaks }}</p>
+  <div class="book-tabs">
+    <ul class="nav nav-tabs" id="bookTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc-pane" type="button" role="tab">Mô tả</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review-pane" type="button" role="tab">Đánh giá</button>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="desc-pane" role="tabpanel">
+        <div class="desc-block">
+          <h5>Mô tả chi tiết</h5>
+          <div class="desc-html">
+            {% if book.detailed_description %}
+              {{ book.detailed_description|safe }}
+            {% else %}
+              {{ book.description|linebreaks }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="review-pane" role="tabpanel">
+        <div class="review-summary">
+          <div class="avg-block">
+            <div class="avg-score">{{ avg_rating|floatformat:1 }}<span>/5</span></div>
+            <div class="stars">
+              {% for i in "12345" %}
+                <i class="bi {% if avg_rating >= i|add:0 %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+              {% endfor %}
+            </div>
+            <div class="count">({{ total_reviews }} đánh giá)</div>
+          </div>
+          <div class="rating-bars">
+            {% for row in rating_rows %}
+              <div class="rating-row">
+                <span>{{ row.star }} sao</span>
+                <div class="bar">
+                  <div class="fill" style="width: {{ row.percent }}%;"></div>
+                </div>
+                <span>{{ row.percent }}%</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="review-list">
+          {% for review in approved_reviews %}
+            <div class="review-item">
+              <div class="review-user">
+                <div class="avatar">{{ review.user.username|first|upper }}</div>
+                <div>
+                  <div class="name">{{ review.user.get_full_name|default:review.user.username }}</div>
+                  <div class="date">{{ review.created_at|date:"d/m/Y" }}</div>
+                </div>
+              </div>
+              <div class="review-body">
+                <div class="stars">
+                  {% for i in "12345" %}
+                    <i class="bi {% if i|add:0 <= review.rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                  {% endfor %}
+                </div>
+                <p>{{ review.comment }}</p>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+          {% endfor %}
+        </div>
+
+        <div class="review-form">
+          <h5>Viết đánh giá của bạn</h5>
+          <form action="{% url 'reviews:review_add' book.id %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="rating" class="form-label">Chất lượng</label>
+              <select name="rating" id="rating" class="form-select">
+                <option value="5">5 sao (Tuyệt vời)</option>
+                <option value="4">4 sao (Tốt)</option>
+                <option value="3">3 sao (Bình thường)</option>
+                <option value="2">2 sao (Tệ)</option>
+                <option value="1">1 sao (Rất tệ)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Bình luận</label>
+              <textarea name="comment" id="comment" rows="4" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Gửi đánh giá</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const form = this;
-        const url = form.action;
-        const formData = new FormData(form);
+  (function () {
+    const userKey = "{{ request.user.id|default:'guest' }}";
+    const storageKey = `wishlist:${userKey}`;
+    const btn = document.getElementById("wishlist-btn");
+    if (!btn) return;
 
-        fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.cart_length !== undefined) {
-                // Update cart badge
-                const badge = document.querySelector('.bi-cart-fill').nextElementSibling;
-                if (badge) {
-                    badge.textContent = data.cart_length;
-                    badge.classList.remove('d-none');
-                } else {
-                    // If badge doesn't exist (cart was empty), create it or reload
-                    location.reload(); 
-                }
-                
-                // Show success message (optional)
-                alert('Đã thêm vào giỏ hàng!');
-            } else {
-                // Fallback
-                window.location.href = "{% url 'orders:cart_detail' %}";
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            window.location.href = "{% url 'orders:cart_detail' %}";
-        });
+    const payload = {
+      id: btn.dataset.bookId,
+      title: btn.dataset.title,
+      author: btn.dataset.author,
+      price: btn.dataset.price,
+      cover: btn.dataset.cover,
+      url: btn.dataset.url
+    };
+
+    function loadWishlist() {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveWishlist(items) {
+      localStorage.setItem(storageKey, JSON.stringify(items));
+    }
+
+    function isSaved(items) {
+      return items.some((item) => item.id === payload.id);
+    }
+
+    function setActive(active) {
+      btn.classList.toggle("active", active);
+    }
+
+    btn.addEventListener("click", () => {
+      const items = loadWishlist();
+      if (isSaved(items)) {
+        saveWishlist(items.filter((item) => item.id !== payload.id));
+        setActive(false);
+      } else {
+        items.push(payload);
+        saveWishlist(items);
+        setActive(true);
+      }
     });
+
+    setActive(isSaved(loadWishlist()));
+  })();
 </script>
-
-<hr class="my-5">
-
-<div class="row">
-    <div class="col-md-8">
-        <h4 class="mb-4">Đánh giá sản phẩm ({{ book.reviews.count }})</h4>
-        {% for review in book.reviews.all %}
-            <div class="d-flex mb-4">
-                <div class="flex-shrink-0">
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                        {{ review.user.username|first|upper }}
-                    </div>
-                </div>
-                <div class="ms-3 w-100">
-                    <div class="d-flex justify-content-between">
-                      <h6 class="fw-bold mb-1">{{ review.user.get_full_name|default:review.user.username }}</h6>
-                      {% if review.user == request.user %}
-                        <a href="{% url 'reviews:review_edit' review.pk %}" class="btn btn-sm btn-outline-secondary">
-                          <i class="bi bi-pencil-square"></i> Sửa
-                        </a>
-                      {% endif %}
-                    </div>
-                    <div class="text-warning mb-2">
-                        {% for i in "12345" %}
-                            <i class="bi {% if i|add:0 <= review.rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>
-                        {% endfor %}
-                    </div>
-                    <p>{{ review.comment }}</p>
-                    <small class="text-muted">{{ review.created_at|timesince }} trước</small>
-                </div>
-            </div>
-        {% empty %}
-            <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
-        {% endfor %}
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Viết đánh giá của bạn</h5>
-                <form action="{% url 'reviews:review_add' book.id %}" method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="rating" class="form-label">Chất lượng</label>
-                        <select name="rating" id="rating" class="form-select">
-                            <option value="5">5 sao (Tuyệt vời)</option>
-                            <option value="4">4 sao (Tốt)</option>
-                            <option value="3">3 sao (Bình thường)</option>
-                            <option value="2">2 sao (Tệ)</option>
-                            <option value="1">1 sao (Rất tệ)</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="comment" class="form-label">Bình luận</label>
-                        <textarea name="comment" id="comment" rows="4" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Gửi đánh giá</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

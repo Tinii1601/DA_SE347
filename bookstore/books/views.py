@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 from .models import Book, Category
 from .forms import BookSearchForm
+from orders.forms import CartAddProductForm
 
 class BookListView(ListView):
     model = Book
@@ -60,6 +61,25 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cart_product_form'] = CartAddProductForm()
+        approved_reviews = self.object.reviews.filter(is_approved=True)
+        total_reviews = approved_reviews.count()
+        rating_counts = {i: approved_reviews.filter(rating=i).count() for i in range(1, 6)}
+        rating_percent = {
+            i: int((rating_counts[i] / total_reviews) * 100) if total_reviews else 0
+            for i in range(1, 6)
+        }
+        rating_rows = [
+            {"star": i, "count": rating_counts[i], "percent": rating_percent[i]}
+            for i in range(5, 0, -1)
+        ]
+        avg_rating = (
+            sum(rating * count for rating, count in rating_counts.items()) / total_reviews
+            if total_reviews else 0
+        )
+        context["approved_reviews"] = approved_reviews
+        context["total_reviews"] = total_reviews
+        context["rating_rows"] = rating_rows
+        context["avg_rating"] = avg_rating
         
         # Breadcrumb logic
         if self.object.category:

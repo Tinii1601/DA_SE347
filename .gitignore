@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Django
+media/
+db.sqlite3
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store

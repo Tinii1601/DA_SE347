@@ -22,3 +22,9 @@ class BookSearchForm(forms.Form):
         super().__init__(*args, **kwargs)
         from .models import Category
         self.fields['category'].queryset = Category.objects.all()
+
+class ExcelImportForm(forms.Form):
+    excel_file = forms.FileField(
+        label="Chọn file Excel (.xlsx)",
+        help_text="File cần có các sheet: Attributes, Categories, Products"
+    )

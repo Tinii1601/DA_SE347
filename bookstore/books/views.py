@@ -1,17 +1,17 @@
-# books/views.py
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
-from .models import Book, Category
+from .models import Product, Category
 from .forms import BookSearchForm
+from orders.forms import CartAddProductForm
 
-class BookListView(ListView):
-    model = Book
+class ProductListView(ListView):
+    model = Product
     template_name = 'books/book_list.html'
     context_object_name = 'books'
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Book.objects.filter(is_active=True).select_related('category')
+        queryset = Product.objects.filter(is_active=True).select_related('category')
         
         # Lọc theo danh mục
         category_slug = self.kwargs.get('category_slug')
@@ -23,10 +23,15 @@ class BookListView(ListView):
         # Sắp xếp
         sort_by = self.request.GET.get('sort', '-created_at') # Mặc định là hàng mới
         valid_sorts = [
-            'title', '-title', 
+            'name', '-name', 
             'price', '-price', 
             '-created_at'
         ]
+        
+        # Map title sorting to name for backward compatibility in URL params
+        if sort_by == 'title': sort_by = 'name'
+        if sort_by == '-title': sort_by = '-name'
+
         if sort_by in valid_sorts:
             queryset = queryset.order_by(sort_by)
             
@@ -51,8 +56,8 @@ class BookListView(ListView):
         
         return context
 
-class BookDetailView(DetailView):
-    model = Book
+class ProductDetailView(DetailView):
+    model = Product
     template_name = 'books/book_detail.html'
     context_object_name = 'book'
     slug_field = 'slug'
@@ -69,8 +74,8 @@ class BookDetailView(DetailView):
         return context
 
 
-class BookSearchView(ListView):
-    model = Book
+class ProductSearchView(ListView):
+    model = Product
     template_name = 'books/search.html'
     context_object_name = 'books'
 
@@ -79,13 +84,13 @@ class BookSearchView(ListView):
         if form.is_valid():
             q = form.cleaned_data.get('q')
             category = form.cleaned_data.get('category')
-            queryset = Book.objects.filter(is_active=True)
+            queryset = Product.objects.filter(is_active=True)
             if q:
-                queryset = queryset.filter(title__icontains=q) | queryset.filter(author__icontains=q)
+                queryset = queryset.filter(name__icontains=q)
             if category:
                 queryset = queryset.filter(category=category)
             return queryset
-        return Book.objects.none()
+        return Product.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

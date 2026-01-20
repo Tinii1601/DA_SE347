@@ -1,27 +1,37 @@
-# books/models.py
 from django.db import models
 from django.utils.text import slugify
 from unidecode import unidecode
 import os
 
+# 1. Định nghĩa Tên thuộc tính
+class Attribute(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name="Tên thuộc tính")
+    
+    class Meta:
+        verbose_name = "Thuộc tính"
+        verbose_name_plural = "Các thuộc tính"
 
-# Đường dẫn lưu ảnh: media/books/covers/nha-gia-kim.jpg
-def book_cover_upload_to(instance, filename):
-    """Tạo tên file an toàn + chống trùng"""
+    def __str__(self):
+        return self.name
+
+def product_cover_upload_to(instance, filename):
     ext = filename.split('.')[-1].lower()
-    safe_title = slugify(unidecode(instance.title)) or "book"
+    safe_title = slugify(unidecode(instance.name)) or "product"
     filename = f"{safe_title}.{ext}"
-    return f"books/covers/{filename}"
+    return f"products/covers/{filename}"
 
-
+# 2. Danh mục (Category)
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True, blank=True)
-    description = models.TextField(blank=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="Tên danh mục")
+    slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name="Slug")
+    description = models.TextField(blank=True, verbose_name="Mô tả")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name="Danh mục cha")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    attributes = models.ManyToManyField(Attribute, blank=True, verbose_name="Thuộc tính")
 
     class Meta:
+        verbose_name = "Danh mục"
         verbose_name_plural = "Các thể loại"
         ordering = ['name']
         unique_together = ('slug', 'parent',)
@@ -39,7 +49,6 @@ class Category(models.Model):
             base = slugify(unidecode(self.name))
             slug = base
             i = 1
-            # Đảm bảo slug là duy nhất trong cùng một danh mục cha
             while Category.objects.filter(slug=slug, parent=self.parent).exists():
                 slug = f"{base}-{i}"
                 i += 1
@@ -47,90 +56,102 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
     def get_descendants_and_self_ids(self):
-        """
-        Trả về một danh sách ID chứa chính nó và tất cả các danh mục con (đệ quy).
-        """
         result = [self.id]
         for child in self.children.all():
             result.extend(child.get_descendants_and_self_ids())
         return result
 
     def get_ancestors(self):
-        """
-        Trả về danh sách các danh mục cha, dùng cho breadcrumb.
-        """
         ancestors = []
         k = self.parent
         while k is not None:
             ancestors.append(k)
             k = k.parent
-        return ancestors[::-1]  # Đảo ngược để có thứ tự từ gốc -> cha
+        return ancestors[::-1]
 
+    def get_all_attributes(self):
+        """
+        Lấy tất cả thuộc tính của danh mục hiện tại và các danh mục cha (kế thừa).
+        """
+        # 1. Lấy thuộc tính riêng của danh mục này
+        all_attrs = list(self.attributes.all())
 
-class Book(models.Model):
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True, blank=True)  # tự sinh
-    author = models.CharField(max_length=150)
-    publisher = models.CharField(max_length=150, blank=True)
-    isbn = models.CharField(max_length=13, blank=True, null=True)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    stock = models.PositiveIntegerField(default=0)
+        # 2. Duyệt ngược lên các cha để lấy thêm thuộc tính
+        parent = self.parent
+        while parent:
+            parent_attrs = parent.attributes.all()
+            for attr in parent_attrs:
+                # Chỉ thêm nếu chưa có (tránh trùng lặp)
+                if attr not in all_attrs:
+                    all_attrs.append(attr)
+            parent = parent.parent
+            
+        return all_attrs
 
-    cover_image = models.ImageField(
-        upload_to=book_cover_upload_to,
-        blank=True,
-        null=True,
-        help_text="Ảnh sẽ lưu tại: media/books/covers/"
-    )
-
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='books')
-    published_year = models.PositiveIntegerField(blank=True, null=True)
-    pages = models.PositiveIntegerField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+# 3. Sản phẩm (Product)
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name="Danh mục")
+    name = models.CharField(max_length=255, verbose_name="Tên sản phẩm")
+    slug = models.SlugField(max_length=255, unique=True, blank=True, verbose_name="Slug")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Giá")
+    stock = models.PositiveIntegerField(default=0, verbose_name="Tồn kho")
+    description = models.TextField(blank=True, verbose_name="Mô tả")
+    cover_image = models.ImageField(upload_to=product_cover_upload_to, blank=True, null=True, verbose_name="Ảnh bìa")
+    
+    is_active = models.BooleanField(default=True, verbose_name="Kích hoạt")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
 
     class Meta:
-        verbose_name_plural = "Danh sách sách"
+        verbose_name = "Sản phẩm"
+        verbose_name_plural = "Danh sách sản phẩm"
         ordering = ['-created_at']
-        unique_together = ('title', 'author')
 
-    def __str__(self):
-        return f"{self.title} - {self.author}"
-
-    # TỰ ĐỘNG TẠO SLUG TỪ TITLE
     def save(self, *args, **kwargs):
         if not self.slug:
-            base = slugify(unidecode(self.title))
-            if not base:
-                base = "book"
+            base = slugify(unidecode(self.name))
             slug = base
             i = 1
-            while Book.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            while Product.objects.filter(slug=slug).exists():
                 slug = f"{base}-{i}"
                 i += 1
             self.slug = slug
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+        
     def get_final_price(self):
-        return self.discount_price if self.discount_price else self.price
+        # Placeholder if discount logic is needed but kept simple for now
+        return self.price
 
     def in_stock(self):
         return self.stock > 0
 
-    def get_average_rating(self):
-        """Tính điểm đánh giá trung bình và số lượng đánh giá."""
-        reviews = self.reviews.all()
-        count = reviews.count()
-        if count == 0:
-            return {'average': 0, 'count': 0}
-        
-        total_rating = sum(review.rating for review in reviews)
-        average = total_rating / count
-        return {'average': round(average, 1), 'count': count}
-
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('books:book_detail', args=[self.slug])
+        # Assuming URL pattern will be updated to 'product_detail'
+        return reverse('books:product_detail', args=[self.slug])
+
+# 4. Giá trị của thuộc tính
+class ProductAttributeValue(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attribute_values', verbose_name="Sản phẩm")
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, verbose_name="Thuộc tính")
+    value = models.TextField(verbose_name="Giá trị")
+
+    class Meta:
+        verbose_name = "Giá trị thuộc tính"
+        verbose_name_plural = "Các giá trị thuộc tính"
+        unique_together = ('product', 'attribute')
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name="Sản phẩm")
+    image = models.ImageField(upload_to='products/gallery/', help_text="Ảnh album sản phẩm", verbose_name="Ảnh")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+
+    class Meta:
+        verbose_name = "Ảnh sản phẩm"
+        verbose_name_plural = "Album ảnh sản phẩm"
+
+    def __str__(self):
+        return f"Image for {self.product.name}"

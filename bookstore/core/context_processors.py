@@ -7,7 +7,7 @@ def categories_processor(request):
     Mỗi thể loại cha sẽ chứa các thể loại con của nó.
     """
     # Lấy các danh mục cha (không có parent) và tải trước các con của chúng để tối ưu
-    parent_categories = Category.objects.filter(parent__isnull=True).prefetch_related('children')
+    parent_categories = Category.objects.filter(parent__isnull=True).prefetch_related('children__children')
     return {
         'parent_categories': parent_categories
     }

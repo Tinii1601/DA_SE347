@@ -1,0 +1,86 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Configuration for extra buttons
+            const buttonsConfig = [
+                {
+                    match: "/books/attribute/add/",
+                    url: "/admin/books/attribute/import-excel/",
+                    text: "Thêm bằng Excel",
+                    icon: "fa-file-excel-o",
+                    className: "btn-success" 
+                },
+                {
+                    match: "/books/category/add/",
+                    url: "/admin/books/category/import-excel/",
+                    text: "Thêm bằng Excel",
+                    icon: "fa-file-excel-o",
+                    className: "btn-success"
+                },
+                {
+                    match: "/books/product/add/",
+                    url: "/admin/books/product/import-excel/",
+                    text: "Thêm bằng Excel",
+                    icon: "fa-file-excel-o",
+                    className: "btn-success"
+                },
+                {
+                    match: "/books/product/",
+                    exclude: "/add/",
+                    requireParent: "TD",
+                    url: "/admin/books/product/import-master/",
+                    text: "Thêm bằng Excel (3 sheets)",
+                    icon: "fa-file-excel-o",
+                    className: "btn-success",
+                    display: "block"
+                }
+            ];
+
+            buttonsConfig.forEach(config => {
+                // Find all buttons that match the URL pattern
+                const anchors = document.querySelectorAll(`a[href*="${config.match}"]`);
+                
+                anchors.forEach(anchor => {
+                    // Filter exclusions
+                    if (config.exclude && anchor.href.includes(config.exclude)) return;
+                    if (config.requireParent && anchor.parentElement.tagName !== config.requireParent) return;
+
+                    // Create the new button
+                    const newBtn = document.createElement("a");
+                    newBtn.href = config.url;
+                    newBtn.innerHTML = `<i class="fa ${config.icon}"></i> ${config.text}`;
+                    
+                    // Copy classes from the original button to match style
+                    newBtn.className = anchor.className;
+                    
+                    // Custom class handling
+                    if (config.className) {
+                         // Remove common conflicting classes
+                         newBtn.classList.remove("btn-success", "btn-primary", "btn-info", "btn-danger");
+                         newBtn.classList.add(config.className);
+                    }
+                    
+                    // Style adjustments
+                    newBtn.style.marginLeft = "8px";
+                    newBtn.style.marginRight = "8px";
+                    newBtn.style.textDecoration = "none";
+
+                    if (config.display === "block") {
+                        newBtn.style.display = "block";
+                        newBtn.style.marginTop = "50px";
+                        newBtn.style.marginLeft = "0";
+                        newBtn.style.textAlign = "center";
+                        newBtn.style.borderRadius = "4px";
+                        newBtn.style.color = "#fff";
+                        anchor.parentNode.appendChild(newBtn);
+                    } else {
+                        anchor.parentNode.insertBefore(newBtn, anchor.nextSibling);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

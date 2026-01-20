@@ -1,10 +1,9 @@
-# orders/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, FormView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from books.models import Book
+from books.models import Product
 from users.models import Address
 from .cart import Cart
 from .forms import CartAddProductForm, CheckoutForm
@@ -14,13 +13,13 @@ from payment.models import Payment
 from django.http import JsonResponse
 
 @require_POST
-def cart_add(request, book_id):
+def cart_add(request, product_id):
     cart = Cart(request)
-    book = get_object_or_404(Book, id=book_id)
+    product = get_object_or_404(Product, id=product_id)
     form = CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        cart.add(book=book,
+        cart.add(product=product,
                  quantity=cd['quantity'],
                  override_quantity=cd['override'])
     
@@ -31,10 +30,10 @@ def cart_add(request, book_id):
     return redirect('orders:cart_detail')
 
 @require_POST
-def cart_remove(request, book_id):
+def cart_remove(request, product_id):
     cart = Cart(request)
-    book = get_object_or_404(Book, id=book_id)
-    cart.remove(book)
+    product = get_object_or_404(Product, id=product_id)
+    cart.remove(product)
     return redirect('orders:cart_detail')
 
 def cart_detail(request):
@@ -70,15 +69,15 @@ def cart_detail(request):
     
     continue_shopping_url = request.session.get('continue_shopping_url', '/')
 
-    # Get random books for recommendations
+    # Get random products for recommendations
     import random
-    all_books = list(Book.objects.filter(is_active=True))
-    recommended_books = random.sample(all_books, min(len(all_books), 4))
+    all_products = list(Product.objects.filter(is_active=True))
+    recommended_products = random.sample(all_products, min(len(all_products), 4))
 
     return render(request, 'orders/cart_detail.html', {
         'cart': cart_wrapper, 
         'continue_shopping_url': continue_shopping_url,
-        'recommended_books': recommended_books
+        'recommended_books': recommended_products 
     })
 
 class CheckoutView(LoginRequiredMixin, View):
@@ -185,7 +184,7 @@ class CheckoutView(LoginRequiredMixin, View):
             for item in cart:
                 OrderItem.objects.create(
                     order=order,
-                    book=item['product'],
+                    product=item['product'],
                     price=item['price'],
                     quantity=item['quantity']
                 )

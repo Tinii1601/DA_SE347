@@ -4,14 +4,19 @@ Django settings for bookstore project.
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 from decouple import config, Csv  
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '.env')  # Load environment variables from .env file explicitly
+
+
 # ================== BẢO MẬT – DÙNG .env ==================
 SECRET_KEY = config('SECRET_KEY') 
 DEBUG = config('DEBUG', default=False, cast=bool)
+GEMINI_API_KEY = config('GEMINI_API_KEY', default=None)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1')
 
@@ -32,6 +37,7 @@ INSTALLED_APPS = [
     'orders',
     'reviews',
     'payment',
+    'chatbot',
 
     # login social
     'django.contrib.sites',
@@ -144,11 +150,11 @@ CART_SESSION_ID = 'cart'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ================== PAYOS PAYMENT CONFIG ==================
-PAYOS_CLIENT_ID = config('PAYOS_CLIENT_ID', default='')
-PAYOS_API_KEY = config('PAYOS_API_KEY', default='')
-PAYOS_CHECKSUM_KEY = config('PAYOS_CHECKSUM_KEY', default='')
+PAYOS_CLIENT_ID = os.getenv('PAYOS_CLIENT_ID', default='')
+PAYOS_API_KEY = os.getenv('PAYOS_API_KEY', default='')
+PAYOS_CHECKSUM_KEY = os.getenv('PAYOS_CHECKSUM_KEY', default='')
 
-MOMO_NOTIFY_URL = config('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')
+MOMO_NOTIFY_URL = os.getenv('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')
 
 # ================== EMAIL CONFIGURATION ==================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -168,3 +174,4 @@ ALLOWED_HOSTS = [
 ]
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

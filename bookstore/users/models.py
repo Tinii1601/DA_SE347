@@ -25,13 +25,18 @@ def validate_min_age_14(value):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name='profile'
+        User, on_delete=models.CASCADE, related_name='profile', verbose_name="Người dùng"
     )
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    avatar = models.ImageField(upload_to=user_avatar_upload_to, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True,null=True, validators=[validate_min_age_14])
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    phone = models.CharField(max_length=15, blank=True, null=True, verbose_name="Số điện thoại")
+    avatar = models.ImageField(upload_to=user_avatar_upload_to, blank=True, null=True, verbose_name="Ảnh đại diện")
+    date_of_birth = models.DateField(blank=True,null=True, validators=[validate_min_age_14], verbose_name="Ngày sinh")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
+
+    class Meta:
+        verbose_name = "Hồ sơ người dùng"
+        verbose_name_plural = "Hồ sơ người dùng"
+
     def save(self, *args, **kwargs):
         self.full_clean() 
         super().save(*args, **kwargs)
@@ -44,7 +49,7 @@ class UserProfile(models.Model):
         return self.user.get_full_name() or self.user.username
 
 class Address(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses', verbose_name="Người dùng")
     full_name = models.CharField("Họ và tên", max_length=150)
     phone = models.CharField("Số điện thoại", max_length=15)
     address_line = models.CharField("Địa chỉ chi tiết (số nhà, đường...)", max_length=255)
@@ -52,11 +57,11 @@ class Address(models.Model):
     district = models.CharField("Quận/Huyện", max_length=100)
     city = models.CharField("Tỉnh/Thành phố", max_length=100)
     is_default = models.BooleanField("Mặc định", default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
 
     class Meta:
         verbose_name = "Địa chỉ giao hàng"
-        verbose_name_plural = "Địa chỉ giao hàng"
+        verbose_name_plural = "Danh sách địa chỉ"
         ordering = ['-is_default', '-created_at']
 
     def __str__(self):

@@ -98,7 +98,20 @@
                     </h6>
                     <ul class="list-unstyled">
                       {% for child_cat in parent_cat.children.all %}
-                        <li><a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0">{{ child_cat.name }}</a></li>
+                        <li>
+                          <a href="{% url 'books:category_detail' child_cat.slug %}" class="dropdown-item ps-0 fw-bold">{{ child_cat.name }}</a>
+                          {% if child_cat.children.all %}
+                            <ul class="list-unstyled ms-2 border-start ps-2">
+                              {% for grand_child in child_cat.children.all %}
+                                <li>
+                                  <a href="{% url 'books:category_detail' grand_child.slug %}" class="dropdown-item py-1 ps-0 text-muted" style="font-size: 0.9rem;">
+                                    {{ grand_child.name }}
+                                  </a>
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          {% endif %}
+                        </li>
                       {% endfor %}
                     </ul>
                   </div>
@@ -304,5 +317,9 @@
 
   <script src="{% static 'js/base.js' %}"></script>
   {% block extra_js %}{% endblock %}
+
+  <!-- Chatbot Integration -->
+  {% include 'chatbot/window.html' %}
+
 </body>
 </html>

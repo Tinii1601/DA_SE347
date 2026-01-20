@@ -8,6 +8,7 @@ from .models import Category, Product, Attribute, ProductAttributeValue, Product
 from .forms import ExcelImportForm
 import openpyxl
 import requests
+import os
 from django.core.files.base import ContentFile
 
 # --- Shared Logic ---
@@ -93,15 +94,25 @@ def process_products_sheet(wb, request_msg_func=None):
                 )
 
                 if img_url and str(img_url).strip():
+                    img_url = str(img_url).strip()
                     try:
-                        response = requests.get(img_url, timeout=10)
-                        if response.status_code == 200:
-                            # Try to guess filename from URL or default to product slug
-                            file_name = img_url.split("/")[-1]
-                            if not file_name or '.' not in file_name:
-                                file_name = f"{product.slug}.jpg"
-                            
-                            product.cover_image.save(file_name, ContentFile(response.content), save=True)
+                        if img_url.startswith(('http://', 'https://')):
+                            response = requests.get(img_url, timeout=10)
+                            if response.status_code == 200:
+                                # Try to guess filename from URL or default to product slug
+                                file_name = img_url.split("/")[-1]
+                                if not file_name or '.' not in file_name:
+                                    file_name = f"{product.slug}.jpg"
+                                
+                                product.cover_image.save(file_name, ContentFile(response.content), save=True)
+                        else:
+                            # Xử lý file cục bộ
+                            if os.path.exists(img_url):
+                                with open(img_url, 'rb') as f:
+                                    file_name = os.path.basename(img_url)
+                                    product.cover_image.save(file_name, ContentFile(f.read()), save=True)
+                            else:
+                                errors.append(f"File ảnh bìa không tồn tại: {img_url}")
                     except Exception as e:
                         errors.append(f"Không tải được ảnh cho '{name}': {e}")
                 
@@ -111,15 +122,25 @@ def process_products_sheet(wb, request_msg_func=None):
                         url = url.strip()
                         if url:
                             try:
-                                res = requests.get(url, timeout=10)
-                                if res.status_code == 200:
-                                    fname = url.split("/")[-1]
-                                    if not fname or '.' not in fname:
-                                        fname = f"{product.slug}_album_{idx}.jpg"
-                                    
-                                    # Create ProductImage
-                                    p_img = ProductImage(product=product)
-                                    p_img.image.save(fname, ContentFile(res.content), save=True)
+                                if url.startswith(('http://', 'https://')):
+                                    res = requests.get(url, timeout=10)
+                                    if res.status_code == 200:
+                                        fname = url.split("/")[-1]
+                                        if not fname or '.' not in fname:
+                                            fname = f"{product.slug}_album_{idx}.jpg"
+                                        
+                                        # Create ProductImage
+                                        p_img = ProductImage(product=product)
+                                        p_img.image.save(fname, ContentFile(res.content), save=True)
+                                else:
+                                    # Xử lý file cục bộ cho album
+                                    if os.path.exists(url):
+                                        with open(url, 'rb') as f:
+                                            fname = os.path.basename(url)
+                                            p_img = ProductImage(product=product)
+                                            p_img.image.save(fname, ContentFile(f.read()), save=True)
+                                    else:
+                                        errors.append(f"File ảnh album không tồn tại: {url}")
                             except Exception as e:
                                 errors.append(f"Không tải được ảnh album cho '{name}': {e}")
 
@@ -254,12 +275,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'final_price', 'stock', 'is_active', 'cover_image_thumb']
+    list_display = ['name', 'price', 'discount_percentage', 'final_price', 'stock', 'is_active', 'cover_image_thumb']
     list_filter = ['is_active', 'category', 'created_at']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['created_at', 'updated_at']
-    list_editable = ['is_active']
+    list_editable = ['is_active', 'price', 'discount_percentage', 'stock']
     inlines = [ProductAttributeValueInline, ProductImageInline]
     # change_list_template removed to avoid duplication with JS injection
 

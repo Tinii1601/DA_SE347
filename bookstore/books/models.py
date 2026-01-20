@@ -94,6 +94,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tên sản phẩm")
     slug = models.SlugField(max_length=255, unique=True, blank=True, verbose_name="Slug")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Giá")
+    discount_percentage = models.PositiveIntegerField(default=0, verbose_name="Phần trăm giảm giá")
     stock = models.PositiveIntegerField(default=0, verbose_name="Tồn kho")
     description = models.TextField(blank=True, verbose_name="Mô tả")
     cover_image = models.ImageField(upload_to=product_cover_upload_to, blank=True, null=True, verbose_name="Ảnh bìa")
@@ -122,8 +123,13 @@ class Product(models.Model):
         return self.name
         
     def get_final_price(self):
-        # Placeholder if discount logic is needed but kept simple for now
+        if self.discount_percentage > 0:
+            return self.price * (100 - self.discount_percentage) / 100
         return self.price
+
+    @property
+    def is_on_sale(self):
+        return self.discount_percentage > 0
 
     def in_stock(self):
         return self.stock > 0
@@ -131,7 +137,7 @@ class Product(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         # Assuming URL pattern will be updated to 'product_detail'
-        return reverse('books:product_detail', args=[self.slug])
+        return reverse('books:book_detail', args=[self.slug])
 
 # 4. Giá trị của thuộc tính
 class ProductAttributeValue(models.Model):

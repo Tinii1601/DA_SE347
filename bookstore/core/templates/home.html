@@ -4,6 +4,53 @@
 {% block title %}Trang chủ - Bookstore{% endblock %}
 
 {% block content %}
+<style>
+    .product-scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+    .product-scroll-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .product-item {
+        flex: 0 0 calc(20% - 16px); /* 5 items per row with gap */
+        max-width: calc(20% - 16px);
+    }
+    @media (max-width: 1200px) {
+        .product-item { flex: 0 0 calc(25% - 16px); max-width: calc(25% - 16px); } /* 4 items */
+    }
+    @media (max-width: 992px) {
+        .product-item { flex: 0 0 calc(33.333% - 16px); max-width: calc(33.333% - 16px); } /* 3 items */
+    }
+    @media (max-width: 768px) {
+        .product-item { flex: 0 0 calc(50% - 16px); max-width: calc(50% - 16px); } /* 2 items */
+    }
+    @media (max-width: 576px) {
+        .product-item { flex: 0 0 calc(100% - 16px); max-width: calc(100% - 16px); } /* 1 item */
+    }
+    
+    .btn-nav-slider {
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.9;
+        transition: all 0.3s;
+        z-index: 100 !important; /* Force on top */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-nav-slider:hover {
+        opacity: 1;
+        background-color: var(--lumiere-green);
+        color: white;
+        border-color: var(--lumiere-green);
+        transform: scale(1.1);
+    }
+</style>
+
 <!-- Banner Carousel -->
 <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
@@ -40,22 +87,107 @@
     </button>
 </div>
 
-<!-- Sách Việt Nam Mới -->
-<div class="container mt-5">
-    <h2 class="mb-4">Sách Việt Nam Mới</h2>
-    <div class="product-carousel-container">
-        <div class="product-carousel">
-            {% for book in new_vietnamese_books %}
-                <div class="product-carousel-item">
+<!-- Sách Mới Nhất (Văn Học) -->
+<div class="container mt-5 position-relative group-slider">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-uppercase border-start border-4 border-success ps-3">Sách Văn Học Mới</h2>
+        <a href="#" class="btn btn-outline-success rounded-pill px-4">Xem tất cả</a>
+    </div>
+    
+    <div class="position-relative">
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 start-0 translate-middle-y ms-n3" onclick="scrollSlider('slider-new-books', -1)" style="left: -15px;">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        
+        <div id="slider-new-books" class="d-flex overflow-auto gap-3 py-2 px-1 product-scroll-container" style="scroll-behavior: smooth;">
+            {% for book in new_books %}
+                <div class="product-item">
                     {% include 'books/partials/book_card.html' with book=book %}
                 </div>
             {% empty %}
-                <p class="text-center">Chưa có sách nào trong danh mục này.</p>
+                <div class="w-100 text-center text-muted py-5">
+                    Chưa có sách nào mới cập nhật.
+                </div>
             {% endfor %}
         </div>
+
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 end-0 translate-middle-y me-n3" onclick="scrollSlider('slider-new-books', 1)" style="right: -15px;">
+            <i class="bi bi-chevron-right"></i>
+        </button>
     </div>
 </div>
 
-<!-- Bạn có thể thêm các khu vực khác ở đây, ví dụ Sách Nước Ngoài Mới -->
+<!-- Sách Trong Nước -->
+<div class="container mt-5 position-relative group-slider">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-uppercase border-start border-4 border-primary ps-3">Sách Trong Nước</h2>
+        <a href="#" class="btn btn-outline-primary rounded-pill px-4">Xem tất cả</a>
+    </div>
+    
+    <div class="position-relative">
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 start-0 translate-middle-y ms-n3" onclick="scrollSlider('slider-domestic-books', -1)" style="left: -15px;">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        
+        <div id="slider-domestic-books" class="d-flex overflow-auto gap-3 py-2 px-1 product-scroll-container" style="scroll-behavior: smooth;">
+            {% for book in domestic_books %}
+                <div class="product-item">
+                    {% include 'books/partials/book_card.html' with book=book %}
+                </div>
+            {% empty %}
+                <div class="w-100 text-center text-muted py-5">
+                    Chưa có sách nào trong danh mục này.
+                </div>
+            {% endfor %}
+        </div>
+
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 end-0 translate-middle-y me-n3" onclick="scrollSlider('slider-domestic-books', 1)" style="right: -15px;">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Sách Nổi Bật (Tiểu Thuyết) -->
+<div class="container mt-5 mb-5 position-relative group-slider">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-uppercase border-start border-4 border-warning ps-3">Tiểu Thuyết Nổi Bật</h2>
+        <a href="#" class="btn btn-outline-warning rounded-pill px-4">Xem tất cả</a>
+    </div>
+    
+    <div class="position-relative">
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 start-0 translate-middle-y ms-n3" onclick="scrollSlider('slider-best-sellers', -1)" style="left: -15px;">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        
+        <div id="slider-best-sellers" class="d-flex overflow-auto gap-3 py-2 px-1 product-scroll-container" style="scroll-behavior: smooth;">
+            {% for book in best_sellers %}
+                <div class="product-item">
+                    {% include 'books/partials/book_card.html' with book=book %}
+                </div>
+            {% empty %}
+               <div class="w-100 text-center text-muted py-5">
+                    Chưa có tiểu thuyết nào nổi bật.
+                </div>
+            {% endfor %}
+        </div>
+
+        <button class="btn btn-nav-slider rounded-circle position-absolute top-50 end-0 translate-middle-y me-n3" onclick="scrollSlider('slider-best-sellers', 1)" style="right: -15px;">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    function scrollSlider(id, direction) {
+        const container = document.getElementById(id);
+        if (container) {
+            const scrollAmount = container.clientWidth * 0.8; // Scroll 80% of width
+            container.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }
+</script>
 
 {% endblock %}

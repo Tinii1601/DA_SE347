@@ -9,6 +9,7 @@ payos
 cryptography
 django-allauth
 PyJWT
+
 openpyxl
 
 google-generativeai

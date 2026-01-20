@@ -6,6 +6,7 @@ app_name = 'payment'
 urlpatterns = [
     path('create/<int:order_id>/', views.create_payment, name='create_payment'),
     path('momo/<int:order_id>/', views.payment_momo, name='payment_momo'),
+    path('momo/confirm/<int:order_id>/', views.payment_momo_confirm, name='payment_momo_confirm'),
     path('vietqr/<int:order_id>/', views.payment_vietqr, name='payment_vietqr'),
     path('return/<int:order_id>/', views.payment_return, name='payment_return'),
     path('cancel/<int:order_id>/', views.payment_cancel, name='payment_cancel'),

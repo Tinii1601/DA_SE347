@@ -13,6 +13,20 @@ def payment_momo(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'payment/payment_momo.html', {'order': order})
 
+def payment_momo_confirm(request, order_id):
+    """
+    Handle user clicking 'I have transferred' for MoMo.
+    Since this is manual, we just clear the cart and redirect to success.
+    The admin must manually verify the transaction.
+    """
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Clear cart
+    cart = Cart(request)
+    cart.clear()
+    
+    return redirect('orders:order_success', order_id=order.id)
+
 def payment_vietqr(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     try:
@@ -40,7 +54,8 @@ def create_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     
     # Construct PaymentData
-    domain = "http://127.0.0.1:8000"
+    # Lấy domain động hiện tại (localhost hoặc pythonanywhere)
+    domain = request.build_absolute_uri('/')[:-1] 
     
     # Use total_amount from order which already includes shipping and discount
     total_amount = int(order.total_amount)

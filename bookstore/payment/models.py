@@ -6,7 +6,6 @@ class Payment(models.Model):
         ('cod', 'Thanh toán khi nhận hàng'), 
         ('momo', 'MoMo'),
         ('vietqr', 'VietQR'),
-        ('vnpay', 'VNPAY'), 
     ]
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment', verbose_name="Đơn hàng")

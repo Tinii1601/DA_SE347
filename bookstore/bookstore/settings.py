@@ -123,6 +123,10 @@ LANGUAGE_CODE = 'vi-vn'
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 USE_TZ = True
+USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 # ================== STATIC & MEDIA ==================
 STATIC_URL = '/static/'
@@ -167,11 +171,11 @@ EMAIL_HOST_USER = 'nguyenthikimngoc1402@gmail.com'
 EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'apryl-unstent(or)iously-olive.ngrok-free.dev',
-]
+
+# Load ALLOWED_HOSTS from .env, default to localhost
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
+ALLOWED_HOSTS = allowed_hosts_env.split(',')
+
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Liên hệ mới</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f2ec;font-family:Arial, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f2ec;padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #eadfce;overflow:hidden;">
+          <tr>
+            <td style="background:#1a4d2e;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:700;">
+              Liên hệ mới từ website Bookstore
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 24px;color:#1f1f1f;font-size:14px;line-height:1.6;">
+              <p style="margin:0 0 12px 0;"><strong>Tên:</strong> {{ name }}</p>
+              <p style="margin:0 0 12px 0;"><strong>Email:</strong> {{ email }}</p>
+              <p style="margin:0 0 12px 0;"><strong>Số điện thoại:</strong> {{ phone }}</p>
+              <p style="margin:0 0 12px 0;"><strong>Tiêu đề:</strong> {{ subject }}</p>
+              <p style="margin:0 0 16px 0;"><strong>Thời gian:</strong> {{ submitted_at|date:"d/m/Y H:i" }}</p>
+              <div style="border-top:1px solid #eadfce;margin:16px 0;"></div>
+              <p style="margin:0 0 6px 0;font-weight:700;">Nội dung:</p>
+              <p style="margin:0;">{{ message|linebreaksbr }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f8f5f0;color:#6f6a5f;padding:12px 24px;font-size:12px;">
+              Email này được gửi tự động từ form liên hệ Bookstore.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

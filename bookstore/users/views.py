@@ -67,11 +67,17 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
         # Address (mặc định)
         address = Address.objects.filter(user=self.request.user, is_default=True).first()
+        display_email = self.request.user.email
+        if not display_email:
+            social = self.request.user.socialaccount_set.first()
+            if social:
+                display_email = social.extra_data.get("email", "")
         context["profile_form"] = kwargs.get("profile_form",ProfileUpdateForm(instance=profile, user=self.request.user))
         context["address_form"] = kwargs.get("address_form",AddressForm(instance=address))
         context["default_address"] = address
         context["password_form"] = kwargs.get("password_form",PasswordChangeCustomForm(self.request.user))
         context["active"] = "info"
+        context["display_email"] = display_email
         return context
     def post(self, request, *args, **kwargs):
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -108,4 +114,13 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
                     self.get_context_data(password_form=password_form)
                 )
         return redirect("users:profile")
+
+
+class WishlistView(LoginRequiredMixin, TemplateView):
+    template_name = "users/profile/profile_wishlist.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["active"] = "wishlist"
+        return context
         

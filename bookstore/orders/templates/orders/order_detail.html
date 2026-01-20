@@ -1,0 +1,98 @@
+{% extends 'users/profile/profile_base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết đơn hàng {{ order.order_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order_detail.css' %}">
+{% endblock %}
+
+{% block profile_content %}
+<div class="order-detail">
+  <div class="detail-header">
+    <div>
+      <h4>Chi tiết đơn hàng #{{ order.order_number }}</h4>
+      <p class="text-muted mb-0">{{ order.created_at|date:"d/m/Y H:i" }} • {{ order.items.count }} sản phẩm</p>
+    </div>
+    <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success btn-sm">Quay lại</a>
+  </div>
+
+  <div class="detail-cards">
+    <div class="info-card">
+      <h6>Địa chỉ giao hàng</h6>
+      <p class="mb-1 fw-bold">{{ order.shipping_address.full_name }}</p>
+      <p class="mb-1">{{ order.shipping_address.address_line }}</p>
+      <p class="mb-1">{{ order.shipping_address.ward }}, {{ order.shipping_address.district }}, {{ order.shipping_address.city }}</p>
+      <p class="mb-0">SĐT: {{ order.shipping_address.phone }}</p>
+    </div>
+    <div class="info-card">
+      <h6>Thông tin đơn hàng</h6>
+      <p class="mb-1">Mã đơn: <strong>#{{ order.order_number }}</strong></p>
+      <p class="mb-1">Trạng thái: <strong class="order-status status-{{ order.status }}">{{ order.get_status_display }}</strong></p>
+      <p class="mb-0">Thanh toán: <strong>{{ order.payment.get_method_display }}</strong></p>
+    </div>
+    <div class="info-card">
+      <h6>Tổng quan</h6>
+      <div class="info-row">
+        <span>Tạm tính</span>
+        <span>{{ subtotal|floatformat:0 }}₫</span>
+      </div>
+      <div class="info-row">
+        <span>Giảm giá</span>
+        <span>{{ order.discount_amount|floatformat:0 }}₫</span>
+      </div>
+      <div class="info-row">
+        <span>Phí giao hàng</span>
+        <span>{{ order.shipping_fee|floatformat:0 }}₫</span>
+      </div>
+      <div class="info-row total">
+        <span>Tổng cộng</span>
+        <span>{{ order.total_amount|floatformat:0 }}₫</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-progress">
+    <div class="progress-track">
+      <div class="progress-fill" style="width: {{ progress_percent }}%;"></div>
+    </div>
+    <div class="progress-steps">
+      {% for step in steps %}
+        <div class="progress-step{% if forloop.counter0 <= step_index and not is_canceled %} is-complete{% endif %}{% if forloop.counter0 == step_index and not is_canceled %} is-active{% endif %}{% if is_canceled %} is-canceled{% endif %}">
+          <div class="dot"><span>{{ forloop.counter|stringformat:"02d" }}</span></div>
+          <div class="label">{{ step.label }}</div>
+        </div>
+      {% endfor %}
+    </div>
+    {% if is_canceled %}
+      <div class="canceled-note">Đơn hàng đã bị hủy bởi cửa hàng.</div>
+    {% endif %}
+  </div>
+
+  <div class="order-items">
+    <div class="order-items-header">
+      <div>Sản phẩm</div>
+      <div>Giá tiền</div>
+      <div>Số lượng</div>
+      <div>Thành tiền</div>
+    </div>
+    {% for item in order.items.all %}
+    <div class="order-item-row">
+        <div class="item-info" data-label="Sản phẩm">
+          <div class="item-thumb">
+            {% if item.book.cover_image %}
+              <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }}">
+            {% else %}
+              <img src="{% static 'img/logo.png' %}" alt="{{ item.book.title }}">
+            {% endif %}
+          </div>
+          <div class="item-name">{{ item.book.title }}</div>
+        </div>
+        <div class="item-price" data-label="Giá tiền">{{ item.price|floatformat:0 }}₫</div>
+        <div class="item-qty" data-label="Số lượng">{{ item.quantity }}</div>
+        <div class="item-subtotal" data-label="Thành tiền">{{ item.get_subtotal|floatformat:0 }}₫</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

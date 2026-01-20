@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liên hệ | Bookstore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+  <div class="contact-hero">
+    <h1>Hãy kết nối với chúng tôi</h1>
+    <p>Gửi tin nhắn để Bookstore hỗ trợ bạn nhanh nhất.</p>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-info">
+      <div class="info-item">
+        <div class="icon"><i class="bi bi-telephone"></i></div>
+        <div>
+          <div class="label">Số điện thoại</div>
+          <div class="value">1800 8386</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="icon"><i class="bi bi-envelope"></i></div>
+        <div>
+          <div class="label">Địa chỉ Email</div>
+          <div class="value">lumiere_bookstore@gmail.com</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="icon"><i class="bi bi-geo-alt"></i></div>
+        <div>
+          <div class="label">Địa chỉ chi nhánh trung tâm</div>
+          <div class="value">Đường Hàn Thuyên, phường Linh Trung, TP. Thủ Đức</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h3>Gửi tin nhắn đến chúng tôi</h3>
+      <p class="text-muted">Nếu bạn có thắc mắc hay cần hỗ trợ, hãy để lại thông tin.</p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Tên của bạn *</label>
+            <input type="text" name="name" class="form-control" required value="{{ form.name.value|default_if_none:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default_if_none:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email liên hệ *</label>
+            <input type="email" name="email" class="form-control" required value="{{ form.email.value|default_if_none:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tiêu đề *</label>
+            <input type="text" name="subject" class="form-control" required value="{{ form.subject.value|default_if_none:'' }}">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Lời nhắn *</label>
+            <textarea name="message" rows="4" class="form-control" required>{{ form.message.value|default_if_none:'' }}</textarea>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="submit" class="btn btn-dark px-4">Gửi tin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <div class="section-header">
+      <h2>Các vấn đề bạn thường gặp phải</h2>
+    </div>
+    <div class="issue-grid">
+      <div class="issue-list">
+        <div class="issue-row">
+          <span>Bạn bị quên mật khẩu?</span>
+          <i class="bi bi-arrow-up-right"></i>
+        </div>
+        <div class="issue-row">
+          <span>Bạn không thể thanh toán đơn hàng?</span>
+          <i class="bi bi-arrow-up-right"></i>
+        </div>
+        <div class="issue-row">
+          <span>Bạn không thể gửi tin nhắn để nhận được hỗ trợ?</span>
+          <i class="bi bi-arrow-up-right"></i>
+        </div>
+      </div>
+      <div class="issue-image">
+        <img src="{% static 'img/Inquiry.png' %}" alt="Câu hỏi thường gặp">
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-section">
+    <div class="section-header">
+      <h2>Các kênh mạng xã hội dễ dàng kết nối</h2>
+    </div>
+    <div class="social-grid">
+      <div class="social-copy">
+        <p>Khi bạn không thể liên hệ gửi tin đến chúng mình.</p>
+        <p>Bạn có thể liên hệ thông qua các kênh mạng xã hội dưới đây.</p>
+        <div class="social-icons">
+          <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+        </div>
+      </div>
+      <div class="social-image">
+        <img src="{% static 'img/mxh.png' %}" alt="Kết nối mạng xã hội">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

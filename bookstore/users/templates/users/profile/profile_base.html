@@ -11,8 +11,8 @@
           <h6 class="fw-bold mb-3">Tài khoản</h6>
           <ul class="nav flex-column gap-2">
             <li><a href="{% url 'users:profile' %}" class="nav-link {% if active == 'info' %}fw-bold text-success{% endif %}">Thông tin cá nhân</a></li>
-            <li><a href="{% url 'orders:order_history' %}" class="nav-link">Đơn hàng của bạn</a></li>
-            <li><a href="#" class="nav-link">Sản phẩm yêu thích</a></li>
+            <li><a href="{% url 'orders:order_history' %}" class="nav-link {% if active == 'orders' %}fw-bold text-success{% endif %}">Đơn hàng của bạn</a></li>
+            <li><a href="{% url 'users:wishlist' %}" class="nav-link {% if active == 'wishlist' %}fw-bold text-success{% endif %}">Sản phẩm yêu thích</a></li>
           </ul>
         </div>
       </div>

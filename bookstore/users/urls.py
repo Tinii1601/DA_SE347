@@ -3,7 +3,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from .forms import CustomPasswordResetForm, CustomSetPasswordForm
-from .views import ProfileView, ProfilePageView
+from .views import ProfileView, ProfilePageView, WishlistView
 
 app_name = 'users'
 
@@ -12,6 +12,7 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('profile/', ProfilePageView.as_view(), name='profile'),
+    path('profile/wishlist/', WishlistView.as_view(), name='wishlist'),
     path('address/add/', views.AddressCreateView.as_view(), name='address_add'),
     # Password reset
     path('password-reset/',auth_views.PasswordResetView.as_view(

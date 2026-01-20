@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from unidecode import unidecode
+from ckeditor_uploader.fields import RichTextUploadingField
 import os
 
 # 1. Định nghĩa Tên thuộc tính

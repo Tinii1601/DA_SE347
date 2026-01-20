@@ -2,6 +2,20 @@
 Django settings for bookstore project.
 """
 
+# START PATCH: Fix Jazzmin format_html compatibility with Django 6.0
+from django.utils import html
+from django.utils.safestring import mark_safe
+
+_original_format_html = html.format_html
+
+def patched_format_html(format_string, *args, **kwargs):
+    if not args and not kwargs:
+        return mark_safe(format_string)
+    return _original_format_html(format_string, *args, **kwargs)
+
+html.format_html = patched_format_html
+# END PATCH
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -29,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ckeditor',
+    'ckeditor_uploader',
+    'import_export',
 
     # Local apps
     'core',
@@ -136,6 +153,13 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  
 
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+    }
+}
+
 # ================== AUTHENTICATION ==================
 AUTHENTICATION_BACKENDS = [
     'users.backends.EmailBackend',
@@ -173,8 +197,15 @@ EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Load ALLOWED_HOSTS from .env, default to localhost
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
-ALLOWED_HOSTS = allowed_hosts_env.split(',')
+# allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
+# ALLOWED_HOSTS = allowed_hosts_env.split(',')
+
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='nguyenthikimngoc1402@gmail.com')
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'apryl-unstent(or)iously-olive.ngrok-free.dev',
+]
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page.title }} | Bookstore{% endblock %}
+
+{% block extra_css %}
+  <link href="{% static 'css/page_detail.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<nav class="page-breadcrumb-top" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang chủ</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>
+  </ol>
+</nav>
+
+<div class="page-shell">
+  <div class="page-hero">
+    <h1>{{ page.title }}</h1>
+  </div>
+  <div class="page-body content-html">
+    {{ page.content_html|safe }}
+  </div>
+</div>
+{% endblock %}

@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
+    'django_unused_media',
+    'django_cleanup.apps.CleanupConfig',
 ]
 SITE_ID = 1
 

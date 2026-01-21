@@ -10,7 +10,8 @@ cryptography
 django-allauth
 PyJWT
 
-openpyxl
+django-ckeditor
+django-import-export
 
 google-generativeai
 python-dotenv

@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.urls import reverse
-import google.generativeai as genai
+from google import genai
 from google.genai import types
 from books.models import Product, Category
 

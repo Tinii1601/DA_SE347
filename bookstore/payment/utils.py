@@ -3,12 +3,28 @@ from payos import PayOS
 from payos.types import ItemData, CreatePaymentLinkRequest
 from orders.models import Order
 import time
+import sys
+import os
 
 def get_payos_client():
+    # DEBUG: Print keys to stderr (logs) to check if they are loaded
+    client_id = settings.PAYOS_CLIENT_ID
+    api_key = settings.PAYOS_API_KEY
+    checksum_key = settings.PAYOS_CHECKSUM_KEY
+    
+    # Mask keys for security in logs, show first 5 chars
+    masked_cid = client_id[:5] + "..." if client_id else "NONE"
+    masked_api = api_key[:5] + "..." if api_key else "NONE"
+    
+    print(f"DEBUG PAYOS: ClientID={masked_cid}, APIKey={masked_api}", file=sys.stderr)
+    
+    if not client_id or not api_key:
+        print("DEBUG PAYOS: ERROR - Keys are missing!", file=sys.stderr)
+
     return PayOS(
-        client_id=settings.PAYOS_CLIENT_ID,
-        api_key=settings.PAYOS_API_KEY,
-        checksum_key=settings.PAYOS_CHECKSUM_KEY
+        client_id=client_id,
+        api_key=api_key,
+        checksum_key=checksum_key
     )
 
 def create_or_get_payment_link(order, domain=None):

@@ -86,12 +86,12 @@ class RegistrationForm(UserCreationForm):
 # ĐĂNG NHẬP
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        label="Số điện thoại (*)",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
+        label="Tên đăng nhập hoặc email (*)",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tên đăng nhập hoặc email'})
     )
     password = forms.CharField(
         label="Mật khẩu (*)",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mô tả cụ thể tại đây'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Nhập mật khẩu'})
     )
     class Meta:
         fields = ['username', 'password']

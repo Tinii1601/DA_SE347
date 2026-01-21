@@ -28,12 +28,10 @@
           </div>
           {% endfor %}
           {% endif %}
-          {# Kết thúc phần thông báo lỗi chung #}
           
           <div class="mb-3">
             <label class="form-label">Tên đăng nhập hoặc email <span class="text-danger">*</span> </label>
             {{ form.username }}
-            {# Hiển thị lỗi cụ thể cho trường username (nếu có) #}
             {% for error in form.username.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}

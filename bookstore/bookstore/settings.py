@@ -197,15 +197,10 @@ EMAIL_HOST_PASSWORD = 'jpqq jock xbky hheu'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Load ALLOWED_HOSTS from .env, default to localhost
-# allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
-# ALLOWED_HOSTS = allowed_hosts_env.split(',')
+# Lấy từ file .env, nếu không có thì mặc định là localhost
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
 CONTACT_EMAIL = config('CONTACT_EMAIL', default='nguyenthikimngoc1402@gmail.com')
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'apryl-unstent(or)iously-olive.ngrok-free.dev',
-]
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 

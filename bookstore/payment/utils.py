@@ -51,7 +51,12 @@ def create_or_get_payment_link(order, domain=None):
 
         # Generate unique orderCode to avoid collision with old orders
         # Using timestamp to ensure uniqueness: ID + last 6 digits of timestamp
-        orderCode = int(str(order.id) + str(int(time.time())))
+        # Ensure it fits within safe integer range (max 9007199254740991)
+        # Using last 6 digits of timestamp gives us 1 second resolution per order ID unique space
+        orderCode = int(str(order.id) + str(int(time.time()))[-6:])
+
+        # DEBUG: Print the payload being sent
+        print(f"DEBUG PAYOS Payload: orderCode={orderCode}, amount={total_amount}, returnUrl={domain}/payment/return/{order.id}/", file=sys.stderr)
 
         payment_data = CreatePaymentLinkRequest(
             orderCode=orderCode,

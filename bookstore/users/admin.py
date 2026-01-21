@@ -5,6 +5,19 @@ from django.contrib.auth.models import User
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from .models import UserProfile
 from .models import Address
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
+
+# Vietnamese labels for EmailAddress in admin
+EmailAddress._meta.verbose_name = "Địa chỉ email"
+EmailAddress._meta.verbose_name_plural = "Địa chỉ email"
+
+SocialAccount._meta.verbose_name = "Tài khoản liên kết"
+SocialAccount._meta.verbose_name_plural = "Tài khoản liên kết"
+SocialApp._meta.verbose_name = "Ứng dụng mạng xã hội"
+SocialApp._meta.verbose_name_plural = "Ứng dụng mạng xã hội"
+SocialToken._meta.verbose_name = "Token mạng xã hội"
+SocialToken._meta.verbose_name_plural = "Token mạng xã hội"
 
 # Thêm profile vào trang User
 class UserProfileInline(admin.StackedInline):

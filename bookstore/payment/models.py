@@ -4,7 +4,6 @@ from orders.models import Order
 class Payment(models.Model):
     METHOD_CHOICES = [
         ('cod', 'Thanh toán khi nhận hàng'), 
-        ('momo', 'MoMo'),
         ('vietqr', 'VietQR'),
     ]
 

@@ -38,7 +38,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
-    'django.contrib.auth',
+    'bookstore.custom_app_configs.CustomAuthConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'import_export',
 
     # Local apps
-    'core',
+    'core.apps.CoreConfig',
     'books',
     'users',
     'orders',
@@ -57,10 +57,10 @@ INSTALLED_APPS = [
     'chatbot',
 
     # login social
-    'django.contrib.sites',
+    'bookstore.custom_app_configs.CustomSitesConfig',
     'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+    'bookstore.custom_app_configs.CustomAccountConfig',
+    'bookstore.custom_app_configs.CustomSocialAccountConfig',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
     'django_unused_media',
@@ -185,7 +185,12 @@ PAYOS_CLIENT_ID = os.getenv('PAYOS_CLIENT_ID', default='').strip()
 PAYOS_API_KEY = os.getenv('PAYOS_API_KEY', default='').strip()
 PAYOS_CHECKSUM_KEY = os.getenv('PAYOS_CHECKSUM_KEY', default='').strip()
 
-MOMO_NOTIFY_URL = os.getenv('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')
+# ================== MANUAL PAYMENT (VIETQR) ==================
+VIETQR_BANK_NAME = os.getenv('VIETQR_BANK_NAME', default='BIDV')
+VIETQR_BANK_BIN = os.getenv('VIETQR_BANK_BIN', default='970418')
+VIETQR_ACCOUNT_NAME = os.getenv('VIETQR_ACCOUNT_NAME', default='PHAM MINH TIEN')
+VIETQR_ACCOUNT_NUMBER = os.getenv('VIETQR_ACCOUNT_NUMBER', default='8871946801')
+VIETQR_QR_URL = os.getenv('VIETQR_QR_URL', default='')
 
 # ================== EMAIL CONFIGURATION ==================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

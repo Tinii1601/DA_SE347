@@ -10,6 +10,7 @@ from .forms import CartAddProductForm, CheckoutForm
 from .models import Order, OrderItem
 from payment.models import Payment
 from django.contrib import messages
+from django.db.models import Q
 
 from django.http import JsonResponse
 
@@ -197,16 +198,15 @@ class CheckoutView(LoginRequiredMixin, View):
                 method=payment_method,
                 amount=order.total_amount
             )
-            
-            # Clear Cart immediately after order creation for all payment methods
-            cart.clear()
+
+            # Clear cart only for COD; manual payments clear on confirm
+            if payment_method == 'cod':
+                cart.clear()
 
             # Redirect based on payment method
             print(f"DEBUG: Payment method selected: {payment_method}")
             
-            if payment_method == 'momo':
-                return redirect('payment:payment_momo', order_id=order.id)
-            elif payment_method == 'vietqr':
+            if payment_method == 'vietqr':
                 return redirect('payment:payment_vietqr', order_id=order.id)
             elif payment_method == 'cod':
                 return redirect('orders:order_success', order_id=order.id)
@@ -235,6 +235,11 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
         return (
             Order.objects.filter(user=self.request.user)
             .select_related("payment")
+            .filter(
+                Q(payment__method='cod') |
+                Q(payment__status='completed') |
+                Q(payment__transaction_id='USER_REPORTED')
+            )
             .order_by("-created_at")
         )
 

@@ -12,19 +12,17 @@
                 <span class="badge bg-danger rounded-0 text-uppercase px-3 py-2" style="transform: rotate(-45deg) translate(-10px, 10px); font-size: 0.7rem;">Best Seller</span>
             </div>
         {% endif %}
-        <div class="position-absolute top-0 end-0 m-2">
+        <div class="position-absolute top-0 start-0 m-2 z-1">
             {% if user.is_authenticated %}
-                <form action="{% url 'users:wishlist_toggle' book.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    <button type="submit" class="btn btn-light btn-sm rounded-circle wishlist-toggle-btn" aria-label="Yêu thích">
-                        {% if book.id in wishlist_ids %}
-                            <i class="bi bi-heart-fill text-danger"></i>
-                        {% else %}
-                            <i class="bi bi-heart text-danger"></i>
-                        {% endif %}
-                    </button>
-                </form>
+                <button type="button" class="btn btn-light btn-sm rounded-circle wishlist-toggle-btn" aria-label="Yêu thích"
+                        data-product-id="{{ book.id }}"
+                        data-in-wishlist="{% if book.id in wishlist_ids %}1{% else %}0{% endif %}">
+                    {% if book.id in wishlist_ids %}
+                        <i class="bi bi-heart-fill text-danger"></i>
+                    {% else %}
+                        <i class="bi bi-heart text-danger"></i>
+                    {% endif %}
+                </button>
             {% else %}
                 <a href="{% url 'users:login' %}?next={{ request.get_full_path }}" class="btn btn-light btn-sm rounded-circle wishlist-toggle-btn" aria-label="Yêu thích">
                     <i class="bi bi-heart text-danger"></i>

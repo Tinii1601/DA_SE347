@@ -2,6 +2,10 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from .models import Store, ContentPage, NewsPost
 
+admin.site.site_header = "Admin"
+admin.site.site_title = "Admin"
+admin.site.index_title = "Bảng điều khiển"
+
 
 @admin.register(Store)
 class StoreAdmin(ImportExportModelAdmin):

@@ -51,6 +51,8 @@ class ContentPage(models.Model):
 
     class Meta:
         ordering = ["-updated_at"]
+        verbose_name = "Trang nội dung"
+        verbose_name_plural = "Trang nội dung"
 
     def __str__(self):
         return self.title
@@ -77,6 +79,8 @@ class NewsPost(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Bài viết"
+        verbose_name_plural = "Bài viết"
 
     def __str__(self):
         return self.title

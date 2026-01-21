@@ -8,49 +8,47 @@ from .models import Payment
 from .utils import get_payos_client, create_or_get_payment_link
 from payos.types import ItemData, CreatePaymentLinkRequest
 import json
-
-def payment_momo(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'payment/payment_momo.html', {'order': order})
-
-def payment_momo_confirm(request, order_id):
-    """
-    Handle user clicking 'I have transferred' for MoMo.
-    Since this is manual, we just clear the cart and redirect to success.
-    The admin must manually verify the transaction.
-    """
-    order = get_object_or_404(Order, id=order_id)
-    
-    # Clear cart
-    cart = Cart(request)
-    cart.clear()
-    
-    return redirect('orders:order_success', order_id=order.id)
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from urllib.parse import quote_plus
 
 def payment_vietqr(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    try:
-        domain = request.build_absolute_uri('/')[:-1]
-        
-        # FIX: PayOS requires valid URLs. If on production (not localhost), force https
-        if '127.0.0.1' not in domain and 'localhost' not in domain and 'http:' in domain:
-            domain = domain.replace('http:', 'https:')
-            
-        payment_info = create_or_get_payment_link(order, domain=domain)
-        print(f"Payment Info: {payment_info}") # Debug print
-        if hasattr(payment_info, '__dict__'):
-             print(f"Payment Info Dict: {payment_info.__dict__}")
-        
-        return render(request, 'payment/payment_vietqr.html', {
-            'order': order,
-            'payment_info': payment_info
-        })
-    except Exception as e:
-        print(f"Error getting PayOS link: {e}")
-        return render(request, 'payment/payment_vietqr.html', {
-            'order': order,
-            'error': f'Lỗi: {str(e)}'
-        })
+    payment_content = f"DH {order.order_number}"
+    content_encoded = quote_plus(payment_content)
+    account_name_encoded = quote_plus(settings.VIETQR_ACCOUNT_NAME)
+    generated_qr_url = (
+        f"https://img.vietqr.io/image/{settings.VIETQR_BANK_BIN}-{settings.VIETQR_ACCOUNT_NUMBER}-compact.png"
+        f"?amount={int(order.total_amount)}&addInfo={content_encoded}&accountName={account_name_encoded}"
+    )
+    qr_url = settings.VIETQR_QR_URL or generated_qr_url
+
+    return render(request, 'payment/payment_vietqr.html', {
+        'order': order,
+        'bank_name': settings.VIETQR_BANK_NAME,
+        'bank_account_name': settings.VIETQR_ACCOUNT_NAME,
+        'bank_account_number': settings.VIETQR_ACCOUNT_NUMBER,
+        'payment_content': payment_content,
+        'payment_amount': order.total_amount,
+        'qr_url': qr_url,
+        'generated_qr_url': generated_qr_url,
+    })
+
+
+@require_POST
+def payment_vietqr_confirm(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    payment = getattr(order, 'payment', None)
+    if payment:
+        payment.status = 'pending'
+        payment.transaction_id = payment.transaction_id or 'USER_REPORTED'
+        payment.save()
+
+    cart = Cart(request)
+    cart.clear()
+
+    messages.success(request, 'Đã ghi nhận thanh toán. Đơn hàng sẽ được xác minh thủ công.')
+    return redirect('orders:order_detail', pk=order.id)
 
 def payment_cancel(request, order_id):
     order = get_object_or_404(Order, id=order_id)

@@ -7,6 +7,8 @@ venv/
 # Python
 __pycache__/
 *.pyc
+*.py[cod]
+*$py.class
 
 # Database
 db.sqlite3
@@ -16,3 +18,8 @@ db.sqlite3
 
 # OS
 .DS_Store
+
+# Django
+*.pot
+/media/
+/staticfiles/

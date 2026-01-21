@@ -9,6 +9,7 @@ from .cart import Cart
 from .forms import CartAddProductForm, CheckoutForm
 from .models import Order, OrderItem
 from payment.models import Payment
+from django.contrib import messages
 
 from django.http import JsonResponse
 
@@ -197,6 +198,9 @@ class CheckoutView(LoginRequiredMixin, View):
                 amount=order.total_amount
             )
             
+            # Clear Cart immediately after order creation for all payment methods
+            cart.clear()
+
             # Redirect based on payment method
             print(f"DEBUG: Payment method selected: {payment_method}")
             
@@ -205,11 +209,9 @@ class CheckoutView(LoginRequiredMixin, View):
             elif payment_method == 'vietqr':
                 return redirect('payment:payment_vietqr', order_id=order.id)
             elif payment_method == 'cod':
-                # Clear Cart only for COD
-                cart.clear()
                 return redirect('orders:order_success', order_id=order.id)
             else:
-                # For other methods (e.g. vnpay), do not clear cart immediately
+                # For other methods (e.g. vnpay)
                 # TODO: Implement handlers for other methods
                 return redirect('orders:order_success', order_id=order.id)
                 
@@ -279,6 +281,20 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
             }
         )
         return context
+
+def cancel_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if order.status == 'pending':
+        order.status = 'canceled'
+        order.save()
+        # Update payment status if exists
+        if hasattr(order, 'payment'):
+            order.payment.status = 'canceled'
+            order.payment.save()
+        messages.success(request, "Đã hủy đơn hàng thành công.")
+    else:
+        messages.error(request, "Không thể hủy đơn hàng này do trạng thái không hợp lệ.")
+    return redirect('orders:order_detail', pk=order.id)
 
 @require_POST
 def apply_coupon(request):

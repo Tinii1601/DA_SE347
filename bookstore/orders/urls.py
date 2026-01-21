@@ -13,4 +13,5 @@ urlpatterns = [
     path('success/<int:order_id>/', views.order_success, name='order_success'),
     path('history/', views.OrderHistoryView.as_view(), name='order_history'),
     path('detail/<int:pk>/', views.OrderDetailView.as_view(), name='order_detail'),
+    path('cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 ]

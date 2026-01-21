@@ -80,13 +80,13 @@
     <div class="order-item-row">
         <div class="item-info" data-label="Sản phẩm">
           <div class="item-thumb">
-            {% if item.book.cover_image %}
-              <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }}">
+            {% if item.product.cover_image %}
+              <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}">
             {% else %}
-              <img src="{% static 'img/logo.png' %}" alt="{{ item.book.title }}">
+              <img src="{% static 'img/logo.png' %}" alt="{{ item.product.name }}">
             {% endif %}
           </div>
-          <div class="item-name">{{ item.book.title }}</div>
+          <div class="item-name">{{ item.product.name }}</div>
         </div>
         <div class="item-price" data-label="Giá tiền">{{ item.price|floatformat:0 }}₫</div>
         <div class="item-qty" data-label="Số lượng">{{ item.quantity }}</div>

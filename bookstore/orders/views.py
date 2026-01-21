@@ -251,7 +251,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return (
             Order.objects.filter(user=self.request.user)
             .select_related("payment", "shipping_address")
-            .prefetch_related("items__book")
+            .prefetch_related("items__product")
         )
 
     def get_context_data(self, **kwargs):

@@ -12,8 +12,8 @@ PyJWT
 
 django-ckeditor
 django-import-export
-django_unused_media
-diango-cleanup
+django-unused-media
+django-cleanup
 
 google-generativeai
 google-genai

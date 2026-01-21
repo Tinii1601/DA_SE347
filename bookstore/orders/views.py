@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from books.models import Product
-from users.models import Address
+from users.models import Address, WishlistItem
 from .cart import Cart
 from .forms import CartAddProductForm, CheckoutForm
 from .models import Order, OrderItem
@@ -241,6 +241,10 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["active"] = "orders"
+        context["wishlist_items"] = (
+            WishlistItem.objects.filter(user=self.request.user)
+            .select_related("product")
+        )
         return context
 
 

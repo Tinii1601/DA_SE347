@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('profile/', ProfilePageView.as_view(), name='profile'),
     path('profile/wishlist/', WishlistView.as_view(), name='wishlist'),
+    path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='wishlist_toggle'),
     path('address/add/', views.AddressCreateView.as_view(), name='address_add'),
     # Password reset
     path('password-reset/',auth_views.PasswordResetView.as_view(

@@ -56,14 +56,20 @@ class CategoryResource(resources.ModelResource):
         attribute='parent',
         widget=CategoryParentForeignKeyWidget(Category, 'name')
     )
+    # EXPORT FIELD: Flatten attributes to string "Attr1; Attr2"
+    attributes = fields.Field(column_name='attributes', readonly=True)
 
     class Meta:
         model = Category
         import_id_fields = ('name',)
-        fields = ('id', 'name', 'slug', 'description', 'parent')
+        fields = ('id', 'name', 'slug', 'description', 'parent', 'attributes')
         # Disable skipping to force updates for existing categories (like attributes)
         skip_unchanged = False
         report_skipped = True
+
+    def dehydrate_attributes(self, category):
+        # Format: "Màu sắc; Size"
+        return "; ".join([attr.name for attr in category.attributes.all()])
 
     def before_import_row(self, row, **kwargs):
         if 'name' in row and ('slug' not in row or not row['slug']):
@@ -119,15 +125,32 @@ class ProductResource(resources.ModelResource):
         attribute='category',
         widget=ForeignKeyWidget(Category, 'name')
     )
-    # Exclude cover_image from automatic mapping to handle URL download manually
-    # We will handle 'cover_image' in hooks
+    # EXPORT FIELDS: Define fields to match Import logic
+    attributes_values = fields.Field(column_name='attributes-values', readonly=True)
+    image = fields.Field(column_name='image', readonly=True)
+    cover_image = fields.Field(column_name='cover_image', attribute='cover_image')
 
     class Meta:
         model = Product
         import_id_fields = ('name',) 
-        fields = ('id', 'category', 'name', 'slug', 'price', 'discount_percentage', 'stock', 'description', 'is_active')
+        # Update fields list to include new export columns
+        fields = ('id', 'category', 'name', 'slug', 'price', 'discount_percentage', 'stock', 'description', 'is_active', 
+                  'cover_image', 'attributes_values', 'image')
         skip_unchanged = True
         report_skipped = True
+
+    # --- Dehydrate Methods for Export ---
+    def dehydrate_attributes_values(self, product):
+        # Export format: "AttributeName:Value; AttributeName2:Value2"
+        # Matches the expected import format in after_save_instance
+        values = product.attribute_values.select_related('attribute').all()
+        return "; ".join([f"{v.attribute.name}:{v.value}" for v in values])
+
+    def dehydrate_image(self, product):
+        # Export format: "path/to/img1.jpg; path/to/img2.jpg"
+        # Matches the expected import format in after_save_instance
+        images = product.images.all()
+        return "; ".join([img.image.name for img in images if img.image])
 
     def before_import_row(self, row, **kwargs):
         # Auto-generate slug
@@ -140,6 +163,8 @@ class ProductResource(resources.ModelResource):
 
     def before_save_instance(self, instance, row, **kwargs):
         # Handle Cover Image (URL or Local Path)
+        # Note: If 'cover_image' is in fields, instance.cover_image might be set to string already.
+        # But we want to handle the file download/copy logic explicitly.
         img_path = row.get('cover_image')
         if img_path:
             import os

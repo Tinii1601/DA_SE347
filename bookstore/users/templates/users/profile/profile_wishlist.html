@@ -1,5 +1,6 @@
 {% extends 'users/profile/profile_base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Sản phẩm yêu thích{% endblock %}
 
@@ -14,67 +15,43 @@
     <p class="text-muted">Chỉ bạn thấy danh sách này trên tài khoản của mình.</p>
   </div>
 
-  <div id="wishlist-empty" class="wishlist-empty d-none">
-    <p>Bạn chưa có sản phẩm yêu thích nào.</p>
-    <a href="{% url 'books:book_list' %}" class="btn btn-success btn-sm">Mua sắm ngay</a>
-  </div>
-
-  <div id="wishlist-grid" class="wishlist-grid"></div>
-</div>
-
-<script>
-  (function () {
-    const userKey = "{{ request.user.id|default:'guest' }}";
-    const storageKey = `wishlist:${userKey}`;
-    const grid = document.getElementById("wishlist-grid");
-    const emptyState = document.getElementById("wishlist-empty");
-
-    function loadWishlist() {
-      const raw = localStorage.getItem(storageKey);
-      return raw ? JSON.parse(raw) : [];
-    }
-
-    function saveWishlist(items) {
-      localStorage.setItem(storageKey, JSON.stringify(items));
-    }
-
-    function removeItem(id) {
-      const items = loadWishlist().filter((item) => item.id !== id);
-      saveWishlist(items);
-      render();
-    }
-
-    function render() {
-      const items = loadWishlist();
-      grid.innerHTML = "";
-      if (!items.length) {
-        emptyState.classList.remove("d-none");
-        return;
-      }
-      emptyState.classList.add("d-none");
-
-      items.forEach((item) => {
-        const card = document.createElement("div");
-        card.className = "wishlist-card";
-        card.innerHTML = `
-          <a href="${item.url}" class="wishlist-thumb">
-            <img src="${item.cover || '{% static "img/logo.png" %}'}" alt="${item.title}">
+  {% if wishlist_items %}
+    <div class="wishlist-grid">
+      {% for item in wishlist_items %}
+        <div class="wishlist-card">
+          <a href="{{ item.product.get_absolute_url }}" class="wishlist-thumb">
+            {% if item.product.cover_image %}
+              <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+              <img src="{% static 'img/default-book-cover.jpg' %}" alt="{{ item.product.name }}">
+            {% endif %}
           </a>
           <div class="wishlist-info">
-            <a href="${item.url}" class="wishlist-title">${item.title}</a>
-            <div class="wishlist-author">${item.author || ""}</div>
-            <div class="wishlist-price">${item.price || ""}</div>
+            <a href="{{ item.product.get_absolute_url }}" class="wishlist-title">{{ item.product.name }}</a>
+            <div class="wishlist-author">
+              {% for attr_value in item.product.attribute_values.all %}
+                {% if attr_value.attribute.name == "Tác giả" %}
+                  {{ attr_value.value }}
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="wishlist-price">{{ item.product.get_final_price|vnd_currency }}</div>
           </div>
-          <button class="wishlist-heart" type="button" aria-label="Bỏ yêu thích">
-            <i class="bi bi-heart-fill"></i>
-          </button>
-        `;
-        card.querySelector(".wishlist-heart").addEventListener("click", () => removeItem(item.id));
-        grid.appendChild(card);
-      });
-    }
-
-    render();
-  })();
-</script>
+          <form action="{% url 'users:wishlist_toggle' item.product.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="wishlist-heart" type="submit" aria-label="Bỏ yêu thích">
+              <i class="bi bi-heart-fill"></i>
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="wishlist-empty">
+      <p>Bạn chưa có sản phẩm yêu thích nào.</p>
+      <a href="{% url 'books:book_list' %}" class="btn btn-success btn-sm">Mua sắm ngay</a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

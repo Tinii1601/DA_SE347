@@ -46,35 +46,7 @@ def payment_vietqr(request, order_id):
             'payment_info': payment_info
         })
     except Exception as e:
-        import sys
-        import traceback
-        
-        print(f"========== PAYOS ERROR DETAIL ==========", file=sys.stderr)
-        print(f"Error Message: {str(e)}", file=sys.stderr)
-        print(f"Error Type: {type(e).__name__}", file=sys.stderr)
-        
-        # Check for response attribute (requests library)
-        if hasattr(e, 'response') and e.response is not None:
-            print(f"HTTP Status Code: {e.response.status_code}", file=sys.stderr)
-            print(f"Response Headers: {e.response.headers}", file=sys.stderr)
-            try:
-                print(f"Response JSON: {e.response.json()}", file=sys.stderr)
-            except:
-                 pass
-            try:
-                print(f"Response Text: {e.response.text}", file=sys.stderr)
-            except:
-                 pass
-        
-        # Check for code/message attributes (common in SDKs)
-        if hasattr(e, 'code'):
-            print(f"SDK Error Code: {e.code}", file=sys.stderr)
-        if hasattr(e, 'message'):
-            print(f"SDK Error Message: {e.message}", file=sys.stderr)
-            
-        print(f"Traceback: {traceback.format_exc()}", file=sys.stderr)
-        print(f"========================================", file=sys.stderr)
-
+        print(f"Error getting PayOS link: {e}")
         return render(request, 'payment/payment_vietqr.html', {
             'order': order,
             'error': f'Lỗi: {str(e)}'

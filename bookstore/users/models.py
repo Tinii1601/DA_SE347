@@ -8,6 +8,7 @@ from PIL import Image
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import date
+from books.models import Product
 
 # Tự động tạo thư mục nếu chưa có
 def user_avatar_upload_to(instance, filename):
@@ -73,6 +74,20 @@ class Address(models.Model):
             Address.objects.filter(user=self.user).update(is_default=False)
             self.is_default = True
         super().save(*args, **kwargs)
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist_items', verbose_name="Người dùng")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='wishlisted_by', verbose_name="Sản phẩm")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày thêm")
+
+    class Meta:
+        verbose_name = "Sản phẩm yêu thích"
+        verbose_name_plural = "Danh sách yêu thích"
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name}"
         
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

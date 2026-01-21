@@ -114,6 +114,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.categories_processor',
                 'orders.context_processors.cart',
+                'users.context_processors.wishlist_processor',
             ],
         },
     },
@@ -205,5 +206,31 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(','
 CONTACT_EMAIL = config('CONTACT_EMAIL', default='nguyenthikimngoc1402@gmail.com')
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# ================== SOCIAL ACCOUNT CONFIG ==================
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID', ''),
+            'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
+            'key': ''
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'APP': {
+            'client_id': os.getenv('FACEBOOK_CLIENT_ID', ''),
+            'secret': os.getenv('FACEBOOK_CLIENT_SECRET', ''),
+            'key': ''
+        }
+    }
+}
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

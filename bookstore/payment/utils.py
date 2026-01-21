@@ -7,17 +7,9 @@ import sys
 import os
 
 def get_payos_client():
-    # DEBUG: Print keys to stderr (logs) to check if they are loaded
     client_id = settings.PAYOS_CLIENT_ID
     api_key = settings.PAYOS_API_KEY
     checksum_key = settings.PAYOS_CHECKSUM_KEY
-    
-    # Mask keys for security in logs, show first 5 chars
-    masked_cid = client_id[:5] + "..." if client_id else "NONE"
-    masked_api = api_key[:5] + "..." if api_key else "NONE"
-    masked_checksum = checksum_key[:5] + "..." if checksum_key else "NONE"
-    
-    print(f"DEBUG PAYOS: ClientID={masked_cid}, APIKey={masked_api}, ChecksumKey={masked_checksum}", file=sys.stderr)
     
     if not client_id or not api_key or not checksum_key:
         print("DEBUG PAYOS: ERROR - One or more keys are missing!", file=sys.stderr)
@@ -33,38 +25,34 @@ def create_or_get_payment_link(order, domain=None):
     if not domain:
         domain = "http://127.0.0.1:8000"        
     
+    # 1. Try to get existing payment link first to ensure consistency (orderCode = order.id)
     try:
-        # Try to get existing payment link
-        # return payos.payment_requests.get(int(order.id))
-        raise Exception("Force create new link to avoid collision")
+        existing_link = payos.payment_requests.get(int(order.id))
+        if existing_link and existing_link.status != "CANCELLED":
+            print(f"DEBUG PAYOS: Found existing link for Order {order.id}", file=sys.stderr)
+            return existing_link
     except:
-        # Create new payment link
-        # To avoid issues with sum of items not matching total amount due to discounts,
-        # we will send a single summary item.
-        total_amount = int(order.total_amount)
-        
-        items = [ItemData(
-            name=f"Thanh toan don hang {order.order_number}",
-            quantity=1,
-            price=total_amount
-        )]
+        pass # Link not found or error, proceed to create
 
-        # Generate unique orderCode to avoid collision with old orders
-        # Using timestamp to ensure uniqueness: ID + last 6 digits of timestamp
-        # Ensure it fits within safe integer range (max 9007199254740991)
-        # Using last 6 digits of timestamp gives us 1 second resolution per order ID unique space
-        orderCode = int(str(order.id) + str(int(time.time()))[-6:])
+    # 2. Create new payment link
+    total_amount = int(order.total_amount)
+    
+    items = [ItemData(
+        name=f"Thanh toan don hang {order.order_number}",
+        quantity=1,
+        price=total_amount
+    )]
 
-        # DEBUG: Print the payload being sent
-        print(f"DEBUG PAYOS Payload: orderCode={orderCode}, amount={total_amount}, returnUrl={domain}/payment/return/{order.id}/", file=sys.stderr)
+    # Use order.id as orderCode to allow simple status checking
+    orderCode = int(order.id)
 
-        payment_data = CreatePaymentLinkRequest(
-            orderCode=orderCode,
-            amount=total_amount,
-            description=f"DH {order.order_number}",
-            items=items,
-            cancelUrl=f"{domain}/payment/cancel/{order.id}/",
-            returnUrl=f"{domain}/payment/return/{order.id}/"
-        )
-        
-        return payos.payment_requests.create(payment_data)
+    payment_data = CreatePaymentLinkRequest(
+        orderCode=orderCode,
+        amount=total_amount,
+        description=f"DH {order.order_number}",
+        items=items,
+        cancelUrl=f"{domain}/payment/cancel/{order.id}/",
+        returnUrl=f"{domain}/payment/return/{order.id}/"
+    )
+    
+    return payos.payment_requests.create(payment_data)

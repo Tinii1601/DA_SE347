@@ -4,11 +4,14 @@ from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import RegistrationForm, LoginForm, AddressForm, ProfileUpdateForm, PasswordChangeCustomForm
 from django.contrib.auth import login
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import UserProfile, Address
+from .models import UserProfile, Address, WishlistItem
 from django.contrib.auth import update_session_auth_hash
+from books.models import Product
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 class RegisterView(FormView):
     template_name = 'users/register.html'
@@ -122,5 +125,29 @@ class WishlistView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["active"] = "wishlist"
+        context["wishlist_items"] = (
+            WishlistItem.objects.filter(user=self.request.user)
+            .select_related("product")
+        )
         return context
+
+
+@require_POST
+def toggle_wishlist(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect(f"/users/login/?next={request.get_full_path()}")
+
+    product = get_object_or_404(Product, id=product_id)
+    obj, created = WishlistItem.objects.get_or_create(user=request.user, product=product)
+    if not created:
+        obj.delete()
+        added = False
+    else:
+        added = True
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'added': added})
+
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or '/'
+    return redirect(next_url)
         

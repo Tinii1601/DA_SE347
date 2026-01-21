@@ -30,7 +30,8 @@ def payment_momo_confirm(request, order_id):
 def payment_vietqr(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     try:
-        payment_info = create_or_get_payment_link(order)
+        domain = request.build_absolute_uri('/')[:-1]
+        payment_info = create_or_get_payment_link(order, domain=domain)
         print(f"Payment Info: {payment_info}") # Debug print
         if hasattr(payment_info, '__dict__'):
              print(f"Payment Info Dict: {payment_info.__dict__}")

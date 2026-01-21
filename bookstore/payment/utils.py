@@ -10,9 +10,10 @@ def get_payos_client():
         checksum_key=settings.PAYOS_CHECKSUM_KEY
     )
 
-def create_or_get_payment_link(order):
+def create_or_get_payment_link(order, domain=None):
     payos = get_payos_client()
-    domain = "http://127.0.0.1:8000"
+    if not domain:
+        domain = "http://127.0.0.1:8000"
     
     try:
         # Try to get existing payment link

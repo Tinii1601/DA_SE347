@@ -31,6 +31,11 @@ def payment_vietqr(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     try:
         domain = request.build_absolute_uri('/')[:-1]
+        
+        # FIX: PayOS requires valid URLs. If on production (not localhost), force https
+        if '127.0.0.1' not in domain and 'localhost' not in domain and 'http:' in domain:
+            domain = domain.replace('http:', 'https:')
+            
         payment_info = create_or_get_payment_link(order, domain=domain)
         print(f"Payment Info: {payment_info}") # Debug print
         if hasattr(payment_info, '__dict__'):
@@ -44,8 +49,14 @@ def payment_vietqr(request, order_id):
         import sys
         print(f"Error getting PayOS link: {e}", file=sys.stderr)
         # Try to print response body if available (common in requests lib)
-        if hasattr(e, 'response') and hasattr(e.response, 'text'):
-             print(f"PayOS Response Error Body: {e.response.text}", file=sys.stderr)
+        if hasattr(e, 'response'):
+             try:
+                 # Try json
+                 print(f"PayOS Response Error JSON: {e.response.json()}", file=sys.stderr)
+             except:
+                 # Try text
+                 if hasattr(e.response, 'text'):
+                     print(f"PayOS Response Error Text: {e.response.text}", file=sys.stderr)
 
         return render(request, 'payment/payment_vietqr.html', {
             'order': order,

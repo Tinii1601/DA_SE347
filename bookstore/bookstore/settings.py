@@ -180,9 +180,9 @@ CART_SESSION_ID = 'cart'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ================== PAYOS PAYMENT CONFIG ==================
-PAYOS_CLIENT_ID = os.getenv('PAYOS_CLIENT_ID', default='')
-PAYOS_API_KEY = os.getenv('PAYOS_API_KEY', default='')
-PAYOS_CHECKSUM_KEY = os.getenv('PAYOS_CHECKSUM_KEY', default='')
+PAYOS_CLIENT_ID = os.getenv('PAYOS_CLIENT_ID', default='').strip()
+PAYOS_API_KEY = os.getenv('PAYOS_API_KEY', default='').strip()
+PAYOS_CHECKSUM_KEY = os.getenv('PAYOS_CHECKSUM_KEY', default='').strip()
 
 MOMO_NOTIFY_URL = os.getenv('MOMO_NOTIFY_URL', default='http://127.0.0.1:8000/orders/momo/notify/')
 

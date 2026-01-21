@@ -15,11 +15,12 @@ def get_payos_client():
     # Mask keys for security in logs, show first 5 chars
     masked_cid = client_id[:5] + "..." if client_id else "NONE"
     masked_api = api_key[:5] + "..." if api_key else "NONE"
+    masked_checksum = checksum_key[:5] + "..." if checksum_key else "NONE"
     
-    print(f"DEBUG PAYOS: ClientID={masked_cid}, APIKey={masked_api}", file=sys.stderr)
+    print(f"DEBUG PAYOS: ClientID={masked_cid}, APIKey={masked_api}, ChecksumKey={masked_checksum}", file=sys.stderr)
     
-    if not client_id or not api_key:
-        print("DEBUG PAYOS: ERROR - Keys are missing!", file=sys.stderr)
+    if not client_id or not api_key or not checksum_key:
+        print("DEBUG PAYOS: ERROR - One or more keys are missing!", file=sys.stderr)
 
     return PayOS(
         client_id=client_id,

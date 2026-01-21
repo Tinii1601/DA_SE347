@@ -41,7 +41,12 @@ def payment_vietqr(request, order_id):
             'payment_info': payment_info
         })
     except Exception as e:
-        print(f"Error getting PayOS link: {e}")
+        import sys
+        print(f"Error getting PayOS link: {e}", file=sys.stderr)
+        # Try to print response body if available (common in requests lib)
+        if hasattr(e, 'response') and hasattr(e.response, 'text'):
+             print(f"PayOS Response Error Body: {e.response.text}", file=sys.stderr)
+
         return render(request, 'payment/payment_vietqr.html', {
             'order': order,
             'error': f'Lỗi: {str(e)}'

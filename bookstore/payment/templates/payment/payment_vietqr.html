@@ -20,7 +20,6 @@
                 <!-- Left: QR Code -->
                 <div class="col-md-5 text-center border-end-md">
                     <div class="qr-container mb-3">
-                        <!-- VietQR API Link using PayOS Data -->
                         {% if error %}
                         <div class="alert alert-danger">{{ error }}</div>
                         {% elif payment_info %}
@@ -31,8 +30,6 @@
                         {% endif %}
                     </div>
                     <div class="d-flex justify-content-center gap-3 mb-4">
-                        <img src="https://vietqr.net/img/logo.png" alt="VietQR" height="30">
-                        <span class="fw-bold text-primary fs-5">napas 247</span>
                     </div>
                     
                     <div class="timer-container">
@@ -68,14 +65,14 @@
                     <div class="info-row mb-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted">Nội dung</span>
                         <div class="d-flex align-items-center">
-                            <span class="fw-bold me-2" id="contentNum">{{ payment_info.description }}</span>
-                            <button class="btn btn-sm btn-light text-primary" onclick="copyToClipboard('{{ payment_info.description }}')"><i class="bi bi-files"></i></button>
+                            <span class="fw-bold me-2" id="contentNum">{{ payment_info.description|default:order.order_number }}</span>
+                            <button class="btn btn-sm btn-light text-primary" onclick="copyToClipboard('{{ payment_info.description|default:order.order_number }}')"><i class="bi bi-files"></i></button>
                         </div>
                     </div>
                     
                     <div class="info-row mb-3 d-flex justify-content-between align-items-center">
                         <span class="text-muted">Số tiền</span>
-                        <span class="fw-bold">{{ payment_info.amount|vnd_currency }}</span>
+                        <span class="fw-bold">{{ payment_info.amount|default:order.total_amount|vnd_currency }}</span>
                     </div>
                     
                     <hr class="my-4">

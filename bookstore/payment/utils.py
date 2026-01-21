@@ -2,6 +2,7 @@ from django.conf import settings
 from payos import PayOS
 from payos.types import ItemData, CreatePaymentLinkRequest
 from orders.models import Order
+import time
 
 def get_payos_client():
     return PayOS(
@@ -17,7 +18,8 @@ def create_or_get_payment_link(order, domain=None):
     
     try:
         # Try to get existing payment link
-        return payos.payment_requests.get(int(order.id))
+        # return payos.payment_requests.get(int(order.id))
+        raise Exception("Force create new link to avoid collision")
     except:
         # Create new payment link
         # To avoid issues with sum of items not matching total amount due to discounts,
@@ -30,8 +32,12 @@ def create_or_get_payment_link(order, domain=None):
             price=total_amount
         )]
 
+        # Generate unique orderCode to avoid collision with old orders
+        # Using timestamp to ensure uniqueness: ID + last 6 digits of timestamp
+        orderCode = int(str(order.id) + str(int(time.time())))
+
         payment_data = CreatePaymentLinkRequest(
-            orderCode=int(order.id),
+            orderCode=orderCode,
             amount=total_amount,
             description=f"DH {order.order_number}",
             items=items,

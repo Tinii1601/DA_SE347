@@ -14,7 +14,7 @@ def get_payos_client():
 def create_or_get_payment_link(order, domain=None):
     payos = get_payos_client()
     if not domain:
-        domain = "http://127.0.0.1:8000"
+        domain = "http://127.0.0.1:8000"        
     
     try:
         # Try to get existing payment link

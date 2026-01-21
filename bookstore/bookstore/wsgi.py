@@ -8,8 +8,13 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Force load .env file specific to project structure
+ENV_PATH = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(ENV_PATH)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bookstore.settings')
 

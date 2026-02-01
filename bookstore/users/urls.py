@@ -16,13 +16,7 @@ urlpatterns = [
     path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='wishlist_toggle'),
     path('address/add/', views.AddressCreateView.as_view(), name='address_add'),
     # Password reset
-    path('password-reset/',auth_views.PasswordResetView.as_view(
-            template_name='users/password_reset_form.html',
-            email_template_name='users/password_reset_email.txt',  # fallback text
-            html_email_template_name='users/emails/password_reset.html',
-            form_class=CustomPasswordResetForm,
-            success_url='/users/password-reset/done/'),
-        name='forget_password'),
+    path('password-reset/', views.CustomPasswordResetView.as_view(), name='forget_password'),
     path('password-reset/done/',auth_views.PasswordResetDoneView.as_view(
         template_name='users/password_reset_done.html'),
         name='password_reset_done'),

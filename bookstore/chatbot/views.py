@@ -88,7 +88,7 @@ def chat_view(request):
                 # 1. Tìm các Categories khớp với keyword để lấy cả danh mục con
                 target_cat_ids = set()
                 try:
-                    matching_cats = Category.objects.filter(name__icontains=search_query)
+                    matching_cats = Category.objects.filter(name__icontains=search_query, is_active=True)
                     for cat in matching_cats:
                         target_cat_ids.update(cat.get_descendants_and_self_ids())
                 except Exception as e:
@@ -99,7 +99,8 @@ def chat_view(request):
                     Q(name__icontains=search_query) | 
                     Q(category__id__in=target_cat_ids) |
                     Q(category__name__icontains=search_query),
-                    is_active=True
+                    is_active=True,
+                    category__is_active=True
                 ).distinct()[:5]
                 
                 print(f"Chatbot: Found {products.count()} products for '{search_query}'")

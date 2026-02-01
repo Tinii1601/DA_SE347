@@ -284,10 +284,11 @@ class AttributeAdmin(ImportExportModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(ImportExportModelAdmin):
     resource_class = CategoryResource
-    list_display = ['name', 'slug', 'product_count', 'parent']
+    list_display = ['name', 'slug', 'is_active', 'product_count', 'parent']
     search_fields = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
-    list_filter = ['parent']
+    list_filter = ['is_active', 'parent']
+    list_editable = ['is_active']
     
     def product_count(self, obj):
         return obj.products.count()

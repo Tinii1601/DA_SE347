@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Store, ContentPage, NewsPost
+from .models import Store, ContentPage, NewsPost, Banner
 
 admin.site.site_header = "Admin"
 admin.site.site_title = "Admin"
@@ -29,3 +29,11 @@ class NewsPostAdmin(ImportExportModelAdmin):
     list_filter = ("category", "is_active")
     search_fields = ("title", "summary", "slug")
     ordering = ("-created_at",)
+
+
+@admin.register(Banner)
+class BannerAdmin(ImportExportModelAdmin):
+    list_display = ("id", "title", "is_active", "display_order", "start_at", "end_at")
+    list_filter = ("is_active",)
+    search_fields = ("title",)
+    ordering = ("display_order", "-created_at")

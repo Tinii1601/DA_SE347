@@ -7,10 +7,11 @@ from books.models import Product
 from users.models import Address, WishlistItem
 from .cart import Cart
 from .forms import CartAddProductForm, CheckoutForm
-from .models import Order, OrderItem
+from .models import Order, OrderItem, Coupon
 from payment.models import Payment
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, F
+from django.utils import timezone
 
 from django.http import JsonResponse
 
@@ -36,6 +37,34 @@ def cart_remove(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     cart.remove(product)
+    return redirect('orders:cart_detail')
+
+@require_POST
+def cart_update_selection(request):
+    cart = Cart(request)
+    selected_items = request.POST.getlist('selected_items')
+    select_all = request.POST.get('select_all')
+
+    if select_all == '1':
+        cart.set_all_selected(True)
+    elif select_all == '0':
+        cart.set_all_selected(False)
+    else:
+        cart.set_selected(selected_items)
+
+    next_action = request.POST.get('next')
+    if next_action == 'checkout':
+        return redirect('orders:checkout')
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'selected_total': float(cart.get_selected_total_price()),
+            'cart_total': float(cart.get_total_price()),
+            'selected_count': len(selected_items) if select_all in [None, ''] else (
+                len(cart.cart) if select_all == '1' else 0
+            )
+        })
+
     return redirect('orders:cart_detail')
 
 def cart_detail(request):
@@ -73,11 +102,12 @@ def cart_detail(request):
 
     # Get random products for recommendations
     import random
-    all_products = list(Product.objects.filter(is_active=True))
+    all_products = list(Product.objects.filter(is_active=True, category__is_active=True))
     recommended_products = random.sample(all_products, min(len(all_products), 4))
 
     return render(request, 'orders/cart_detail.html', {
         'cart': cart_wrapper, 
+        'selected_total': cart.get_selected_total_price(),
         'continue_shopping_url': continue_shopping_url,
         'recommended_books': recommended_products 
     })
@@ -85,15 +115,52 @@ def cart_detail(request):
 class CheckoutView(LoginRequiredMixin, View):
     def get(self, request):
         cart = Cart(request)
-        if len(cart) == 0:
+        selected_items = cart.get_selected_items()
+        if len(cart) == 0 or len(selected_items) == 0:
+            messages.warning(request, "Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.")
             return redirect('orders:cart_detail')
         
         form = CheckoutForm()
         addresses = Address.objects.filter(user=request.user)
         default_address = addresses.filter(is_default=True).first() or addresses.first()
         
+        now = timezone.now()
+        selected_total = cart.get_selected_total_price()
+        coupons = Coupon.objects.filter(is_active=True).order_by('-value', 'code')
+        available_coupons = []
+        for coupon in coupons:
+            if not (coupon.valid_from <= now <= coupon.valid_to):
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': 'Hết hạn hoặc chưa đến ngày áp dụng',
+                })
+                continue
+            if coupon.used_count >= coupon.max_uses:
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': 'Đã hết lượt sử dụng',
+                })
+                continue
+            if selected_total < coupon.min_order_value:
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': f'Đơn tối thiểu {coupon.min_order_value:,.0f}₫',
+                })
+                continue
+            available_coupons.append({
+                'coupon': coupon,
+                'eligible': True,
+                'reason': 'Có thể áp dụng',
+            })
+
         return render(request, 'orders/checkout.html', {
             'cart': cart,
+            'selected_items': selected_items,
+            'selected_total': selected_total,
+            'available_coupons': available_coupons,
             'form': form,
             'addresses': addresses,
             'default_address': default_address
@@ -101,7 +168,9 @@ class CheckoutView(LoginRequiredMixin, View):
 
     def post(self, request):
         cart = Cart(request)
-        if len(cart) == 0:
+        selected_items = cart.get_selected_items()
+        if len(cart) == 0 or len(selected_items) == 0:
+            messages.warning(request, "Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.")
             return redirect('orders:cart_detail')
             
         form = CheckoutForm(request.POST)
@@ -152,13 +221,12 @@ class CheckoutView(LoginRequiredMixin, View):
             order = form.save(commit=False)
             order.user = request.user
             order.shipping_address = address
-            order.total_amount = cart.get_total_price()
+            order.total_amount = cart.get_selected_total_price()
             
             # Apply Coupon
             coupon_id = request.session.get('coupon_id')
             if coupon_id:
                 try:
-                    from .models import Coupon
                     coupon = Coupon.objects.get(id=coupon_id)
                     if coupon.is_valid():
                         discount = coupon.calculate_discount(order.total_amount, order.shipping_fee)
@@ -183,7 +251,7 @@ class CheckoutView(LoginRequiredMixin, View):
             order.save()
             
             # Create OrderItems
-            for item in cart:
+            for item in selected_items:
                 OrderItem.objects.create(
                     order=order,
                     product=item['product'],
@@ -201,7 +269,7 @@ class CheckoutView(LoginRequiredMixin, View):
 
             # Clear cart only for COD; manual payments clear on confirm
             if payment_method == 'cod':
-                cart.clear()
+                cart.remove_selected()
 
             # Redirect based on payment method
             print(f"DEBUG: Payment method selected: {payment_method}")
@@ -216,8 +284,43 @@ class CheckoutView(LoginRequiredMixin, View):
                 return redirect('orders:order_success', order_id=order.id)
                 
         addresses = Address.objects.filter(user=request.user)
+        now = timezone.now()
+        selected_total = cart.get_selected_total_price()
+        coupons = Coupon.objects.filter(is_active=True).order_by('-value', 'code')
+        available_coupons = []
+        for coupon in coupons:
+            if not (coupon.valid_from <= now <= coupon.valid_to):
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': 'Hết hạn hoặc chưa đến ngày áp dụng',
+                })
+                continue
+            if coupon.used_count >= coupon.max_uses:
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': 'Đã hết lượt sử dụng',
+                })
+                continue
+            if selected_total < coupon.min_order_value:
+                available_coupons.append({
+                    'coupon': coupon,
+                    'eligible': False,
+                    'reason': f'Đơn tối thiểu {coupon.min_order_value:,.0f}₫',
+                })
+                continue
+            available_coupons.append({
+                'coupon': coupon,
+                'eligible': True,
+                'reason': 'Có thể áp dụng',
+            })
+
         return render(request, 'orders/checkout.html', {
             'cart': cart,
+            'selected_items': selected_items,
+            'selected_total': selected_total,
+            'available_coupons': available_coupons,
             'form': form,
             'addresses': addresses
         })
@@ -313,10 +416,13 @@ def apply_coupon(request):
     
     try:
         data = json.loads(request.body)
-        code = data.get('code')
+        code = (data.get('code') or '').strip()
         cart = Cart(request)
-        total_price = cart.get_total_price()
+        total_price = cart.get_selected_total_price()
         shipping_fee = 30000 # Default shipping fee
+
+        if not code:
+            return JsonResponse({'success': False, 'message': 'Vui lòng chọn hoặc nhập mã giảm giá.'})
         
         try:
             coupon = Coupon.objects.get(code=code)

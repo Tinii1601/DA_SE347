@@ -3,6 +3,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.text import slugify
 from django.urls import reverse
 from urllib.parse import quote_plus
+from django.utils import timezone
 
 
 class Store(models.Model):
@@ -98,3 +99,32 @@ class NewsPost(models.Model):
                 suffix += 1
             self.slug = slug
         super().save(*args, **kwargs)
+
+
+class Banner(models.Model):
+    title = models.CharField("Tiêu đề", max_length=200, blank=True)
+    image = models.ImageField("Ảnh banner", upload_to="banners/")
+    link = models.URLField("Liên kết", blank=True)
+    is_active = models.BooleanField("Hiển thị", default=True)
+    display_order = models.PositiveIntegerField("Thứ tự hiển thị", default=0)
+    start_at = models.DateTimeField("Bắt đầu", blank=True, null=True)
+    end_at = models.DateTimeField("Kết thúc", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "-created_at"]
+        verbose_name = "Banner"
+        verbose_name_plural = "Banners"
+
+    def __str__(self):
+        return self.title or f"Banner #{self.pk}"
+
+    def is_available(self):
+        if not self.is_active:
+            return False
+        now = timezone.now()
+        if self.start_at and now < self.start_at:
+            return False
+        if self.end_at and now > self.end_at:
+            return False
+        return True

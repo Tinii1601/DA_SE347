@@ -151,4 +151,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    const couponSelect = document.getElementById('coupon-select');
+    if (couponSelect && couponInput) {
+        couponSelect.addEventListener('change', () => {
+            couponInput.value = couponSelect.value || '';
+        });
+    }
 });

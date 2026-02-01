@@ -101,15 +101,35 @@
             <div class="col-md-5">
                 <div class="card border bg-white p-4">
                     <!-- Discount Code -->
-                    <div class="input-group mb-2">
-                        {{ form.coupon_code }}
-                        <button class="btn btn-success" type="button" id="apply-coupon-btn" style="background-color: #1a4d2e; border-color: #1a4d2e;">Sử dụng</button>
+                    <div class="mb-2">
+                        <label class="form-label small text-muted fw-bold">Chọn mã giảm giá</label>
+                        <div class="input-group">
+                            <select class="form-select" id="coupon-select">
+                                <option value="">-- Chọn mã giảm giá --</option>
+                                {% for item in available_coupons %}
+                                    <option value="{{ item.coupon.code }}" {% if not item.eligible %}disabled{% endif %}>
+                                        {{ item.coupon.code }} - {{ item.coupon.get_discount_type_display }}
+                                        {% if item.coupon.discount_type == 'percent' or item.coupon.discount_type == 'ship_percent' %}
+                                            ({{ item.coupon.value }}%)
+                                        {% else %}
+                                            ({{ item.coupon.value|vnd_currency }})
+                                        {% endif %}
+                                        {% if not item.eligible %} - {{ item.reason }}{% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {{ form.coupon_code }}
+                            <button class="btn btn-success" type="button" id="apply-coupon-btn" style="background-color: #1a4d2e; border-color: #1a4d2e;">Sử dụng</button>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            Hiển thị tất cả mã. Chỉ mã đủ điều kiện mới chọn được.
+                        </div>
                     </div>
                     <div id="coupon-message" class="small mb-4"></div>
                     
                     <!-- Product List -->
                     <div class="mb-4 border-bottom pb-3">
-                        {% for item in cart %}
+                        {% for item in selected_items %}
                             <div class="d-flex align-items-center mb-3">
                                 <div class="position-relative me-3">
                                     {% if item.product.cover_image %}
@@ -124,8 +144,7 @@
                                     </span>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0 small fw-bold">{{ item.product.title }}</h6>
-                                    <small class="text-muted">{{ item.product.author }}</small>
+                                    <h6 class="mb-0 small fw-bold">{{ item.product.name }}</h6>
                                 </div>
                                 <div class="text-end">
                                     <span class="small fw-bold">{{ item.total_price|vnd_currency }}</span>
@@ -137,7 +156,7 @@
                     <!-- Totals -->
                     <div class="mb-2 d-flex justify-content-between">
                         <span class="text-muted small">Tạm tính</span>
-                        <span class="small fw-bold">{{ cart.get_total_price|vnd_currency }}</span>
+                        <span class="small fw-bold">{{ selected_total|vnd_currency }}</span>
                     </div>
                     <div class="mb-2 d-flex justify-content-between">
                         <span class="text-muted small">Mã giảm giá</span>
@@ -151,7 +170,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="fw-bold text-uppercase">Tổng cộng</span>
                         <span class="fs-4 fw-bold text-success" style="color: #1a4d2e !important;" id="total-amount">
-                            {{ cart.get_total_price|add:30000|vnd_currency }}
+                            {{ selected_total|add:30000|vnd_currency }}
                         </span>
                     </div>
                 </div>

@@ -25,7 +25,12 @@ class CheckoutForm(forms.ModelForm):
     coupon_code = forms.CharField(
         max_length=50,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mã giảm giá (nếu có)', 'id': 'coupon-input'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control d-none',
+            'placeholder': 'Mã giảm giá (nếu có)',
+            'id': 'coupon-input',
+            'list': 'coupon-options'
+        })
     )
 
     class Meta:

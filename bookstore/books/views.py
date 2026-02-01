@@ -11,12 +11,12 @@ class ProductListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True).select_related('category')
+        queryset = Product.objects.filter(is_active=True, category__is_active=True).select_related('category')
         
         # Lọc theo danh mục
         category_slug = self.kwargs.get('category_slug')
         if category_slug:
-            category = get_object_or_404(Category, slug=category_slug)
+            category = get_object_or_404(Category, slug=category_slug, is_active=True)
             category_ids = category.get_descendants_and_self_ids()
             queryset = queryset.filter(category_id__in=category_ids)
 
@@ -43,13 +43,13 @@ class ProductListView(ListView):
         category_slug = self.kwargs.get('category_slug')
 
         if category_slug:
-            category = get_object_or_404(Category, slug=category_slug)
+            category = get_object_or_404(Category, slug=category_slug, is_active=True)
             context['category'] = category
-            context['subcategories'] = category.children.all()
+            context['subcategories'] = category.children.filter(is_active=True)
             context['breadcrumb'] = category.get_ancestors()
         else:
             # Nếu không có danh mục nào được chọn, hiển thị các danh mục cấp cao nhất
-            context['top_level_categories'] = Category.objects.filter(parent__isnull=True)
+            context['top_level_categories'] = Category.objects.filter(parent__isnull=True, is_active=True)
         
         # Giữ lại tham số sort khi chuyển trang
         context['current_sort'] = self.request.GET.get('sort', '-created_at')
@@ -103,7 +103,7 @@ class ProductSearchView(ListView):
         if form.is_valid():
             q = form.cleaned_data.get('q')
             category = form.cleaned_data.get('category')
-            queryset = Product.objects.filter(is_active=True)
+            queryset = Product.objects.filter(is_active=True, category__is_active=True)
             if q:
                 queryset = queryset.filter(name__icontains=q)
             if category:

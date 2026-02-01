@@ -27,6 +27,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name="Slug")
     description = models.TextField(blank=True, verbose_name="Mô tả")
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name="Danh mục cha")
+    is_active = models.BooleanField(default=True, verbose_name="Kích hoạt")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
     
     attributes = models.ManyToManyField(Attribute, blank=True, verbose_name="Thuộc tính")

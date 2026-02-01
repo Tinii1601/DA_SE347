@@ -25,8 +25,11 @@ class Cart(object):
             if hasattr(product, 'get_final_price'):
                 price = product.get_final_price()
                 
-            self.cart[product_id] = {'quantity': 0,
-                                  'price': str(price)}
+            self.cart[product_id] = {
+                'quantity': 0,
+                'price': str(price),
+                'selected': True,
+            }
 
         if override_quantity:
             self.cart[product_id]['quantity'] = quantity
@@ -66,6 +69,7 @@ class Cart(object):
             if item['product']:
                 item['price'] = Decimal(item['price'])
                 item['total_price'] = item['price'] * item['quantity']
+                item['selected'] = item_data.get('selected', True)
                 yield item
 
     def __len__(self):
@@ -76,6 +80,51 @@ class Cart(object):
 
     def get_total_price(self):
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+
+    def get_selected_items(self):
+        selected_ids = [pid for pid, item in self.cart.items() if item.get('selected', True)]
+        if not selected_ids:
+            return []
+        products = Product.objects.filter(id__in=selected_ids, is_active=True, category__is_active=True)
+        product_map = {str(product.id): product for product in products}
+        selected_items = []
+        for product_id in selected_ids:
+            item_data = self.cart.get(product_id)
+            product = product_map.get(product_id)
+            if not item_data or not product:
+                continue
+            item = item_data.copy()
+            item['product'] = product
+            item['price'] = Decimal(item['price'])
+            item['total_price'] = item['price'] * item['quantity']
+            item['selected'] = item_data.get('selected', True)
+            selected_items.append(item)
+        return selected_items
+
+    def get_selected_total_price(self):
+        return sum(
+            Decimal(item['price']) * item['quantity']
+            for item in self.cart.values()
+            if item.get('selected', True)
+        )
+
+    def set_selected(self, selected_ids):
+        selected_ids = {str(pid) for pid in selected_ids}
+        for product_id in self.cart.keys():
+            self.cart[product_id]['selected'] = product_id in selected_ids
+        self.save()
+
+    def set_all_selected(self, selected=True):
+        for product_id in self.cart.keys():
+            self.cart[product_id]['selected'] = selected
+        self.save()
+
+    def remove_selected(self):
+        to_remove = [pid for pid, item in self.cart.items() if item.get('selected', True)]
+        for product_id in to_remove:
+            del self.cart[product_id]
+        if to_remove:
+            self.save()
 
     def clear(self):
         # remove cart from session

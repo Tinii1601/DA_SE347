@@ -21,5 +21,5 @@ class BookSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from .models import Category
-        self.fields['category'].queryset = Category.objects.all()
+        self.fields['category'].queryset = Category.objects.filter(is_active=True)
 

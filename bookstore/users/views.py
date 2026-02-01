@@ -1,8 +1,15 @@
 # users/views.py
 from django.views.generic import FormView, TemplateView, CreateView, UpdateView
-from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView
+from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView as AuthLogoutView, PasswordResetView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import RegistrationForm, LoginForm, AddressForm, ProfileUpdateForm, PasswordChangeCustomForm
+from .forms import (
+    RegistrationForm,
+    LoginForm,
+    AddressForm,
+    ProfileUpdateForm,
+    PasswordChangeCustomForm,
+    CustomPasswordResetForm,
+)
 from django.contrib.auth import login
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -12,6 +19,7 @@ from django.contrib.auth import update_session_auth_hash
 from books.models import Product
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.http import HttpResponseRedirect
 
 class RegisterView(FormView):
     template_name = 'users/register.html'
@@ -35,6 +43,29 @@ class LoginView(AuthLoginView):
     
 class LogoutView(AuthLogoutView):
     next_page = reverse_lazy('core:home')
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'users/password_reset_form.html'
+    email_template_name = 'users/password_reset_email.txt'
+    html_email_template_name = 'users/emails/password_reset.html'
+    form_class = CustomPasswordResetForm
+    success_url = reverse_lazy('users:password_reset_done')
+
+    def form_valid(self, form):
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+            'extra_email_context': self.extra_email_context,
+            'domain_override': self.request.get_host(),
+        }
+        form.save(**opts)
+        return HttpResponseRedirect(self.get_success_url())
 
 class AddressCreateView(LoginRequiredMixin, CreateView):
     model = Address

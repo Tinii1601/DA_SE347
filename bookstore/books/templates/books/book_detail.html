@@ -1,5 +1,6 @@
 <!-- books/templates/books/book_detail.html -->
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ book.name }}{% endblock %}
 
 {% block content %}
@@ -75,7 +76,7 @@
     </p>
 
     <div class="mt-4">
-      <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form">
+    <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form" data-cart-detail-url="{% url 'orders:cart_detail' %}">
           {% csrf_token %}
           <div class="row align-items-center">
               <div class="col-md-4 col-lg-3">
@@ -121,85 +122,8 @@
          <button id="toggle-desc-btn" class="btn btn-sm btn-primary d-none" onclick="toggleDescription()">Xem thêm <i class="bi bi-chevron-down"></i></button>
     </div>
     
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var wrapper = document.getElementById('description-wrapper');
-            var content = document.getElementById('description-content');
-            var btn = document.getElementById('toggle-desc-btn');
-            var fade = document.getElementById('fade-overlay');
-            
-            // Check if content is taller than max-height (150px)
-            if (content.scrollHeight > 150) {
-                btn.classList.remove('d-none');
-            } else {
-                wrapper.style.maxHeight = 'none';
-                fade.style.display = 'none';
-            }
-        });
-
-        function toggleDescription() {
-            var wrapper = document.getElementById('description-wrapper');
-            var btn = document.getElementById('toggle-desc-btn');
-            var fade = document.getElementById('fade-overlay');
-            
-            if (wrapper.style.maxHeight !== 'none') {
-                wrapper.style.maxHeight = 'none';
-                btn.innerHTML = 'Thu gọn <i class="bi bi-chevron-up"></i>';
-                btn.classList.replace('btn-primary', 'btn-outline-primary');
-                fade.style.display = 'none';
-            } else {
-                wrapper.style.maxHeight = '150px';
-                btn.innerHTML = 'Xem thêm <i class="bi bi-chevron-down"></i>';
-                btn.classList.replace('btn-outline-primary', 'btn-primary');
-                fade.style.display = 'block';
-                wrapper.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-            }
-        }
-    </script>
   </div>
 </div>
-
-<script>
-    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const form = this;
-        const url = form.action;
-        const formData = new FormData(form);
-
-        fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.cart_length !== undefined) {
-                // Update cart badge
-                const badge = document.querySelector('.bi-cart-fill').nextElementSibling;
-                if (badge) {
-                    badge.textContent = data.cart_length;
-                    badge.classList.remove('d-none');
-                } else {
-                    // If badge doesn't exist (cart was empty), create it or reload
-                    location.reload(); 
-                }
-                
-                // Show success message (optional)
-                alert('Đã thêm vào giỏ hàng!');
-            } else {
-                // Fallback
-                window.location.href = "{% url 'orders:cart_detail' %}";
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            window.location.href = "{% url 'orders:cart_detail' %}";
-        });
-    });
-</script>
 
 <hr class="my-5">
 
@@ -274,35 +198,8 @@
   </div>
 </div>
 
-<script>
-    function updateMainImage(thumb) {
-        // Update main image src
-        var mainImg = document.getElementById('main-product-img');
-        if (mainImg) {
-            mainImg.src = thumb.src;
-            
-            // Reset all thumbnails
-            document.querySelectorAll('.thumbnail-img').forEach(el => {
-                el.style.opacity = '0.6';
-                el.style.border = '1px solid #dee2e6';
-            });
-            
-            // Highlight active thumbnail
-            thumb.style.opacity = '1';
-            thumb.style.border = '2px solid #0d6efd';
-        }
-    }
+{% endblock %}
 
-    // Modal logic
-    var imageModal = document.getElementById('imageModal');
-    if (imageModal) {
-        imageModal.addEventListener('show.bs.modal', function (event) {
-            var mainImg = document.getElementById('main-product-img');
-            var modalImg = document.getElementById('modal-img-content');
-            if(mainImg && modalImg) {
-                modalImg.src = mainImg.src;
-            }
-        });
-    }
-</script>
+{% block extra_js %}
+<script src="{% static 'js/book_detail.js' %}"></script>
 {% endblock %}

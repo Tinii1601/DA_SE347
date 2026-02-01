@@ -3,76 +3,32 @@
 
 {% block title %}Trang chủ - Bookstore{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
 {% block content %}
-<style>
-    .product-scroll-container::-webkit-scrollbar {
-        display: none;
-    }
-    .product-scroll-container {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    .product-item {
-        flex: 0 0 calc(20% - 16px); /* 5 items per row with gap */
-        max-width: calc(20% - 16px);
-    }
-    @media (max-width: 1200px) {
-        .product-item { flex: 0 0 calc(25% - 16px); max-width: calc(25% - 16px); } /* 4 items */
-    }
-    @media (max-width: 992px) {
-        .product-item { flex: 0 0 calc(33.333% - 16px); max-width: calc(33.333% - 16px); } /* 3 items */
-    }
-    @media (max-width: 768px) {
-        .product-item { flex: 0 0 calc(50% - 16px); max-width: calc(50% - 16px); } /* 2 items */
-    }
-    @media (max-width: 576px) {
-        .product-item { flex: 0 0 calc(100% - 16px); max-width: calc(100% - 16px); } /* 1 item */
-    }
-    
-    .btn-nav-slider {
-        width: 40px;
-        height: 40px;
-        background-color: white;
-        border: 1px solid #dee2e6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.9;
-        transition: all 0.3s;
-        z-index: 100 !important; /* Force on top */
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .btn-nav-slider:hover {
-        opacity: 1;
-        background-color: var(--lumiere-green);
-        color: white;
-        border-color: var(--lumiere-green);
-        transform: scale(1.1);
-    }
-</style>
 
 <!-- Banner Carousel -->
+{% if banners %}
 <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
-        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
-        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+        {% for banner in banners %}
+            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" {% if forloop.first %}aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
     </div>
     <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="{% static 'img/banner/Banner1.jpg' %}" class="d-block w-100 h-50" alt="Banner 1">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'img/banner/Banner2.jpg' %}" class="d-block w-100 h-50" alt="Banner 2">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'img/banner/Banner3.jpg' %}" class="d-block w-100 h-50" alt="Banner 3">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'img/banner/Banner4.jpg' %}" class="d-block w-100 h-50" alt="Banner 4">
-        </div>
+        {% for banner in banners %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                {% if banner.link %}
+                    <a href="{{ banner.link }}">
+                        <img src="{{ banner.image.url }}" class="d-block w-100 h-50" alt="{{ banner.title|default:'Banner' }}">
+                    </a>
+                {% else %}
+                    <img src="{{ banner.image.url }}" class="d-block w-100 h-50" alt="{{ banner.title|default:'Banner' }}">
+                {% endif %}
+            </div>
+        {% endfor %}
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -83,6 +39,7 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+{% endif %}
 
 <!-- Sách Mới Nhất (Văn Học) -->
 <div class="container mt-5 position-relative group-slider">
@@ -174,17 +131,8 @@
     </div>
 </div>
 
-<script>
-    function scrollSlider(id, direction) {
-        const container = document.getElementById(id);
-        if (container) {
-            const scrollAmount = container.clientWidth * 0.8; // Scroll 80% of width
-            container.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    }
-</script>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

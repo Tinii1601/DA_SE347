@@ -33,3 +33,7 @@
     background-color: var(--lumiere-green);
     border-color: var(--lumiere-green);
 }
+
+.password-field {
+    position: relative;
+}

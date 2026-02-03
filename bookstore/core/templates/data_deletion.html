@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Hướng dẫn xóa dữ liệu{% endblock %}
+
+{% block content %}
+<div class="py-4">
+  <h1 class="mb-4">Hướng dẫn xóa dữ liệu người dùng</h1>
+  {% if request.GET.code %}
+    <div class="alert alert-success">
+      Yêu cầu xóa dữ liệu đã được ghi nhận. Mã xác nhận: <strong>{{ request.GET.code }}</strong>
+    </div>
+  {% endif %}
+  <p>Nếu bạn muốn yêu cầu xóa dữ liệu cá nhân khỏi hệ thống, vui lòng làm theo một trong các cách sau:</p>
+
+  <h5>Cách 1: Gửi email yêu cầu</h5>
+  <ol>
+    <li>Gửi email đến <a href="mailto:lumierebookstore347@gmail.com">lumierebookstore347@gmail.com</a>.</li>
+    <li>Tiêu đề: <strong>Yêu cầu xóa dữ liệu</strong>.</li>
+    <li>Nội dung: cung cấp email/tài khoản đã đăng ký và mô tả yêu cầu.</li>
+  </ol>
+
+  <h5>Cách 2: Liên hệ qua trang liên hệ</h5>
+  <p>Truy cập trang liên hệ để gửi yêu cầu: <a href="{% url 'core:contact' %}">Trang liên hệ</a>.</p>
+
+  <p class="mt-3">Chúng tôi sẽ xử lý yêu cầu trong vòng 7 ngày làm việc.</p>
+</div>
+{% endblock %}

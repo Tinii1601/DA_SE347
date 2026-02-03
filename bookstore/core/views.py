@@ -1,12 +1,18 @@
 # core/views.py
+import base64
+import hashlib
+import hmac
+import json
 import math
 import re
+import uuid
 from django.db import models
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from django.shortcuts import render
 from django.conf import settings
+from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -254,6 +260,57 @@ def nearest_store(request):
             "city": nearest.city,
             "map_url": nearest.map_url,
             "distance_km": round(nearest_distance, 2),
+        }
+    )
+
+
+def _base64_url_decode(data: str) -> bytes:
+    padding = "=" * (-len(data) % 4)
+    return base64.urlsafe_b64decode(data + padding)
+
+
+def _parse_facebook_signed_request(signed_request: str, app_secret: str):
+    try:
+        encoded_sig, payload = signed_request.split(".", 1)
+    except ValueError:
+        return None
+
+    sig = _base64_url_decode(encoded_sig)
+    data = _base64_url_decode(payload)
+
+    expected_sig = hmac.new(
+        app_secret.encode("utf-8"), msg=payload.encode("utf-8"), digestmod=hashlib.sha256
+    ).digest()
+
+    if not hmac.compare_digest(sig, expected_sig):
+        return None
+
+    try:
+        return json.loads(data.decode("utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+@require_POST
+def facebook_data_deletion_callback(request):
+    signed_request = request.POST.get("signed_request", "")
+    app_secret = getattr(settings, "FACEBOOK_CLIENT_SECRET", "")
+    if not signed_request or not app_secret:
+        return JsonResponse({"error": "invalid_request"}, status=400)
+
+    payload = _parse_facebook_signed_request(signed_request, app_secret)
+    if not payload:
+        return JsonResponse({"error": "invalid_signature"}, status=400)
+
+    confirmation_code = uuid.uuid4().hex
+    status_url = request.build_absolute_uri(
+        f"{reverse('core:data_deletion')}?code={confirmation_code}"
+    )
+
+    return JsonResponse(
+        {
+            "url": status_url,
+            "confirmation_code": confirmation_code,
         }
     )
 

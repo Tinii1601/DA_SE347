@@ -8,7 +8,7 @@ import re
 import uuid
 from django.db import models
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from django.shortcuts import render
 from django.conf import settings
@@ -291,8 +291,14 @@ def _parse_facebook_signed_request(signed_request: str, app_secret: str):
         return None
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def facebook_data_deletion_callback(request):
+    if request.method == "GET":
+        return HttpResponse(
+            "Endpoint này dùng cho Facebook Data Deletion Callback (POST).",
+            content_type="text/plain; charset=utf-8",
+        )
+
     signed_request = request.POST.get("signed_request", "")
     app_secret = getattr(settings, "FACEBOOK_CLIENT_SECRET", "")
     if not signed_request or not app_secret:

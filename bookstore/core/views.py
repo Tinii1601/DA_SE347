@@ -7,7 +7,7 @@ import math
 import re
 import uuid
 from django.db import models
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from django.shortcuts import render
@@ -304,7 +304,7 @@ def facebook_data_deletion_callback(request):
 
     confirmation_code = uuid.uuid4().hex
     status_url = request.build_absolute_uri(
-        f"{reverse('core:data_deletion')}?code={confirmation_code}"
+        f"{reverse('core:facebook_data_deletion_status')}?code={confirmation_code}"
     )
 
     return JsonResponse(
@@ -312,5 +312,14 @@ def facebook_data_deletion_callback(request):
             "url": status_url,
             "confirmation_code": confirmation_code,
         }
+    )
+
+
+@require_GET
+def facebook_data_deletion_status(request):
+    code = request.GET.get("code", "")
+    return HttpResponse(
+        f"Yêu cầu xóa dữ liệu đã được ghi nhận. Mã xác nhận: {code}",
+        content_type="text/plain; charset=utf-8",
     )
 

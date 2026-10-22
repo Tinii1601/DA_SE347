@@ -3,8 +3,9 @@ from orders.models import Order
 
 class Payment(models.Model):
     METHOD_CHOICES = [
-        ('cod', 'Thanh toán khi nhận hàng'), 
-        ('vietqr', 'VietQR'),
+        ('cod', 'Thanh toán khi nhận hàng (COD)'), 
+        ('payos', 'Thanh toán online (Cổng PayOS: Quét mã QR Napas 247 / Thẻ ATM)'),
+        ('vietqr', 'Chuyển khoản thủ công (VietQR)'),
     ]
 
     STATUS_CHOICES = [

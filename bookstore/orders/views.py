@@ -365,19 +365,18 @@ class CheckoutView(LoginRequiredMixin, View):
                 if coupon_id and 'coupon_id' in request.session:
                     del request.session['coupon_id']
 
-                # Xóa các món đã đặt khỏi giỏ (với COD xóa ngay; online payments xóa khi hoàn tất)
-                if payment_method == 'cod':
-                    cart.remove_selected()
+                # Xóa các món đã đặt khỏi giỏ hàng
+                cart.remove_selected()
 
                 logger.info(
                     "Đơn hàng %s được tạo thành công bởi user %s (Tổng tiền: %s, Phương thức: %s)",
                     order.order_number, request.user.username, order.total_amount, payment_method
                 )
                 
-                if payment_method == 'vietqr':
+                if payment_method == 'payos':
+                    return redirect('payment:create_payment', order_id=order.id)
+                elif payment_method == 'vietqr':
                     return redirect('payment:payment_vietqr', order_id=order.id)
-                elif payment_method == 'cod':
-                    return redirect('orders:order_success', order_id=order.id)
                 else:
                     return redirect('orders:order_success', order_id=order.id)
 

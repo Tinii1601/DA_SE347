@@ -20,6 +20,7 @@ class CartAddProductForm(forms.Form):
 class CheckoutForm(forms.ModelForm):
     payment_method = forms.ChoiceField(
         choices=Payment.METHOD_CHOICES,
+        initial='cod',
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
     coupon_code = forms.CharField(

@@ -8,9 +8,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="newspost",
-            name="display_order",
-            field=models.PositiveIntegerField(default=0),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AddField(
+                    model_name="newspost",
+                    name="display_order",
+                    field=models.PositiveIntegerField(default=0),
+                ),
+            ],
+            database_operations=[]
         ),
     ]

@@ -181,17 +181,28 @@ header {
 .cart-icon {
     position: relative;
     font-size: 1.35rem;
-    color: #ffffff;
+    color: #ffffff !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
-    transition: transform 0.2s ease;
+    padding: 6px 10px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    cursor: pointer !important;
+    z-index: 1050;
+    text-decoration: none !important;
 }
 
 .cart-icon:hover {
-    transform: scale(1.1);
-    color: #ffffff;
+    transform: translateY(-1px);
+    color: #86efac !important;
+}
+
+.toast-container {
+    pointer-events: none !important;
+}
+
+.toast-container .toast {
+    pointer-events: auto !important;
 }
 
 .cart-badge {

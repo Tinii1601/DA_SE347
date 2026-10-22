@@ -1,4 +1,55 @@
+/* ==========================================================================
+   CART PAGE STYLES - Modern E-Commerce Cart
+   ========================================================================== */
+
+.table-responsive {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table > :not(caption) > * > * {
+    padding: 1.25rem 0.75rem;
+}
+
+.table th {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    border-bottom: 2px solid #f3f4f6 !important;
+}
+
 .form-check-input:checked {
-    background-color: #1a4d2e;
-    border-color: #1a4d2e;
+    background-color: var(--lumiere-green) !important;
+    border-color: var(--lumiere-green) !important;
+}
+
+.cart-qty-input {
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.cart-qty-input:focus {
+    border-color: var(--lumiere-green) !important;
+    box-shadow: 0 0 0 3px rgba(26, 77, 46, 0.15) !important;
+}
+
+/* Cart Summary Card */
+.cart-summary-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+#selected-total-amount {
+    color: var(--lumiere-green);
+    font-weight: 800;
 }

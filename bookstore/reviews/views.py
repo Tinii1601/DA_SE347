@@ -15,6 +15,9 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     template_name = 'reviews/review_form.html'
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
         product = get_object_or_404(Product, id=self.kwargs['product_id'])
         existing_review = Review.objects.filter(user=request.user, product=product).first()
         if existing_review:

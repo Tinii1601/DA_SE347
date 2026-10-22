@@ -82,8 +82,12 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
+            import uuid
             from django.utils import timezone
-            self.order_number = f"ORD{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            # Format: ORD + YYMMDDHHMMSS (12 digits) + 4-char random hex = 19 chars (<= max_length 20)
+            now_str = timezone.now().strftime('%y%m%d%H%M%S')
+            rand_suffix = uuid.uuid4().hex[:4].upper()
+            self.order_number = f"ORD{now_str}{rand_suffix}"
         super().save(*args, **kwargs)
 
     def __str__(self):

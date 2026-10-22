@@ -85,26 +85,35 @@
         {% endif %}
     </div>
     <p class="fs-5"><strong>Tồn kho:</strong> 
-        {% if book.in_stock %}
-            <span class="badge bg-success">Còn hàng</span>
+        {% if book.stock > 0 %}
+            <span class="badge bg-success">Còn hàng ({{ book.stock }} cuốn)</span>
         {% else %}
             <span class="badge bg-danger">Hết hàng</span>
         {% endif %}
     </p>
 
     <div class="mt-4">
-    <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form" data-cart-detail-url="{% url 'orders:cart_detail' %}">
+      <form action="{% url 'orders:cart_add' book.id %}" method="post" id="add-to-cart-form">
           {% csrf_token %}
           <div class="row align-items-center">
               <div class="col-md-4 col-lg-3">
-                  <label for="quantity" class="form-label"><strong>Số lượng:</strong></label>
-                  {{ cart_product_form.quantity }}
-                  {{ cart_product_form.override }}
+                  <label for="quantity-input" class="form-label"><strong>Số lượng:</strong></label>
+                  <input type="number" name="quantity" id="quantity-input"
+                         value="1" min="1" max="{{ book.stock }}" 
+                         class="form-control text-center"
+                         {% if not book.in_stock or book.stock <= 0 %}disabled{% endif %}>
+                  <input type="hidden" name="override" value="False">
               </div>
               <div class="col-md-8 col-lg-9 mt-3 mt-md-0">
-                  <button type="submit" class="btn btn-success btn-lg w-100">
-                      <i class="bi bi-cart-plus-fill"></i> Thêm vào giỏ hàng
-                  </button>
+                  {% if book.in_stock and book.stock > 0 %}
+                      <button type="submit" class="btn btn-success btn-lg w-100" id="btn-add-to-cart">
+                          <i class="bi bi-cart-plus-fill me-1"></i> Thêm vào giỏ hàng
+                      </button>
+                  {% else %}
+                      <button type="button" class="btn btn-secondary btn-lg w-100" disabled>
+                          <i class="bi bi-x-circle me-1"></i> Hết hàng
+                      </button>
+                  {% endif %}
               </div>
           </div>
       </form>
@@ -144,65 +153,180 @@
 
 <hr class="my-5">
 
-<div class="row">
-    <div class="col-md-8">
-        <h4 class="mb-4">Đánh giá sản phẩm ({{ book.reviews.count }})</h4>
-        {% for review in book.reviews.all %}
-            <div class="d-flex mb-4">
-                <div class="flex-shrink-0">
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                        {{ review.user.username|first|upper }}
-                    </div>
+<!-- Section: Đánh giá & Nhận xét -->
+<div class="reviews-section mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="fw-bold mb-1 d-flex align-items-center text-dark">
+                <i class="bi bi-star-fill text-warning me-2 fs-4"></i> Đánh giá từ độc giả
+            </h3>
+            <p class="text-muted mb-0 small">Nhận xét thực tế từ độc giả đã trải nghiệm tác phẩm</p>
+        </div>
+        {% if total_reviews > 0 %}
+        <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill fs-6 fw-bold">
+            <i class="bi bi-chat-left-text text-success me-1"></i> {{ total_reviews }} lượt nhận xét
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Rating Overview & Breakdown -->
+    <div class="review-overview-card">
+        <div class="row align-items-center g-4">
+            <!-- Left Score Column -->
+            <div class="col-md-4 text-center border-md-end border-2 pe-md-4">
+                <div class="review-avg-score mb-2">{{ avg_rating }}<span class="fs-4 text-muted fw-normal">/5</span></div>
+                <div class="review-stars-glow mb-2">
+                    {% for i in "12345" %}
+                        {% if i|add:0 <= avg_rating %}
+                            <i class="bi bi-star-fill"></i>
+                        {% elif avg_rating > i|add:"-1" and avg_rating < i|add:0 %}
+                            <i class="bi bi-star-half"></i>
+                        {% else %}
+                            <i class="bi bi-star text-muted opacity-50"></i>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="ms-3 w-100">
-                    <div class="d-flex justify-content-between">
-                      <h6 class="fw-bold mb-1">{{ review.user.get_full_name|default:review.user.username }}</h6>
-                      {% if review.user == request.user %}
-                        <a href="{% url 'reviews:review_edit' review.pk %}" class="btn btn-sm btn-outline-secondary">
-                          <i class="bi bi-pencil-square"></i> Sửa
-                        </a>
-                      {% endif %}
-                    </div>
-                    <div class="text-warning mb-2">
-                        {% for i in "12345" %}
-                            <i class="bi {% if i|add:0 <= review.rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>
-                        {% endfor %}
-                    </div>
-                    <p>{{ review.comment }}</p>
-                    <small class="text-muted">{{ review.created_at|timesince }} trước</small>
+                <div class="text-muted small fw-semibold">
+                    {% if total_reviews > 0 %}
+                        Dựa trên {{ total_reviews }} đánh giá
+                    {% else %}
+                        Chưa có đánh giá nào
+                    {% endif %}
                 </div>
             </div>
-        {% empty %}
-            <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
-        {% endfor %}
+
+            <!-- Right Breakdown Bars Column -->
+            <div class="col-md-8 ps-md-4">
+                {% for row in rating_rows %}
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="text-muted small fw-bold" style="width: 50px;">{{ row.star }} sao</span>
+                    <div class="rating-bar-track flex-grow-1">
+                        <div class="rating-bar-fill" style="width: {{ row.percent }}%;"></div>
+                    </div>
+                    <span class="text-muted small text-end fw-semibold" style="width: 42px;">{{ row.percent }}%</span>
+                    <span class="badge bg-light text-muted border rounded-pill px-2 py-1 small" style="min-width: 30px;">{{ row.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Viết đánh giá của bạn</h5>
-          {% if user.is_authenticated %}
-            <form action="{% url 'reviews:review_add' book.id %}" method="post">
-              {% csrf_token %}
-              <div class="mb-3">
-                <label for="rating" class="form-label">Chất lượng</label>
-                <select name="rating" id="rating" class="form-select">
-                  <option value="5">5 sao (Tuyệt vời)</option>
-                  <option value="4">4 sao (Tốt)</option>
-                  <option value="3">3 sao (Bình thường)</option>
-                  <option value="2">2 sao (Tệ)</option>
-                  <option value="1">1 sao (Rất tệ)</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="comment" class="form-label">Bình luận</label>
-                <textarea name="comment" id="comment" rows="4" class="form-control" required></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Gửi đánh giá</button>
-            </form>
-          {% else %}
-            <p class="text-muted mb-3">Bạn cần đăng nhập để viết bình luận.</p>
-            <a href="{% url 'users:login' %}?next={{ request.get_full_path }}" class="btn btn-outline-primary w-100">Đăng nhập để bình luận</a>
-          {% endif %}
+
+    <!-- Reviews Content Grid -->
+    <div class="row g-4">
+        <!-- Col Left: List of Reviews -->
+        <div class="col-lg-7">
+            <h5 class="fw-bold mb-3 text-dark d-flex align-items-center">
+                <span>Nhận xét gần đây</span>
+                {% if approved_reviews %}
+                <span class="badge bg-success bg-opacity-10 text-success rounded-pill ms-2 fs-7 px-2 py-1">
+                    {{ approved_reviews.count }}
+                </span>
+                {% endif %}
+            </h5>
+
+            {% for review in approved_reviews %}
+                <div class="review-item-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="review-user-avatar">
+                                {{ review.user.username|first|upper }}
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center flex-wrap gap-1">
+                                    <span class="review-user-name">{{ review.user.get_full_name|default:review.user.username }}</span>
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill small px-2 py-0">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Đã mua hàng
+                                    </span>
+                                </div>
+                                <div class="review-stars-glow fs-7 mt-1">
+                                    {% for i in "12345" %}
+                                        <i class="bi {% if i|add:0 <= review.rating %}bi-star-fill{% else %}bi-star text-muted opacity-50{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">
+                                <i class="bi bi-clock me-1"></i>{{ review.created_at|timesince }} trước
+                            </span>
+                            {% if review.user == request.user %}
+                                <a href="{% url 'reviews:review_edit' review.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2 small">
+                                    <i class="bi bi-pencil-square me-1"></i>Sửa
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="review-comment-text">{{ review.comment }}</p>
+                </div>
+            {% empty %}
+                <div class="text-center py-5 bg-white rounded-4 border border-dashed p-4">
+                    <i class="bi bi-chat-heart text-muted display-4 d-block mb-3"></i>
+                    <h6 class="fw-bold text-dark">Chưa có đánh giá nào cho sản phẩm này</h6>
+                    <p class="text-muted small mb-0">Hãy là người đầu tiên chia sẻ cảm nhận của bạn để cộng đồng cùng tham khảo nhé!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Col Right: Write Review Form -->
+        <div class="col-lg-5">
+            <div class="write-review-card sticky-top" style="top: 24px;">
+                <h5 class="fw-bold mb-1 text-dark d-flex align-items-center">
+                    <i class="bi bi-pencil-square text-success me-2"></i> Viết đánh giá của bạn
+                </h5>
+                <p class="text-muted small mb-3">Chia sẻ trải nghiệm của bạn về cuốn sách này</p>
+
+                {% if user.is_authenticated %}
+                    {% if user_review %}
+                        <div class="alert alert-info border-0 rounded-4 p-3 mb-0">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                <span class="fw-bold text-dark">Bạn đã gửi đánh giá cho sản phẩm</span>
+                            </div>
+                            <p class="small text-muted mb-3">Đánh giá của bạn: <strong>{{ user_review.rating }} sao</strong> ("{{ user_review.comment|truncatewords:15 }}")</p>
+                            <a href="{% url 'reviews:review_edit' user_review.pk %}" class="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold">
+                                <i class="bi bi-pencil me-1"></i> Chỉnh sửa đánh giá của bạn
+                            </a>
+                        </div>
+                    {% else %}
+                        <form action="{% url 'reviews:review_add' book.id %}" method="post" id="review-form">
+                            {% csrf_token %}
+                            <!-- Star Rating Selector -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted text-uppercase mb-1">Mức độ hài lòng:</label>
+                                <div class="star-rating-select" id="star-rating-picker">
+                                    <i class="bi bi-star-fill star-item active" data-value="1"></i>
+                                    <i class="bi bi-star-fill star-item active" data-value="2"></i>
+                                    <i class="bi bi-star-fill star-item active" data-value="3"></i>
+                                    <i class="bi bi-star-fill star-item active" data-value="4"></i>
+                                    <i class="bi bi-star-fill star-item active" data-value="5"></i>
+                                </div>
+                                <div class="rating-text-label" id="selected-rating-label">Tuyệt vời (5 sao)</div>
+                                <input type="hidden" name="rating" id="selected-rating-val" value="5">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="comment" class="form-label fw-bold small text-muted text-uppercase mb-1">Nội dung nhận xét:</label>
+                                <textarea name="comment" id="comment" rows="4" class="form-control" 
+                                          style="border-radius: 12px; font-size: 0.93rem;" 
+                                          placeholder="Cuốn sách có giúp ích gì cho bạn không? Chất lượng in ấn, bản dịch hay điều gì làm bạn ấn tượng nhất..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2 rounded-pill fw-bold shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i> Gửi đánh giá ngay
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4 px-3 bg-light rounded-4">
+                        <i class="bi bi-person-lock display-4 text-muted d-block mb-3"></i>
+                        <h6 class="fw-bold text-dark">Bạn cần đăng nhập để viết nhận xét</h6>
+                        <p class="text-muted small mb-3">Hãy đăng nhập để chia sẻ cảm nhận cùng cộng đồng yêu sách của chúng tôi nhé!</p>
+                        <a href="{% url 'users:login' %}?next={{ request.get_full_path }}" class="btn btn-outline-success w-100 rounded-pill fw-bold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập ngay
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -223,5 +347,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/book_detail.js' %}"></script>
+<script src="{% static 'js/book_detail.js' %}?v=3.0"></script>
 {% endblock %}

@@ -16,9 +16,11 @@
     </div>
     <div class="d-flex gap-2">
       {% if order.status == 'pending' %}
-      <a href="{% url 'orders:cancel_order' order.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">Hủy đơn hàng</a>
+      <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+        <i class="bi bi-x-circle me-1"></i> Hủy đơn hàng
+      </button>
       {% endif %}
-      <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success btn-sm">Quay lại</a>
+      <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success btn-sm rounded-pill px-3">Quay lại</a>
     </div>
   </div>
 
@@ -70,7 +72,7 @@
       {% endfor %}
     </div>
     {% if is_canceled %}
-      <div class="canceled-note">Đơn hàng đã bị hủy bởi cửa hàng.</div>
+      <div class="canceled-note">Đơn hàng đã được hủy.</div>
     {% endif %}
   </div>
 
@@ -100,4 +102,33 @@
     {% endfor %}
   </div>
 </div>
+
+<!-- Modal Xác nhận Hủy đơn hàng -->
+{% if order.status == 'pending' %}
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger d-flex align-items-center" id="cancelOrderModalLabel">
+          <i class="bi bi-exclamation-triangle-fill text-danger me-2 fs-4"></i> Xác nhận hủy đơn hàng
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-4">
+        <p class="fs-6 text-dark mb-2">Bạn có chắc chắn muốn hủy đơn hàng <strong>#{{ order.order_number }}</strong> không?</p>
+        <div class="alert alert-warning py-2 px-3 small border-0 rounded-3 mb-0">
+          <i class="bi bi-info-circle me-1"></i> Sau khi hủy đơn, số lượng sách sẽ được tự động hoàn lại vào kho và mã giảm giá (nếu có) sẽ được khôi phục.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+        <a href="{% url 'orders:cancel_order' order.id %}" class="btn btn-danger rounded-pill px-4">
+          <i class="bi bi-trash3 me-1"></i> Đồng ý hủy đơn
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

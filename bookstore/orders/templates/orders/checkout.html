@@ -26,8 +26,10 @@
             <!-- Left Column: Shipping & Payment -->
             <div class="col-md-7 pe-md-5">
                 <!-- Shipping Info -->
-                <div class="mb-5">
-                    <h5 class="fw-bold mb-3">Thông tin giao hàng</h5>
+                <div class="checkout-section-card">
+                    <h5 class="checkout-section-title">
+                        <i class="bi bi-geo-alt-fill me-2"></i> Thông tin giao hàng
+                    </h5>
                     
                     <div class="mb-3">
                         <label class="form-label small text-muted fw-bold">Họ và tên <span class="text-danger">*</span></label>
@@ -39,46 +41,48 @@
                         <input type="text" name="phone" class="form-control" value="{{ default_address.phone|default:user.profile.phone }}" required placeholder="Nhập số điện thoại">
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">Tỉnh, thành <span class="text-danger">*</span></label>
-                        <select name="city" class="form-select" required data-default="{{ default_address.city }}">
-                            <option value="">Chọn tỉnh thành</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label small text-muted fw-bold">Tỉnh, thành <span class="text-danger">*</span></label>
+                            <select name="city" class="form-select" required data-default="{{ default_address.city }}">
+                                <option value="">Chọn tỉnh thành</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label small text-muted fw-bold">Quận, huyện <span class="text-danger">*</span></label>
+                            <select name="district" class="form-select" required disabled data-default="{{ default_address.district }}">
+                                <option value="">Chọn quận huyện</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label small text-muted fw-bold">Phường, xã <span class="text-danger">*</span></label>
+                            <select name="ward" class="form-select" required disabled data-default="{{ default_address.ward }}">
+                                <option value="">Chọn phường xã</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">Quận, huyện <span class="text-danger">*</span></label>
-                        <select name="district" class="form-select" required disabled data-default="{{ default_address.district }}">
-                            <option value="">Chọn quận huyện</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">Phường, xã <span class="text-danger">*</span></label>
-                        <select name="ward" class="form-select" required disabled data-default="{{ default_address.ward }}">
-                            <option value="">Chọn phường xã</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">Địa chỉ <span class="text-danger">*</span></label>
+                        <label class="form-label small text-muted fw-bold">Địa chỉ chi tiết <span class="text-danger">*</span></label>
                         <input type="text" name="address_line" class="form-control" value="{{ default_address.address_line }}" required placeholder="Số nhà, tên đường...">
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">Ghi chú</label>
+                    <div class="mb-0">
+                        <label class="form-label small text-muted fw-bold">Ghi chú giao hàng</label>
                         {{ form.note }}
                     </div>
                 </div>
 
                 <!-- Payment Method -->
-                <div class="mb-5">
-                    <h5 class="fw-bold mb-3">Phương thức thanh toán</h5>
-                    <div class="border rounded p-3">
+                <div class="checkout-section-card">
+                    <h5 class="checkout-section-title">
+                        <i class="bi bi-credit-card-2-front-fill me-2"></i> Phương thức thanh toán
+                    </h5>
+                    <div class="payment-method-box">
                         {% for radio in form.payment_method %}
                             <div class="form-check mb-3 last-mb-0">
                                 {{ radio.tag }}
-                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                <label class="form-check-label fw-500" for="{{ radio.id_for_label }}">
                                     {{ radio.choice_label }}
                                 </label>
                             </div>
@@ -99,9 +103,12 @@
             
             <!-- Right Column: Order Summary -->
             <div class="col-md-5">
-                <div class="card border bg-white p-4">
+                <div class="order-summary-card">
+                    <h5 class="order-summary-title">
+                        <i class="bi bi-receipt me-2 text-success"></i> Tóm tắt đơn hàng
+                    </h5>
                     <!-- Discount Code -->
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label small text-muted fw-bold">Chọn mã giảm giá</label>
                         <div class="input-group">
                             <select class="form-select" id="coupon-select">
@@ -119,10 +126,7 @@
                                 {% endfor %}
                             </select>
                             {{ form.coupon_code }}
-                            <button class="btn btn-success" type="button" id="apply-coupon-btn" style="background-color: #1a4d2e; border-color: #1a4d2e;">Sử dụng</button>
-                        </div>
-                        <div class="small text-muted mt-1">
-                            Hiển thị tất cả mã. Chỉ mã đủ điều kiện mới chọn được.
+                            <button class="btn btn-success" type="button" id="apply-coupon-btn">Áp dụng</button>
                         </div>
                     </div>
                     <div id="coupon-message" class="small mb-4"></div>
@@ -133,43 +137,43 @@
                             <div class="d-flex align-items-center mb-3">
                                 <div class="position-relative me-3">
                                     {% if item.product.cover_image %}
-                                        <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.title }}" class="rounded" style="width: 50px; height: 75px; object-fit: cover;">
+                                        <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.title }}" class="rounded-3 shadow-sm" style="width: 50px; height: 75px; object-fit: cover;">
                                     {% else %}
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 75px;">
+                                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 75px;">
                                             <span class="small text-muted">No img</span>
                                         </div>
                                     {% endif %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="background-color: #1a4d2e !important;">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success shadow-sm">
                                         {{ item.quantity }}
                                     </span>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0 small fw-bold">{{ item.product.name }}</h6>
+                                    <h6 class="mb-0 small fw-bold text-dark">{{ item.product.name }}</h6>
                                 </div>
-                                <div class="text-end">
-                                    <span class="small fw-bold">{{ item.total_price|vnd_currency }}</span>
+                                <div class="text-end ps-2">
+                                    <span class="small fw-bold text-dark">{{ item.total_price|vnd_currency }}</span>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                     
                     <!-- Totals -->
-                    <div class="mb-2 d-flex justify-content-between">
-                        <span class="text-muted small">Tạm tính</span>
-                        <span class="small fw-bold">{{ selected_total|vnd_currency }}</span>
+                    <div class="mb-2 d-flex justify-content-between text-muted small">
+                        <span>Tạm tính</span>
+                        <span class="fw-bold text-dark">{{ selected_total|vnd_currency }}</span>
                     </div>
-                    <div class="mb-2 d-flex justify-content-between">
-                        <span class="text-muted small">Mã giảm giá</span>
-                        <span class="small fw-bold" id="discount-amount">0 VNĐ</span>
+                    <div class="mb-2 d-flex justify-content-between text-muted small">
+                        <span>Mã giảm giá</span>
+                        <span class="fw-bold text-success" id="discount-amount">0 VNĐ</span>
                     </div>
-                    <div class="mb-4 d-flex justify-content-between border-bottom pb-3">
-                        <span class="text-muted small">Phí vận chuyển</span>
-                        <span class="small fw-bold">30.000 VNĐ</span>
+                    <div class="mb-4 d-flex justify-content-between text-muted small border-bottom pb-3">
+                        <span>Phí vận chuyển</span>
+                        <span class="fw-bold text-dark">30.000 VNĐ</span>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-uppercase">Tổng cộng</span>
-                        <span class="fs-4 fw-bold text-success" style="color: #1a4d2e !important;" id="total-amount">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-uppercase fs-6">Tổng thanh toán</span>
+                        <span class="summary-total-price" id="total-amount">
                             {{ selected_total|add:30000|vnd_currency }}
                         </span>
                     </div>

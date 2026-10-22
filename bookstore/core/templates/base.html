@@ -1,17 +1,21 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="vi">
 {% load static %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Bookstore{% endblock %}</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Custom CSS -->
-  <link href="{% static 'css/base.css' %}?v=1.1" rel="stylesheet">
-  <link href="{% static 'css/components.css' %}?v=1.1" rel="stylesheet">
-  <link href="{% static 'css/auth.css' %}?v=1.1" rel="stylesheet">
+  <link href="{% static 'css/base.css' %}?v=3.0" rel="stylesheet">
+  <link href="{% static 'css/components.css' %}?v=3.0" rel="stylesheet">
+  <link href="{% static 'css/auth.css' %}?v=3.0" rel="stylesheet">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -73,9 +77,7 @@
           
           <a href="{% url 'orders:cart_detail' %}" class="cart-icon ms-2">
             <i class="bi bi-cart3"></i>
-            {% if cart|length > 0 %}
-              <span class="cart-badge">{{ cart|length }}</span>
-            {% endif %}
+            <span class="cart-badge {% if cart|length == 0 %}d-none{% endif %}">{{ cart|length }}</span>
           </a>
         </div>
       </div>
@@ -152,9 +154,7 @@
         <!-- Cart -->
         <a href="{% url 'orders:cart_detail' %}" class="cart-icon position-relative text-white">
             <i class="bi bi-cart3 fs-3"></i>
-            {% if cart|length > 0 %}
-              <span class="cart-badge">{{ cart|length }}</span>
-            {% endif %}
+            <span class="cart-badge {% if cart|length == 0 %}d-none{% endif %}">{{ cart|length }}</span>
         </a>
     </div>
     
@@ -240,7 +240,7 @@
   <main class="flex-fill">
     <div class="container">
       {% if messages %}
-        <div class="messages">
+        <div class="messages d-none">
           {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
               {{ message }}
@@ -323,8 +323,73 @@
     </div>
   </footer>
 
-  <script src="{% static 'js/base.js' %}"></script>
-  <script src="{% static 'js/wishlist.js' %}"></script>
+  <!-- Toast Notification Container (Hiện đại, góc trên bên phải) -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 99999;">
+    <div id="appToast" class="toast align-items-center border-0 shadow-lg bg-white" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 12px; min-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;">
+      <div class="d-flex p-2 align-items-center">
+        <div id="toastIcon" class="ps-2 pe-2 fs-4 text-success">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="toast-body text-dark fw-500 fs-6 py-2 flex-grow-1" id="appToastMessage">
+          Đã thêm vào giỏ hàng thành công!
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Hàm hiển thị Toast thông báo đẹp mắt chuẩn Modern UI
+    window.showToast = function(message, type = 'success') {
+      const toastEl = document.getElementById('appToast');
+      const toastMsg = document.getElementById('appToastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      if (!toastEl || !toastMsg) return;
+
+      toastMsg.textContent = message;
+
+      if (type === 'warning') {
+        toastEl.style.borderLeft = '6px solid #ffc107';
+        if (toastIcon) {
+          toastIcon.className = 'ps-2 pe-2 fs-4 text-warning';
+          toastIcon.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i>';
+        }
+      } else if (type === 'danger' || type === 'error') {
+        toastEl.style.borderLeft = '6px solid #dc3545';
+        if (toastIcon) {
+          toastIcon.className = 'ps-2 pe-2 fs-4 text-danger';
+          toastIcon.innerHTML = '<i class="bi bi-x-circle-fill"></i>';
+        }
+      } else {
+        toastEl.style.borderLeft = '6px solid #198754';
+        if (toastIcon) {
+          toastIcon.className = 'ps-2 pe-2 fs-4 text-success';
+          toastIcon.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+        }
+      }
+
+      const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 });
+      bsToast.show();
+    };
+
+    // Tự động kích hoạt Toast khi có thông báo Django (ví dụ: cập nhật giỏ hàng sau khi tải lại trang)
+    {% if messages %}
+      document.addEventListener('DOMContentLoaded', function() {
+        {% for message in messages %}
+          {% if 'warning' in message.tags %}
+            window.showToast("{{ message|escapejs }}", 'warning');
+          {% elif 'error' in message.tags or 'danger' in message.tags %}
+            window.showToast("{{ message|escapejs }}", 'danger');
+          {% else %}
+            window.showToast("{{ message|escapejs }}", 'success');
+          {% endif %}
+        {% endfor %}
+      });
+    {% endif %}
+  </script>
+
+  <script src="{% static 'js/base.js' %}?v=3.0"></script>
+  <script src="{% static 'js/wishlist.js' %}?v=3.0"></script>
   {% block extra_js %}{% endblock %}
 
   <!-- Chatbot Integration -->

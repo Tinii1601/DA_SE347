@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container py-3">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -26,78 +26,205 @@
         </ol>
     </nav>
 
-    <div class="row mb-5 pb-5">
-        <!-- Cột trái: Danh mục -->
-        <div class="col-lg-3 border-end border-dark border-opacity-25 pe-4">
-            <div class="card border-0 bg-transparent">
-                <div class="card-header bg-transparent border-0 ps-0">
-                    <h5 class="mb-3 fw-bold text-uppercase">Danh mục</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    {% if category %}
-                        {# Đang ở trong một danh mục cụ thể, hiển thị các danh mục con #}
-                        {% for sub in subcategories %}
-                            <a href="{% url 'books:category_detail' sub.slug %}" class="list-group-item list-group-item-action">{{ sub.name }}</a>
-                        {% endfor %}
-                        {% if not subcategories and category.parent %}
-                             <a href="{% url 'books:category_detail' category.parent.slug %}" class="list-group-item list-group-item-action">&larr; Quay lại {{ category.parent.name }}</a>
-                        {% endif %}
-                    {% else %}
-                        {# Không ở trong danh mục nào, hiển thị các danh mục cấp cao nhất #}
-                        {% for cat in top_level_categories %}
-                            <a href="{% url 'books:category_detail' cat.slug %}" class="list-group-item list-group-item-action">{{ cat.name }}</a>
-                        {% endfor %}
+    <div class="row mb-5 pb-4">
+        <!-- Cột trái: Bộ lọc sản phẩm -->
+        <div class="col-lg-3 pe-lg-4 mb-4 mb-lg-0">
+            <div class="filter-sidebar-wrapper">
+                <!-- Header bộ lọc -->
+                <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-funnel-fill text-success fs-5 me-2"></i>
+                        <span class="filter-title">Bộ Lọc Sách</span>
+                    </div>
+                    {% if has_active_filters %}
+                    <a href="{% if category %}{% url 'books:category_detail' category.slug %}{% else %}{% url 'books:book_list' %}{% endif %}" 
+                       class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 text-decoration-none py-1 px-2 rounded-pill small">
+                        <i class="bi bi-x-circle me-1"></i>Xóa lọc
+                    </a>
                     {% endif %}
+                </div>
+
+                <!-- 1. Danh mục / Thể loại -->
+                <div class="mb-4">
+                    <div class="filter-section-title">
+                        <i class="bi bi-grid-fill text-success me-2"></i> Danh Mục Thể Loại
+                    </div>
+                    <div class="d-flex flex-column gap-1">
+                        <a href="{% url 'books:book_list' %}{% if current_price_range %}?price_range={{ current_price_range }}{% endif %}" 
+                           class="filter-category-link {% if not category %}active{% endif %}">
+                            <span><i class="bi bi-bookmarks me-2"></i>Tất cả thể loại</span>
+                            {% if not category %}<i class="bi bi-check2 text-success fw-bold"></i>{% endif %}
+                        </a>
+                        {% if category %}
+                            {% if category.parent %}
+                                <a href="{% url 'books:category_detail' category.parent.slug %}" class="filter-category-link text-muted small ps-3">
+                                    <span>&larr; {{ category.parent.name }}</span>
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'books:category_detail' category.slug %}" class="filter-category-link active ps-3">
+                                <span><i class="bi bi-folder-check me-2 text-success"></i>{{ category.name }}</span>
+                                <i class="bi bi-check2 text-success fw-bold"></i>
+                            </a>
+                            {% for sub in subcategories %}
+                                <a href="{% url 'books:category_detail' sub.slug %}" class="filter-category-link ps-4 small">
+                                    <span>{{ sub.name }}</span>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            {% for cat in top_level_categories %}
+                                <a href="{% url 'books:category_detail' cat.slug %}" class="filter-category-link">
+                                    <span>{{ cat.name }}</span>
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 2. Khoảng giá -->
+                <div class="mb-4 pt-3 border-top">
+                    <div class="filter-section-title">
+                        <i class="bi bi-cash-stack text-success me-2"></i> Khoảng Giá (VNĐ)
+                    </div>
+                    <form method="get" id="price-filter-form">
+                        {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+                        {% if current_in_stock %}<input type="hidden" name="in_stock" value="1">{% endif %}
+                        {% if current_on_sale %}<input type="hidden" name="on_sale" value="1">{% endif %}
+
+                        <div class="d-flex flex-column gap-1 mb-3">
+                            <label class="filter-price-option">
+                                <input type="radio" name="price_range" value="" {% if not current_price_range %}checked{% endif %} onchange="this.form.submit()">
+                                <span>Tất cả mức giá</span>
+                            </label>
+                            <label class="filter-price-option">
+                                <input type="radio" name="price_range" value="0-100" {% if current_price_range == '0-100' %}checked{% endif %} onchange="this.form.submit()">
+                                <span>Dưới 100.000₫</span>
+                            </label>
+                            <label class="filter-price-option">
+                                <input type="radio" name="price_range" value="100-200" {% if current_price_range == '100-200' %}checked{% endif %} onchange="this.form.submit()">
+                                <span>100.000₫ - 200.000₫</span>
+                            </label>
+                            <label class="filter-price-option">
+                                <input type="radio" name="price_range" value="200-500" {% if current_price_range == '200-500' %}checked{% endif %} onchange="this.form.submit()">
+                                <span>200.000₫ - 500.000₫</span>
+                            </label>
+                            <label class="filter-price-option">
+                                <input type="radio" name="price_range" value="500-up" {% if current_price_range == '500-up' %}checked{% endif %} onchange="this.form.submit()">
+                                <span>Trên 500.000₫</span>
+                            </label>
+                        </div>
+
+                        <!-- Nhập giá tùy chỉnh -->
+                        <div class="small fw-semibold text-muted mb-1">Hoặc nhập khoảng giá:</div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <input type="number" name="price_min" class="form-control form-control-sm custom-price-input" 
+                                   placeholder="Từ (đ)" value="{{ current_price_min }}">
+                            <span class="text-muted">-</span>
+                            <input type="number" name="price_max" class="form-control form-control-sm custom-price-input" 
+                                   placeholder="Đến (đ)" value="{{ current_price_max }}">
+                        </div>
+                        <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-pill py-1 fw-bold">
+                            Áp dụng giá
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. Tình trạng tồn kho & Giảm giá -->
+                <div class="pt-3 border-top">
+                    <div class="filter-section-title">
+                        <i class="bi bi-tag-fill text-success me-2"></i> Trạng Thái & Ưu Đãi
+                    </div>
+                    <form method="get" id="status-filter-form">
+                        {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+                        {% if current_price_range %}<input type="hidden" name="price_range" value="{{ current_price_range }}">{% endif %}
+                        {% if current_price_min %}<input type="hidden" name="price_min" value="{{ current_price_min }}">{% endif %}
+                        {% if current_price_max %}<input type="hidden" name="price_max" value="{{ current_price_max }}">{% endif %}
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="in_stock" value="1" id="filterInStock" 
+                                   {% if current_in_stock %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small fw-semibold text-dark" for="filterInStock">
+                                Chỉ hiện sách còn hàng
+                            </label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="on_sale" value="1" id="filterOnSale" 
+                                   {% if current_on_sale %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label small fw-semibold text-dark" for="filterOnSale">
+                                Sách đang giảm giá
+                            </label>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- Cột phải: Danh sách sản phẩm và Sắp xếp -->
+        <!-- Cột phải: Danh sách sản phẩm và Thanh công cụ -->
         <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="mb-0">
-                    {% if category %}
-                        {{ category.name }}
-                    {% else %}
-                        Tất cả sản phẩm
-                    {% endif %}
-                </h2>
-                
+            <!-- Catalog Toolbar -->
+            <div class="catalog-toolbar d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <h4 class="fw-bold mb-1 text-dark">
+                        {% if category %}{{ category.name }}{% else %}Tất cả sản phẩm{% endif %}
+                    </h4>
+                    <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
+                        <span>Tìm thấy <strong class="text-dark">{{ paginator.count }}</strong> tác phẩm</span>
+                        {% if has_active_filters %}
+                            <span class="text-muted">• Đang áp dụng lọc:</span>
+                            {% for f in active_filters %}
+                                <span class="filter-chip">
+                                    {{ f.label }}
+                                </span>
+                            {% endfor %}
+                            <a href="{% if category %}{% url 'books:category_detail' category.slug %}{% else %}{% url 'books:book_list' %}{% endif %}" class="small text-danger fw-bold text-decoration-none ms-1">
+                                Xóa tất cả
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <!-- Dropdown Sắp xếp -->
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sắp xếp theo
+                    <button class="sort-dropdown-btn dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-arrow-down-up text-success me-1"></i>
+                        {% if current_sort == '-created_at' %}Mới nhất{% elif current_sort == 'title' or current_sort == 'name' %}Tên: A-Z{% elif current_sort == '-title' or current_sort == '-name' %}Tên: Z-A{% elif current_sort == 'price' %}Giá tăng dần{% elif current_sort == '-price' %}Giá giảm dần{% else %}Sắp xếp{% endif %}
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-                        <li><a class="dropdown-item {% if current_sort == '-created_at' %}active{% endif %}" href="?sort=-created_at">Hàng mới</a></li>
-                        <li><a class="dropdown-item {% if current_sort == 'title' %}active{% endif %}" href="?sort=title">Tên: A-Z</a></li>
-                        <li><a class="dropdown-item {% if current_sort == '-title' %}active{% endif %}" href="?sort=-title">Tên: Z-A</a></li>
-                        <li><a class="dropdown-item {% if current_sort == 'price' %}active{% endif %}" href="?sort=price">Giá: Tăng dần</a></li>
-                        <li><a class="dropdown-item {% if current_sort == '-price' %}active{% endif %}" href="?sort=-price">Giá: Giảm dần</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item py-2 {% if current_sort == '-created_at' %}active fw-bold{% endif %}" href="?sort=-created_at{% if query_params_no_sort %}&{{ query_params_no_sort }}{% endif %}"><i class="bi bi-clock me-2"></i>Hàng mới nhất</a></li>
+                        <li><a class="dropdown-item py-2 {% if current_sort == 'price' %}active fw-bold{% endif %}" href="?sort=price{% if query_params_no_sort %}&{{ query_params_no_sort }}{% endif %}"><i class="bi bi-sort-numeric-down me-2"></i>Giá: Tăng dần</a></li>
+                        <li><a class="dropdown-item py-2 {% if current_sort == '-price' %}active fw-bold{% endif %}" href="?sort=-price{% if query_params_no_sort %}&{{ query_params_no_sort }}{% endif %}"><i class="bi bi-sort-numeric-down-alt me-2"></i>Giá: Giảm dần</a></li>
+                        <li><a class="dropdown-item py-2 {% if current_sort == 'name' or current_sort == 'title' %}active fw-bold{% endif %}" href="?sort=title{% if query_params_no_sort %}&{{ query_params_no_sort }}{% endif %}"><i class="bi bi-sort-alpha-down me-2"></i>Tên: A-Z</a></li>
+                        <li><a class="dropdown-item py-2 {% if current_sort == '-name' or current_sort == '-title' %}active fw-bold{% endif %}" href="?sort=-title{% if query_params_no_sort %}&{{ query_params_no_sort }}{% endif %}"><i class="bi bi-sort-alpha-down-alt me-2"></i>Tên: Z-A</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- Danh sách sản phẩm -->
-            <div class="row row-cols-2 row-cols-md-4 g-4">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4">
                 {% for book in books %}
                     <div class="col">
                         {% include 'books/partials/book_card.html' with book=book %}
                     </div>
                 {% empty %}
                     <div class="col-12">
-                        <p class="text-center">Không tìm thấy sản phẩm nào.</p>
+                        <div class="text-center py-5 bg-white rounded-4 border border-dashed p-4">
+                            <i class="bi bi-search display-3 text-muted d-block mb-3"></i>
+                            <h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào phù hợp</h5>
+                            <p class="text-muted small mb-3">Hãy thử xóa hoặc nới lỏng các tiêu chí lọc để xem thêm nhiều tác phẩm thú vị nhé.</p>
+                            <a href="{% if category %}{% url 'books:category_detail' category.slug %}{% else %}{% url 'books:book_list' %}{% endif %}" class="btn btn-success btn-sm rounded-pill px-4">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Xóa bộ lọc
+                            </a>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
 
             <!-- Phân trang -->
             {% if is_paginated %}
-                <nav aria-label="Page navigation" class="mt-4">
+                <nav aria-label="Page navigation" class="mt-5">
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}" aria-label="Previous">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params_no_page %}&{{ query_params_no_page }}{% endif %}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -111,13 +238,13 @@
                             {% if page_obj.number == i %}
                                 <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
                             {% else %}
-                                <li class="page-item"><a class="page-link" href="?page={{ i }}&sort={{ current_sort }}">{{ i }}</a></li>
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if query_params_no_page %}&{{ query_params_no_page }}{% endif %}">{{ i }}</a></li>
                             {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}" aria-label="Next">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params_no_page %}&{{ query_params_no_page }}{% endif %}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>

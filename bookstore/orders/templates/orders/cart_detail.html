@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/cart_detail.js' %}"></script>
+<script src="{% static 'js/cart_detail.js' %}?v=3.0"></script>
 {% endblock %}
 
 {% block content %}
@@ -91,10 +91,13 @@
                         </td>
                         <td class="text-end py-4">{{ item.price|vnd_currency }}</td>
                         <td class="text-center py-4">
-                            <form action="{% url 'orders:cart_add' product.id %}" method="post" class="d-flex justify-content-center">
+                            <form action="{% url 'orders:cart_add' product.id %}" method="post" class="d-flex flex-column align-items-center">
                                 {% csrf_token %}
-                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control text-center rounded-0" style="width: 60px;" onchange="this.form.submit()">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" 
+                                       min="1" max="{{ product.stock }}" 
+                                       class="form-control text-center rounded-0 cart-qty-input" style="width: 70px;">
                                 {{ item.update_quantity_form.override }}
+                                <small class="text-muted mt-1" style="font-size: 0.75rem;">(Kho: {{ product.stock }})</small>
                             </form>
                         </td>
                         <td class="text-end pe-0 py-4 fw-bold">{{ item.total_price|vnd_currency }}</td>
@@ -110,33 +113,42 @@
     <div class="row mb-5">
         <!-- Gift & Note -->
         <div class="col-md-6 mb-4 mb-md-0">
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <label for="orderNote" class="form-label text-muted fw-bold fs-5 mb-0">Ghi chú:</label>
-                    <span class="small text-muted">Giới hạn 180 ký tự</span>
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+                <div class="d-flex justify-content-between mb-2">
+                    <label for="orderNote" class="form-label text-dark fw-bold mb-0">
+                        <i class="bi bi-pencil-square me-1"></i> Ghi chú cho đơn hàng:
+                    </label>
+                    <span class="small text-muted">Tối đa 180 ký tự</span>
                 </div>
-                <textarea class="form-control rounded-0" id="orderNote" rows="4"></textarea>
+                <textarea class="form-control rounded-3" id="orderNote" rows="4" placeholder="Ví dụ: Giao hàng trong giờ hành chính, gọi điện trước khi giao..."></textarea>
             </div>
         </div>
 
         <!-- Summary & Checkout -->
         <div class="col-md-5 offset-md-1">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-uppercase fw-bold">Tổng đã chọn:</span>
-                <span class="fs-4 fw-bold" id="selected-total-amount">{{ selected_total|vnd_currency }}</span>
+            <div class="cart-summary-card">
+                <h5 class="fw-bold mb-3 d-flex align-items-center">
+                    <i class="bi bi-cart-check-fill me-2 text-success"></i> Tóm tắt giỏ hàng
+                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">Tổng tiền đã chọn:</span>
+                    <span class="fs-4 fw-bold" id="selected-total-amount">{{ selected_total|vnd_currency }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <span class="text-muted small">Tổng tiền toàn bộ giỏ:</span>
+                    <span class="text-muted small fw-bold" id="cart-total-amount">{{ cart.get_total_price|vnd_currency }}</span>
+                </div>
+                <p class="text-muted small mb-4">
+                    <i class="bi bi-shield-check me-1 text-success"></i> Phí vận chuyển và mã giảm giá sẽ được tính ở bước thanh toán.
+                </p>
+                
+                <a href="{% url 'orders:checkout' %}" class="btn btn-success w-100 py-3 text-uppercase fw-bold rounded-pill mb-2 shadow-sm">
+                    Tiến hành thanh toán <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+                <a href="{{ continue_shopping_url }}" class="btn btn-outline-secondary w-100 py-2 rounded-pill small">
+                   <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
+                </a>
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted">Tổng giỏ hàng:</span>
-                <span class="text-muted" id="cart-total-amount">{{ cart.get_total_price|vnd_currency }}</span>
-            </div>
-            <p class="text-end text-muted small mb-4">Phí vận chuyển và thuế được tính khi thanh toán.</p>
-            
-            <a href="{% url 'orders:checkout' %}" class="btn btn-success w-100 py-3 text-uppercase fw-bold rounded-0 mb-3" style="background-color: #1a4d2e; border-color: #1a4d2e;">
-                Thanh toán
-            </a>
-            <a href="{{ continue_shopping_url }}" class="btn btn-outline-dark w-100 py-3 text-uppercase fw-bold rounded-0">
-               <i class="bi bi-arrow-left me-2"></i> Tiếp tục mua sắm
-            </a>
         </div>
     </div>
 

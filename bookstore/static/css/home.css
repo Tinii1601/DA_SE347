@@ -1,3 +1,40 @@
+/* Home Page Modern Enhancements */
+
+/* Banner Carousel */
+#bannerCarousel {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2.5rem;
+}
+
+#bannerCarousel .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 6px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+#bannerCarousel .carousel-indicators .active {
+    width: 28px;
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+/* Product Sliders */
+.group-slider {
+    margin-bottom: 3.5rem;
+}
+
+.group-slider h2 {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
 .product-scroll-container::-webkit-scrollbar {
     display: none;
 }
@@ -5,11 +42,14 @@
 .product-scroll-container {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    padding-top: 10px;
+    padding-bottom: 16px;
 }
 
 .product-item {
     flex: 0 0 calc(20% - 16px);
     max-width: calc(20% - 16px);
+    transition: transform 0.2s;
 }
 
 @media (max-width: 1200px) {
@@ -35,29 +75,31 @@
 
 @media (max-width: 576px) {
     .product-item {
-        flex: 0 0 calc(100% - 16px);
-        max-width: calc(100% - 16px);
+        flex: 0 0 calc(80% - 16px);
+        max-width: calc(80% - 16px);
     }
 }
 
+/* Nav Slider Buttons */
 .btn-nav-slider {
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border: 1px solid #dee2e6;
+    width: 44px;
+    height: 44px;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.9;
-    transition: all 0.3s;
-    z-index: 100 !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 20 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    color: var(--lumiere-green);
+    font-size: 1.1rem;
 }
 
 .btn-nav-slider:hover {
-    opacity: 1;
     background-color: var(--lumiere-green);
-    color: white;
+    color: #ffffff;
     border-color: var(--lumiere-green);
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.12) !important;
+    box-shadow: 0 8px 20px rgba(26, 77, 46, 0.3);
 }

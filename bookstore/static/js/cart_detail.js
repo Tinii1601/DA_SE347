@@ -87,4 +87,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     syncSelectAll();
+
+    // Xử lý ô điều chỉnh số lượng trong giỏ hàng (Auto-clamp tồn kho & Hiển thị Toast đẹp)
+    const qtyInputs = document.querySelectorAll('.cart-qty-input');
+    qtyInputs.forEach(input => {
+        const maxStock = parseInt(input.getAttribute('max')) || 9999;
+
+        input.addEventListener('input', function() {
+            let val = parseInt(this.value);
+            if (!isNaN(val) && val > maxStock) {
+                this.value = maxStock;
+                if (window.showToast) {
+                    window.showToast(`Sản phẩm chỉ còn tối đa ${maxStock} cuốn trong kho! Đã tự động điều chỉnh về tối đa.`, 'warning');
+                }
+            }
+        });
+
+        input.addEventListener('change', function() {
+            let val = parseInt(this.value);
+            if (isNaN(val) || val < 1) {
+                this.value = 1;
+            } else if (val > maxStock) {
+                this.value = maxStock;
+                if (window.showToast) {
+                    window.showToast(`Sản phẩm chỉ còn tối đa ${maxStock} cuốn trong kho! Đã tự động điều chỉnh về tối đa.`, 'warning');
+                }
+            }
+            // Submit form để cập nhật giỏ hàng trên server
+            this.form.submit();
+        });
+    });
 });

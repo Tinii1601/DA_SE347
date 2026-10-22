@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -7,19 +8,21 @@ from google import genai
 from google.genai import types
 from books.models import Product, Category
 
+logger = logging.getLogger(__name__)
+
 # Khởi tạo Client
 def get_client():
     try:
         api_key = settings.GEMINI_API_KEY
         if not api_key:
-            print("Chatbot Error: GEMINI_API_KEY is missing in settings.")
+            logger.warning("Chatbot Warning: GEMINI_API_KEY is missing in settings.")
             return None
         # Debug: Print masked key to verify which key is being used
         masked_key = api_key[:5] + "..." + api_key[-5:] if len(api_key) > 10 else "***"
-        print(f"Chatbot: Using API Key: {masked_key}")
+        logger.debug("Chatbot: Using API Key: %s", masked_key)
         return genai.Client(api_key=api_key)
     except Exception as e:
-        print(f"Chatbot Init Error: {e}")
+        logger.error("Chatbot Init Error: %s", e)
         return None
 
 client = None
@@ -73,9 +76,9 @@ def chat_view(request):
                 )
                 interpretation = json.loads(response1.text)
                 search_query = interpretation.get('search_query')
-                print(f"Chatbot: Search Query = '{search_query}'")
+                logger.info("Chatbot: Search Query = '%s'", search_query)
             except Exception as e:
-                print(f"Lỗi phân tích: {e}")
+                logger.error("Lỗi phân tích intent: %s", e)
                 search_query = None
 
             context_info = ""
@@ -92,7 +95,7 @@ def chat_view(request):
                     for cat in matching_cats:
                         target_cat_ids.update(cat.get_descendants_and_self_ids())
                 except Exception as e:
-                    print(f"Lỗi tìm danh mục: {e}")
+                    logger.error("Lỗi tìm danh mục: %s", e)
 
                 # 2. Tìm sản phẩm: Theo tên HOẶC theo danh mục (bao gồm cả danh mục con)
                 products = Product.objects.filter(
@@ -103,7 +106,7 @@ def chat_view(request):
                     category__is_active=True
                 ).distinct()[:5]
                 
-                print(f"Chatbot: Found {products.count()} products for '{search_query}'")
+                logger.info("Chatbot: Found %s products for '%s'", products.count(), search_query)
 
                 if products.exists():
                     product_list_text = []
@@ -151,9 +154,7 @@ def chat_view(request):
             })
 
         except Exception as e:
-            import traceback
-            error_details = traceback.format_exc()
-            print(f"Lỗi hệ thống Chatbot:\n{error_details}")
+            logger.exception("Lỗi hệ thống Chatbot: %s", e)
             
             # Xử lý lỗi API Key bị lộ hoặc hết hạn
             error_str = str(e)

@@ -12,6 +12,11 @@
                 <span class="badge bg-danger rounded-0 text-uppercase px-3 py-2" style="transform: rotate(-45deg) translate(-10px, 10px); font-size: 0.7rem;">Best Seller</span>
             </div>
         {% endif %}
+        {% if not book.in_stock %}
+            <div class="position-absolute top-50 start-50 translate-middle z-2">
+                <span class="badge bg-dark bg-opacity-75 text-white px-3 py-2 rounded-pill shadow-sm fs-6">Hết hàng</span>
+            </div>
+        {% endif %}
         <div class="position-absolute top-0 start-0 m-2 z-1">
             {% if user.is_authenticated %}
                 <button type="button" class="btn btn-light btn-sm rounded-circle wishlist-toggle-btn" aria-label="Yêu thích"
@@ -35,9 +40,9 @@
                      class="img-fluid" 
                      alt="{{ book.name }}" 
                      loading="lazy" 
-                     style="height: 200px; object-fit: contain;">
+                     style="height: 200px; object-fit: contain; {% if not book.in_stock %}opacity: 0.5; filter: grayscale(50%);{% endif %}">
             {% else %}
-                <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
+                <div class="d-flex align-items-center justify-content-center" style="height: 200px; {% if not book.in_stock %}opacity: 0.5; filter: grayscale(50%);{% endif %}">
                     <img src="{% static 'img/default-book-cover.jpg' %}" class="img-fluid" style="height: 150px; object-fit: contain;" alt="No image">
                 </div>
             {% endif %}
@@ -66,14 +71,20 @@
                 {% endif %}
             </div>
             
-            <form action="{% url 'orders:cart_add' book.id %}" method="post" class="add-to-cart-form">
-                {% csrf_token %}
-                <input type="hidden" name="quantity" value="1">
-                <input type="hidden" name="override" value="False">
-                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                    <i class="bi bi-cart-plus-fill"></i>
+            {% if book.in_stock %}
+                <form action="{% url 'orders:cart_add' book.id %}" method="post" class="add-to-cart-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="override" value="False">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm rounded-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Thêm vào giỏ hàng">
+                        <i class="bi bi-cart-plus-fill"></i>
+                    </button>
+                </form>
+            {% else %}
+                <button type="button" class="btn btn-secondary btn-sm rounded-1 d-flex align-items-center justify-content-center disabled" style="width: 32px; height: 32px; opacity: 0.5;" title="Hết hàng" disabled>
+                    <i class="bi bi-x-circle"></i>
                 </button>
-            </form>
+            {% endif %}
         </div>
     </div>
 </div>

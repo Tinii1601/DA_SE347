@@ -29,8 +29,14 @@
           <div class="order-date" data-label="Thời gian">{{ order.created_at|date:"d/m/Y H:i" }}</div>
           <div class="order-total" data-label="Tổng cộng">{{ order.total_amount|floatformat:0 }}₫</div>
           <div class="order-status status-{{ order.status }}" data-label="Trạng thái">{{ order.get_status_display }}</div>
-          <div class="order-action" data-label="Chi tiết">
-            <a href="{% url 'orders:order_detail' order.id %}">Chi tiết đơn hàng</a>
+          <div class="order-action d-flex align-items-center justify-content-end gap-2" data-label="Thao tác">
+            <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-outline-secondary py-1 px-3 rounded-pill text-nowrap">Chi tiết</a>
+            {% if order.status == 'pending' %}
+              <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill text-nowrap" 
+                      onclick="openCancelHistoryModal('{{ order.id }}', '{{ order.order_number }}')">
+                <i class="bi bi-x-circle me-1"></i> Hủy
+              </button>
+            {% endif %}
           </div>
         </div>
       {% endfor %}
@@ -38,8 +44,43 @@
   {% else %}
     <div class="order-empty">
       <p>Bạn chưa có đơn hàng nào.</p>
-      <a href="{% url 'core:home' %}" class="btn btn-success btn-sm">Mua sắm ngay</a>
+      <a href="{% url 'core:home' %}" class="btn btn-success btn-sm rounded-pill px-4">Mua sắm ngay</a>
     </div>
   {% endif %}
 </div>
+
+<!-- Modal Xác nhận Hủy đơn hàng ở trang Lịch sử -->
+<div class="modal fade" id="cancelHistoryModal" tabindex="-1" aria-labelledby="cancelHistoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger d-flex align-items-center" id="cancelHistoryModalLabel">
+          <i class="bi bi-exclamation-triangle-fill text-danger me-2 fs-4"></i> Xác nhận hủy đơn hàng
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-4">
+        <p class="fs-6 text-dark mb-2">Bạn có chắc chắn muốn hủy đơn hàng <strong id="cancelModalOrderCode">#</strong> không?</p>
+        <div class="alert alert-warning py-2 px-3 small border-0 rounded-3 mb-0">
+          <i class="bi bi-info-circle me-1"></i> Sau khi hủy đơn, số lượng sách sẽ được tự động hoàn lại vào kho và mã giảm giá (nếu có) sẽ được khôi phục.
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+        <a href="#" id="confirmCancelBtn" class="btn btn-danger rounded-pill px-4">
+          <i class="bi bi-trash3 me-1"></i> Đồng ý hủy đơn
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openCancelHistoryModal(orderId, orderNumber) {
+    document.getElementById('cancelModalOrderCode').textContent = '#' + orderNumber;
+    document.getElementById('confirmCancelBtn').href = '/orders/cancel/' + orderId + '/';
+    const modal = new bootstrap.Modal(document.getElementById('cancelHistoryModal'));
+    modal.show();
+  }
+</script>
 {% endblock %}

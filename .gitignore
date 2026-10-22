@@ -34,11 +34,12 @@ wheels/
 *.sqlite3
 db.sqlite3
 
-# Media & Compressed files (Rất quan trọng: chặn media.zip và thư mục media)
-media/
-bookstore/media/
+# Static builds & Compressed files
 staticfiles/
 static_root/
+bookstore/staticfiles/
+media.zip
+bookstore/media.zip
 *.zip
 *.tar.gz
 *.rar

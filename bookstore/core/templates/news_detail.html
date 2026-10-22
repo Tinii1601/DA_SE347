@@ -39,7 +39,7 @@
                 {% if item.cover_image %}
                   <img src="{{ item.cover_image.url }}" alt="{{ item.title }}">
                 {% else %}
-                  <img src="{% static 'img/logo.png' %}" alt="{{ item.title }}">
+                  <div class="d-flex align-items-center justify-content-center bg-light text-muted w-100 h-100" style="min-height: 180px;"><i class="bi bi-newspaper fs-1"></i></div>
                 {% endif %}
               </div>
               <div class="news-title">{{ item.title }}</div>

@@ -33,7 +33,7 @@
                 {% if post.cover_image %}
                   <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
                 {% else %}
-                  <img src="{% static 'img/logo.png' %}" alt="{{ post.title }}">
+                  <div class="d-flex align-items-center justify-content-center bg-light text-muted w-100 h-100" style="min-height: 180px;"><i class="bi bi-newspaper fs-1"></i></div>
                 {% endif %}
               </div>
               <div class="news-title">{{ post.title }}</div>
@@ -60,7 +60,7 @@
                 {% if post.cover_image %}
                   <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
                 {% else %}
-                  <img src="{% static 'img/logo.png' %}" alt="{{ post.title }}">
+                  <div class="d-flex align-items-center justify-content-center bg-light text-muted w-100 h-100" style="min-height: 180px;"><i class="bi bi-newspaper fs-1"></i></div>
                 {% endif %}
               </div>
               <div class="news-title">{{ post.title }}</div>

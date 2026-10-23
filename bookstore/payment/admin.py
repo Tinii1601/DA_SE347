@@ -32,7 +32,11 @@ class PaymentAdmin(ImportExportModelAdmin):
     )
 
     def order_link(self, obj):
-        return format_html('<strong>{}</strong>', obj.order.order_number)
+        try:
+            order_num = obj.order.order_number
+        except Exception:
+            order_num = f"Đơn #{obj.order_id}"
+        return format_html('<strong>{}</strong>', order_num)
     order_link.short_description = "Đơn hàng"
 
     def method_badge(self, obj):
@@ -48,7 +52,8 @@ class PaymentAdmin(ImportExportModelAdmin):
     method_badge.short_description = "Phương thức"
 
     def amount_formatted(self, obj):
-        return format_html('<strong style="color:#1a4d2e;">{:,.0f}₫</strong>', obj.amount)
+        val = f"{obj.amount:,.0f}₫"
+        return format_html('<strong style="color:#1a4d2e;">{}</strong>', val)
     amount_formatted.short_description = "Số tiền"
 
     def status_badge(self, obj):

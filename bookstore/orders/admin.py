@@ -112,15 +112,24 @@ class OrderAdmin(ImportExportModelAdmin):
     )
 
     def customer_info(self, obj):
-        name = obj.shipping_address.full_name if obj.shipping_address else (obj.user.get_full_name() or obj.user.username)
-        phone = obj.shipping_address.phone if obj.shipping_address else ""
+        try:
+            if obj.shipping_address:
+                name = obj.shipping_address.full_name or ""
+                phone = obj.shipping_address.phone or ""
+            else:
+                name = obj.user.get_full_name() or obj.user.username
+                phone = ""
+        except Exception:
+            name = str(obj.user)
+            phone = ""
         if phone:
             return format_html('<strong>{}</strong><br><small class="text-muted">{}</small>', name, phone)
         return format_html('<strong>{}</strong>', name)
     customer_info.short_description = "Khách hàng"
 
     def total_amount_formatted(self, obj):
-        return format_html('<strong style="color:#1a4d2e; font-size: 0.95rem;">{:,.0f}₫</strong>', obj.total_amount)
+        val = f"{obj.total_amount:,.0f}₫"
+        return format_html('<strong style="color:#1a4d2e; font-size: 0.95rem;">{}</strong>', val)
     total_amount_formatted.short_description = "Tổng tiền"
 
     def total_amount_display(self, obj):
@@ -144,9 +153,14 @@ class OrderAdmin(ImportExportModelAdmin):
     status_badge.short_description = "Trạng thái"
 
     def payment_badge(self, obj):
-        if hasattr(obj, 'payment') and obj.payment:
-            method = obj.payment.method
-            status = obj.payment.status
+        try:
+            payment = getattr(obj, 'payment', None)
+        except Exception:
+            payment = None
+
+        if payment:
+            method = getattr(payment, 'method', '')
+            status = getattr(payment, 'status', '')
             if method == 'payos':
                 if status == 'completed':
                     return format_html(

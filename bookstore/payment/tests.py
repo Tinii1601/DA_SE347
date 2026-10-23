@@ -42,6 +42,9 @@ class PaymentModelAndViewsTest(TestCase):
         self.assertEqual(self.payment.status, 'pending')
         self.assertEqual(self.payment.amount, Decimal("250000.00"))
         self.assertEqual(str(self.payment), f"Thanh toán {self.order.order_number}")
+        # Verify only COD and PayOS are in choices (VietQR removed)
+        methods = [choice[0] for choice in Payment.METHOD_CHOICES]
+        self.assertEqual(methods, ['cod', 'payos'])
 
     def test_payment_status_save_without_updated_at(self):
         self.payment.status = 'completed'
@@ -70,7 +73,7 @@ class PaymentModelAndViewsTest(TestCase):
         url = reverse('payment:create_payment', args=[self.order.id])
         with self.settings(PAYOS_CLIENT_ID='', PAYOS_API_KEY='', PAYOS_CHECKSUM_KEY=''):
             response = self.client.get(url, HTTP_HOST='127.0.0.1')
-            self.assertRedirects(response, reverse('payment:payment_vietqr', args=[self.order.id]))
+            self.assertRedirects(response, reverse('orders:order_detail', kwargs={'pk': self.order.id}))
 
     def test_payos_create_redirects_to_checkout_url(self):
         url = reverse('payment:create_payment', args=[self.order.id])
@@ -108,11 +111,3 @@ class PaymentModelAndViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.order.order_number)
         self.assertContains(response, 'Thanh toán chưa hoàn tất')
-
-    def test_payment_vietqr_confirm(self):
-        url = reverse('payment:payment_vietqr_confirm', args=[self.order.id])
-        response = self.client.post(url, HTTP_HOST='127.0.0.1')
-        self.assertRedirects(response, reverse('orders:order_detail', kwargs={'pk': self.order.id}))
-        self.payment.refresh_from_db()
-        self.assertEqual(self.payment.status, 'pending')
-        self.assertEqual(self.payment.transaction_id, 'USER_REPORTED')

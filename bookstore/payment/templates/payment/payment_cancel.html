@@ -34,11 +34,8 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <a href="{% url 'payment:create_payment' order.id %}" class="btn btn-primary py-2 fw-bold">
+                    <a href="{% url 'payment:create_payment' order.id %}" class="btn btn-primary py-2 fw-bold" style="background-color: #1a4d2e; border-color: #1a4d2e;">
                         <i class="bi bi-arrow-repeat me-2"></i> Thử thanh toán lại qua PayOS
-                    </a>
-                    <a href="{% url 'payment:payment_vietqr' order.id %}" class="btn btn-outline-success py-2 fw-bold">
-                        <i class="bi bi-qr-code me-2"></i> Chuyển sang chuyển khoản VietQR
                     </a>
                     <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline-secondary py-2">
                         <i class="bi bi-file-text me-2"></i> Xem chi tiết đơn hàng

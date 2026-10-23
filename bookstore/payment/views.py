@@ -18,46 +18,6 @@ from payos.types import ItemData, CreatePaymentLinkRequest
 logger = logging.getLogger(__name__)
 
 
-def payment_vietqr(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    payment_content = f"DH {order.order_number}"
-    content_encoded = quote_plus(payment_content)
-    account_name_encoded = quote_plus(settings.VIETQR_ACCOUNT_NAME)
-    generated_qr_url = (
-        f"https://img.vietqr.io/image/{settings.VIETQR_BANK_BIN}-{settings.VIETQR_ACCOUNT_NUMBER}-compact.png"
-        f"?amount={int(order.total_amount)}&addInfo={content_encoded}&accountName={account_name_encoded}"
-    )
-    qr_url = settings.VIETQR_QR_URL or generated_qr_url
-
-    return render(request, 'payment/payment_vietqr.html', {
-        'order': order,
-        'bank_name': settings.VIETQR_BANK_NAME,
-        'bank_account_name': settings.VIETQR_ACCOUNT_NAME,
-        'bank_account_number': settings.VIETQR_ACCOUNT_NUMBER,
-        'payment_content': payment_content,
-        'payment_amount': order.total_amount,
-        'qr_url': qr_url,
-        'generated_qr_url': generated_qr_url,
-    })
-
-
-@require_POST
-def payment_vietqr_confirm(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    with transaction.atomic():
-        payment = getattr(order, 'payment', None)
-        if payment:
-            payment.status = 'pending'
-            payment.transaction_id = payment.transaction_id or 'USER_REPORTED'
-            payment.save(update_fields=['status', 'transaction_id'])
-
-    cart = Cart(request)
-    cart.remove_selected()
-
-    messages.success(request, 'Đã ghi nhận yêu cầu chuyển khoản. Đơn hàng sẽ được nhân viên xác nhận ngay khi nhận được thanh toán.')
-    return redirect('orders:order_detail', pk=order.id)
-
-
 def payment_cancel(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'payment/payment_cancel.html', {'order': order})
@@ -68,12 +28,12 @@ def create_payment(request, order_id):
 
     # 1. Kiểm tra cấu hình bộ 3 API Key của PayOS
     if not (settings.PAYOS_CLIENT_ID and settings.PAYOS_API_KEY and settings.PAYOS_CHECKSUM_KEY):
-        logger.warning("PayOS API keys missing in environment. Fallback to VietQR for order %s", order.order_number)
-        messages.warning(
+        logger.warning("PayOS API keys missing in environment for order %s", order.order_number)
+        messages.error(
             request,
-            "Cổng thanh toán PayOS chưa được cấu hình API Key trên máy chủ. Đang chuyển hướng bạn sang hình thức quét mã VietQR."
+            "Cổng thanh toán PayOS chưa được kích hoạt API Key trên máy chủ. Đơn hàng của bạn đã được ghi nhận ở trạng thái chờ thanh toán."
         )
-        return redirect('payment:payment_vietqr', order_id=order.id)
+        return redirect('orders:order_detail', pk=order.id)
 
     # 2. Xây dựng domain an toàn (Render reverse proxy https)
     domain = request.build_absolute_uri('/')[:-1]
@@ -124,9 +84,9 @@ def create_payment(request, order_id):
         logger.error("Lỗi khi tạo payment link PayOS cho đơn hàng %s: %s", order.id, e, exc_info=True)
         messages.error(
             request,
-            f"Không thể mở cổng PayOS ({str(e)}). Bạn có thể thanh toán thuận tiện qua mã VietQR bên dưới."
+            f"Không thể kết nối đến cổng thanh toán PayOS ({str(e)}). Vui lòng thử lại sau từ trang Chi tiết đơn hàng."
         )
-        return redirect('payment:payment_vietqr', order_id=order.id)
+        return redirect('orders:order_detail', pk=order.id)
 
 
 def payment_return(request, order_id):

@@ -1,0 +1,294 @@
+/* ==========================================================================
+   Bookstore Custom Django Admin Styles (Jazzmin Enhancement)
+   ========================================================================== */
+
+/* Google Font: Plus Jakarta Sans / Inter */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --admin-green: #1a4d2e;
+    --admin-green-light: #22c55e;
+    --admin-green-dark: #143d24;
+    --admin-cream: #fbfbf9;
+    --admin-card-bg: #ffffff;
+    --admin-border: #e2e8f0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+/* 1. Navbar Customization */
+.main-header.navbar {
+    background-color: var(--admin-green) !important;
+    border-bottom: none !important;
+    box-shadow: 0 4px 15px rgba(26, 77, 46, 0.15) !important;
+}
+
+.main-header.navbar .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 600;
+}
+
+.main-header.navbar .nav-link:hover {
+    color: #86efac !important;
+}
+
+/* 2. Sidebar Customization */
+.main-sidebar {
+    background-color: #ffffff !important;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05) !important;
+    border-right: 1px solid var(--admin-border) !important;
+}
+
+.brand-link {
+    background-color: var(--admin-green) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 14px 16px !important;
+}
+
+.brand-link .brand-text {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: #ffffff !important;
+    font-size: 1.25rem !important;
+}
+
+.sidebar .nav-sidebar .nav-item .nav-link {
+    color: #334155 !important;
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.sidebar .nav-sidebar .nav-item .nav-link:hover {
+    background-color: #f0fdf4 !important;
+    color: var(--admin-green) !important;
+    transform: translateX(3px);
+}
+
+.sidebar .nav-sidebar .nav-item .nav-link.active {
+    background-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(26, 77, 46, 0.25) !important;
+}
+
+.sidebar .nav-header {
+    text-transform: uppercase !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #94a3b8 !important;
+    padding: 12px 16px 4px !important;
+}
+
+/* 3. Cards & Containers */
+.card {
+    border-radius: 12px !important;
+    border: 1px solid var(--admin-border) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    background-color: #ffffff !important;
+    margin-bottom: 24px !important;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid var(--admin-border) !important;
+    padding: 14px 20px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+/* 4. Tables */
+.table {
+    margin-bottom: 0 !important;
+}
+
+.table th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    border-top: none !important;
+    border-bottom: 2px solid var(--admin-border) !important;
+    padding: 12px 16px !important;
+    vertical-align: middle !important;
+}
+
+.table td {
+    padding: 12px 16px !important;
+    vertical-align: middle !important;
+    color: #334155 !important;
+    border-top: 1px solid #f1f5f9 !important;
+    font-size: 0.9rem !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fafafa !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f0fdf4 !important;
+}
+
+/* 5. Buttons */
+.btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    font-size: 0.88rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-success, .btn-primary {
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(26, 77, 46, 0.2) !important;
+}
+
+.btn-success:hover, .btn-primary:hover {
+    background-color: var(--admin-green-dark) !important;
+    border-color: var(--admin-green-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 77, 46, 0.3) !important;
+}
+
+.btn-outline-secondary {
+    border-color: #cbd5e1 !important;
+    color: #475569 !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* 6. Form Inputs */
+.form-control, .select2-container--default .select2-selection--single {
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px 12px !important;
+    font-size: 0.92rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.form-control:focus {
+    border-color: var(--admin-green) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* 7. Badges & Pills */
+.badge {
+    border-radius: 6px !important;
+    padding: 5px 10px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* 8. Changeform Horizontal Tabs */
+.nav-tabs {
+    border-bottom: 2px solid var(--admin-border) !important;
+    margin-bottom: 16px !important;
+}
+
+.nav-tabs .nav-link {
+    border: none !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+    padding: 10px 20px !important;
+    border-bottom: 3px solid transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--admin-green) !important;
+    border-bottom: 3px solid var(--admin-green) !important;
+    background: transparent !important;
+}
+
+/* 9. Breadcrumbs */
+.breadcrumb {
+    background: transparent !important;
+    padding: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.breadcrumb-item a {
+    color: var(--admin-green) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+/* 10. Dashboard Stats Cards Enhancement */
+.small-box {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+    overflow: hidden;
+}
+
+/* 11. Pagination & Filters */
+.pagination .page-item .page-link {
+    color: var(--admin-green) !important;
+    border-radius: 6px !important;
+    margin: 0 2px !important;
+    font-weight: 600;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+}
+
+#changelist-filter {
+    border-radius: 12px !important;
+    background-color: #ffffff !important;
+    border: 1px solid var(--admin-border) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+#changelist-filter h2 {
+    background: var(--admin-green) !important;
+    color: #ffffff !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    padding: 10px 14px !important;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+#changelist-filter li.selected a {
+    color: var(--admin-green) !important;
+    font-weight: 700 !important;
+}
+
+/* 12. Login Page Beautification */
+.login-page {
+    background: linear-gradient(135deg, #0f2b19 0%, #1a4d2e 50%, #25633a 100%) !important;
+}
+
+.login-box {
+    width: 420px !important;
+}
+
+.login-box .card {
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+    border: none !important;
+}
+
+.login-logo a {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+}

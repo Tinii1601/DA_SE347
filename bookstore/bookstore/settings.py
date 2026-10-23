@@ -76,20 +76,139 @@ SITE_ID = 1
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
-    "site_title": "Bookstore Admin",
+    # Title & Branding
+    "site_title": "Bookstore Quản trị",
     "site_header": "Bookstore",
-    "welcome_sign": "Welcome to Bookstore admin",
-    "show_ui_builder": False,
+    "site_brand": "Bookstore",
+    "site_logo": None,
+    "login_logo": None,
+    "login_logo_dark": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,
+    "welcome_sign": "Hệ thống Quản lý Bookstore",
+    "copyright": "Bookstore",
+    "search_model": ["books.Product", "orders.Order", "auth.User"],
+    "user_avatar": None,
+
+    # Top Menu
     "topmenu_links": [
-        {"name": "Return to site", "url": "/", "new_window": False},
+        {"name": "Trang chủ Website", "url": "/", "new_window": True, "icon": "fas fa-store"},
+        {"name": "Đơn hàng mới", "url": "admin:orders_order_changelist", "permissions": ["orders.view_order"], "icon": "fas fa-shopping-cart"},
     ],
+
+    # User menu
+    "usermenu_links": [
+        {"name": "Xem Website", "url": "/", "new_window": True, "icon": "fas fa-external-link-alt"},
+    ],
+
+    # Side Menu & App Ordering
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "orders",
+        "books",
+        "payment",
+        "users",
+        "reviews",
+        "core",
+        "chatbot",
+        "auth",
+    ],
+
+    # Custom Icons (FontAwesome)
+    "icons": {
+        # Auth
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user-shield",
+        "auth.Group": "fas fa-user-tag",
+
+        # Orders
+        "orders": "fas fa-shopping-bag",
+        "orders.Order": "fas fa-shopping-cart",
+        "orders.OrderItem": "fas fa-receipt",
+        "orders.Coupon": "fas fa-ticket-alt",
+
+        # Books
+        "books": "fas fa-book-open",
+        "books.Product": "fas fa-book",
+        "books.Category": "fas fa-folder-open",
+        "books.Attribute": "fas fa-tags",
+        "books.ProductAttributeValue": "fas fa-tag",
+        "books.ProductImage": "fas fa-images",
+
+        # Payment
+        "payment": "fas fa-money-check-alt",
+        "payment.Payment": "fas fa-credit-card",
+
+        # Users
+        "users": "fas fa-users",
+        "users.UserProfile": "fas fa-id-card",
+        "users.Address": "fas fa-map-marked-alt",
+
+        # Reviews
+        "reviews": "fas fa-star",
+        "reviews.Review": "fas fa-comment-dots",
+
+        # Core
+        "core": "fas fa-cog",
+        "core.Banner": "fas fa-image",
+        "core.NewsPost": "fas fa-newspaper",
+        "core.ContentPage": "fas fa-file-alt",
+        "core.Store": "fas fa-store-alt",
+
+        # Social Account & Allauth
+        "account.EmailAddress": "fas fa-envelope",
+        "socialaccount.SocialAccount": "fas fa-share-alt",
+        "socialaccount.SocialApp": "fas fa-cubes",
+        "socialaccount.SocialToken": "fas fa-key",
+    },
+
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-angle-right",
+
+    # UI Options
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+    "custom_css": "css/admin_custom.css",
+    "custom_js": None,
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "darkly",
     "navbar_small_text": False,
+    "footer_small_text": False,
     "body_small_text": False,
-    "brand_colour": "#175229",
+    "brand_small_text": False,
+    "brand_colour": "navbar-success",
+    "accent": "accent-success",
+    "navbar": "navbar-success navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-light-success",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "flatly",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-success",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
 }
 
 MIDDLEWARE = [

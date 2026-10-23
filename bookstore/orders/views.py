@@ -375,8 +375,6 @@ class CheckoutView(LoginRequiredMixin, View):
                 
                 if payment_method == 'payos':
                     return redirect('payment:create_payment', order_id=order.id)
-                elif payment_method == 'vietqr':
-                    return redirect('payment:payment_vietqr', order_id=order.id)
                 else:
                     return redirect('orders:order_success', order_id=order.id)
 

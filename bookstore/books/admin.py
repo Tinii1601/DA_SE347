@@ -297,26 +297,55 @@ class CategoryAdmin(ImportExportModelAdmin):
 @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
-    list_display = ['name', 'category', 'price_formatted', 'is_active', 'stock', 'cover_image_thumb']
+    list_display = ['cover_image_thumb', 'name', 'category', 'price_display', 'stock', 'stock_badge', 'is_active']
     list_filter = ['is_active', 'category', 'created_at']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ['is_active', 'stock']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'cover_image_preview']
     inlines = [ProductAttributeValueInline, ProductImageInline]
     list_per_page = 20
 
     def cover_image_thumb(self, obj):
         if obj.cover_image:
             return mark_safe(
-                f'<img src="{obj.cover_image.url}" width="40" height="60" style="object-fit: cover; border-radius: 4px;" />'
+                f'<img src="{obj.cover_image.url}" width="42" height="58" style="object-fit: cover; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);" />'
             )
-        return "Không có ảnh"
-    cover_image_thumb.short_description = "Ảnh bìa"
+        return mark_safe('<span class="badge" style="background:#f1f5f9;color:#94a3b8;font-size:0.75rem;">Không có ảnh</span>')
+    cover_image_thumb.short_description = "Ảnh"
 
-    def price_formatted(self, obj):
-        return f"{obj.price:,.0f}₫"
-    price_formatted.short_description = "Giá gốc"
+    def cover_image_preview(self, obj):
+        if obj.cover_image:
+            return mark_safe(
+                f'<img src="{obj.cover_image.url}" style="max-height: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />'
+            )
+        return "Chưa tải lên ảnh bìa"
+    cover_image_preview.short_description = "Xem trước ảnh bìa"
+
+    def price_display(self, obj):
+        if obj.discount_percentage and obj.discount_percentage > 0:
+            final_p = obj.get_final_price()
+            return mark_safe(
+                f'<strong style="color:#1a4d2e;">{final_p:,.0f}₫</strong> '
+                f'<span class="badge badge-danger" style="background:#ef4444;color:#fff;font-size:0.75rem;">-{obj.discount_percentage}%</span><br>'
+                f'<small class="text-muted" style="text-decoration: line-through;">{obj.price:,.0f}₫</small>'
+            )
+        return mark_safe(f'<strong style="color:#1a4d2e;">{obj.price:,.0f}₫</strong>')
+    price_display.short_description = "Giá bán"
+
+    def stock_badge(self, obj):
+        if obj.stock > 10:
+            return mark_safe(
+                f'<span class="badge" style="background:#dcfce7;color:#15803d;padding:4px 8px;font-weight:700;"><i class="fas fa-check-circle mr-1"></i>Còn ({obj.stock})</span>'
+            )
+        elif obj.stock > 0:
+            return mark_safe(
+                f'<span class="badge" style="background:#fef3c7;color:#92400e;padding:4px 8px;font-weight:700;"><i class="fas fa-exclamation-triangle mr-1"></i>Sắp hết ({obj.stock})</span>'
+            )
+        return mark_safe(
+            '<span class="badge" style="background:#fee2e2;color:#b91c1c;padding:4px 8px;font-weight:700;"><i class="fas fa-times-circle mr-1"></i>Hết hàng</span>'
+        )
+    stock_badge.short_description = "Tình trạng"
 
     # Fieldset organization
     fieldsets = (
@@ -326,10 +355,10 @@ class ProductAdmin(ImportExportModelAdmin):
         ("Giá & Kho hàng", {
             "fields": ("price", "discount_percentage", "stock")
         }),
-        ("Hình ảnh", {
-            "fields": ("cover_image",)
+        ("Hình ảnh bìa", {
+            "fields": ("cover_image", "cover_image_preview")
         }),
-        ("Thời gian", {
+        ("Thời gian hệ thống", {
             "fields": ("created_at", "updated_at")
         }),
     )

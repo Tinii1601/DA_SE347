@@ -87,13 +87,12 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
     "welcome_sign": "Hệ thống Quản lý Bookstore",
     "copyright": "Bookstore",
-    "search_model": ["books.Product", "orders.Order", "auth.User"],
+    "search_model": None,  # Tắt search trên navbar để không bị lặp 3 ô tìm kiếm gây chật chội
     "user_avatar": None,
 
     # Top Menu
     "topmenu_links": [
-        {"name": "Trang chủ Website", "url": "/", "new_window": True, "icon": "fas fa-store"},
-        {"name": "Đơn hàng mới", "url": "admin:orders_order_changelist", "permissions": ["orders.view_order"], "icon": "fas fa-shopping-cart"},
+        {"name": "Xem Website", "url": "/", "new_window": True, "icon": "fas fa-external-link-alt"},
     ],
 
     # User menu
@@ -105,7 +104,11 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
-    "hide_models": [],
+    "hide_models": [
+        "orders.OrderItem",             # Đã tích hợp trực tiếp inline trong chi tiết Đơn hàng
+        "books.ProductAttributeValue",  # Đã tích hợp trực tiếp inline trong Sản phẩm
+        "books.ProductImage",           # Đã tích hợp trực tiếp inline trong Sản phẩm
+    ],
     "order_with_respect_to": [
         "orders",
         "books",

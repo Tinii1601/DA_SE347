@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Bookstore Custom Django Admin Styles (Jazzmin Enhancement)
+   Bookstore Custom Django Admin Styles (Jazzmin Modern Overhaul)
    ========================================================================== */
 
-/* Google Font: Plus Jakarta Sans / Inter */
+/* Google Font: Plus Jakarta Sans */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -12,12 +12,14 @@
     --admin-cream: #fbfbf9;
     --admin-card-bg: #ffffff;
     --admin-border: #e2e8f0;
+    --admin-text-main: #1e293b;
+    --admin-text-muted: #64748b;
 }
 
 body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    background-color: #f1f5f9 !important;
-    color: #1e293b !important;
+    background-color: #f8fafc !important;
+    color: var(--admin-text-main) !important;
 }
 
 /* 1. Navbar Customization */
@@ -25,11 +27,16 @@ body {
     background-color: var(--admin-green) !important;
     border-bottom: none !important;
     box-shadow: 0 4px 15px rgba(26, 77, 46, 0.15) !important;
+    padding: 8px 16px !important;
 }
 
 .main-header.navbar .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
     font-weight: 600;
+    font-size: 0.92rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 .main-header.navbar .nav-link:hover {
@@ -46,7 +53,9 @@ body {
 .brand-link {
     background-color: var(--admin-green) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 14px 16px !important;
+    padding: 16px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 .brand-link .brand-text {
@@ -60,9 +69,10 @@ body {
 .sidebar .nav-sidebar .nav-item .nav-link {
     color: #334155 !important;
     border-radius: 8px !important;
-    margin: 2px 8px !important;
+    margin: 3px 10px !important;
     font-weight: 600 !important;
     font-size: 0.9rem !important;
+    padding: 9px 14px !important;
     transition: all 0.2s ease !important;
 }
 
@@ -84,10 +94,264 @@ body {
     font-weight: 800 !important;
     letter-spacing: 0.08em !important;
     color: #94a3b8 !important;
-    padding: 12px 16px 4px !important;
+    padding: 16px 16px 6px !important;
 }
 
-/* 3. Cards & Containers */
+/* 3. Page Header, Title & Breadcrumbs */
+.content-header {
+    padding: 20px 0 16px !important;
+}
+
+.content-header h1 {
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+}
+
+.breadcrumb {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.breadcrumb-item a {
+    color: var(--admin-green) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+.breadcrumb-item.active {
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+/* 4. Changelist Search, Filters & Selection Boxes (CRITICAL FIX FOR CRAMPED SELECTS) */
+#change-list-filters {
+    background: #ffffff !important;
+    padding: 16px 20px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--admin-border) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 20px !important;
+}
+
+#changelist-search {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+#changelist-search .form-group {
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Fix narrow filter select boxes */
+#changelist-search select.search-filter,
+#changelist-search .form-control {
+    min-width: 200px !important;
+    height: 42px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px 14px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Fix Select2 container if rendered */
+.select2-container {
+    min-width: 200px !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 42px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 40px !important;
+    padding-left: 14px !important;
+    padding-right: 26px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+    right: 8px !important;
+}
+
+/* Search Input */
+#changelist-search input#searchbar {
+    min-width: 280px !important;
+    height: 42px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px 16px !important;
+    font-size: 0.9rem !important;
+}
+
+#changelist-search input#searchbar:focus {
+    border-color: var(--admin-green) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* Search Submit Button */
+#changelist-search #search_group button[type="submit"] {
+    height: 42px !important;
+    border-radius: 8px !important;
+    padding: 8px 22px !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+#changelist-search #search_group button[type="submit"]:hover {
+    background-color: var(--admin-green-dark) !important;
+    transform: translateY(-1px);
+}
+
+/* 5. Bulk Actions Toolbar (.actions) */
+.change-list-actions {
+    margin-bottom: 16px !important;
+}
+
+.actions {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    padding: 12px 18px !important;
+    background-color: #ffffff !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--admin-border) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.actions label {
+    margin-bottom: 0 !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+/* Action select dropdown - generous width & clean appearance */
+.actions select[name="action"],
+.actions select {
+    min-width: 260px !important;
+    max-width: 380px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 14px !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    cursor: pointer !important;
+}
+
+.actions select[name="action"]:focus {
+    border-color: var(--admin-green) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2) !important;
+}
+
+.actions .btn {
+    height: 40px !important;
+    border-radius: 8px !important;
+    padding: 6px 20px !important;
+    margin: 0 !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+.actions .btn:hover {
+    background-color: var(--admin-green-dark) !important;
+    transform: translateY(-1px);
+}
+
+.actions .action-counter {
+    color: #64748b !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    padding-left: 6px;
+}
+
+/* 6. Object Tools & Action Buttons (Add, Import, Export) */
+.page-actions, .object-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.page-actions .btn,
+.object-tools .btn,
+ul.object-tools li a {
+    border-radius: 8px !important;
+    padding: 9px 18px !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Primary "+ Thêm" Button */
+.object-tools a.btn-success,
+.page-actions a.btn-success,
+.object-tools a.addlink {
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(26, 77, 46, 0.25) !important;
+}
+
+.object-tools a.btn-success:hover,
+.page-actions a.btn-success:hover,
+.object-tools a.addlink:hover {
+    background-color: var(--admin-green-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(26, 77, 46, 0.35) !important;
+}
+
+/* Import / Export secondary buttons */
+.object-tools a[href*="import"],
+.object-tools a[href*="export"],
+.page-actions a[href*="import"],
+.page-actions a[href*="export"] {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.object-tools a[href*="import"]:hover,
+.object-tools a[href*="export"]:hover,
+.page-actions a[href*="import"]:hover,
+.page-actions a[href*="export"]:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #94a3b8 !important;
+    color: var(--admin-green) !important;
+    transform: translateY(-1px);
+}
+
+/* 7. Tables & Data Presentation */
 .card {
     border-radius: 12px !important;
     border: 1px solid var(--admin-border) !important;
@@ -100,12 +364,11 @@ body {
 .card-header {
     background-color: #ffffff !important;
     border-bottom: 1px solid var(--admin-border) !important;
-    padding: 14px 20px !important;
+    padding: 16px 20px !important;
     font-weight: 700 !important;
     color: #0f172a !important;
 }
 
-/* 4. Tables */
 .table {
     margin-bottom: 0 !important;
 }
@@ -119,12 +382,12 @@ body {
     letter-spacing: 0.04em !important;
     border-top: none !important;
     border-bottom: 2px solid var(--admin-border) !important;
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     vertical-align: middle !important;
 }
 
 .table td {
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     vertical-align: middle !important;
     color: #334155 !important;
     border-top: 1px solid #f1f5f9 !important;
@@ -132,61 +395,14 @@ body {
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #fafafa !important;
+    background-color: #fafbfc !important;
 }
 
 .table-hover tbody tr:hover {
     background-color: #f0fdf4 !important;
 }
 
-/* 5. Buttons */
-.btn {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    padding: 8px 16px !important;
-    font-size: 0.88rem !important;
-    transition: all 0.2s ease !important;
-}
-
-.btn-success, .btn-primary {
-    background-color: var(--admin-green) !important;
-    border-color: var(--admin-green) !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(26, 77, 46, 0.2) !important;
-}
-
-.btn-success:hover, .btn-primary:hover {
-    background-color: var(--admin-green-dark) !important;
-    border-color: var(--admin-green-dark) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(26, 77, 46, 0.3) !important;
-}
-
-.btn-outline-secondary {
-    border-color: #cbd5e1 !important;
-    color: #475569 !important;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-}
-
-/* 6. Form Inputs */
-.form-control, .select2-container--default .select2-selection--single {
-    border-radius: 8px !important;
-    border: 1px solid #cbd5e1 !important;
-    padding: 8px 12px !important;
-    font-size: 0.92rem !important;
-    transition: all 0.2s ease !important;
-}
-
-.form-control:focus {
-    border-color: var(--admin-green) !important;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2) !important;
-}
-
-/* 7. Badges & Pills */
+/* 8. Badges & Pills */
 .badge {
     border-radius: 6px !important;
     padding: 5px 10px !important;
@@ -195,17 +411,39 @@ body {
     letter-spacing: 0.02em !important;
 }
 
-/* 8. Changeform Horizontal Tabs */
+/* 9. Pagination */
+.pagination {
+    margin-top: 16px !important;
+    margin-bottom: 8px !important;
+}
+
+.pagination .page-item .page-link {
+    color: var(--admin-green) !important;
+    border-radius: 6px !important;
+    margin: 0 3px !important;
+    font-weight: 600;
+    padding: 7px 14px !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--admin-green) !important;
+    border-color: var(--admin-green) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(26, 77, 46, 0.25) !important;
+}
+
+/* 10. Forms & Details View Tabs */
 .nav-tabs {
     border-bottom: 2px solid var(--admin-border) !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 20px !important;
 }
 
 .nav-tabs .nav-link {
     border: none !important;
     color: #64748b !important;
     font-weight: 700 !important;
-    padding: 10px 20px !important;
+    padding: 12px 24px !important;
+    font-size: 0.92rem !important;
     border-bottom: 3px solid transparent !important;
 }
 
@@ -215,64 +453,7 @@ body {
     background: transparent !important;
 }
 
-/* 9. Breadcrumbs */
-.breadcrumb {
-    background: transparent !important;
-    padding: 0 !important;
-    margin-bottom: 16px !important;
-}
-
-.breadcrumb-item a {
-    color: var(--admin-green) !important;
-    font-weight: 600 !important;
-    text-decoration: none !important;
-}
-
-/* 10. Dashboard Stats Cards Enhancement */
-.small-box {
-    border-radius: 12px !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-    overflow: hidden;
-}
-
-/* 11. Pagination & Filters */
-.pagination .page-item .page-link {
-    color: var(--admin-green) !important;
-    border-radius: 6px !important;
-    margin: 0 2px !important;
-    font-weight: 600;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: var(--admin-green) !important;
-    border-color: var(--admin-green) !important;
-    color: #ffffff !important;
-}
-
-#changelist-filter {
-    border-radius: 12px !important;
-    background-color: #ffffff !important;
-    border: 1px solid var(--admin-border) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
-}
-
-#changelist-filter h2 {
-    background: var(--admin-green) !important;
-    color: #ffffff !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.05em !important;
-    text-transform: uppercase !important;
-    padding: 10px 14px !important;
-    border-radius: 10px 10px 0 0 !important;
-}
-
-#changelist-filter li.selected a {
-    color: var(--admin-green) !important;
-    font-weight: 700 !important;
-}
-
-/* 12. Login Page Beautification */
+/* 11. Login Page Beautification */
 .login-page {
     background: linear-gradient(135deg, #0f2b19 0%, #1a4d2e 50%, #25633a 100%) !important;
 }
